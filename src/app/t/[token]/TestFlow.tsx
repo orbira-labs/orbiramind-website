@@ -154,7 +154,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   async function initSession() {
     try {
-      const data = await createSession();
+      const data = await createSession(token);
       setSessionId(data.session_id);
       setSessionData(data);
       setPhase("profile");
@@ -247,7 +247,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
     try {
       const supabase = createClient();
-      await supabase
+      const { error: updateError } = await supabase
         .from("test_invitations")
         .update({
           status: "started",
@@ -256,7 +256,11 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         })
         .eq("token", token);
 
-      const data = await submitAnswers(sessionId, profile, coreAnswers, measurements);
+      if (updateError) {
+        console.error("Test başlangıcı kaydedilemedi:", updateError);
+      }
+
+      const data = await submitAnswers(sessionId, profile, coreAnswers, measurements, token);
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
       setPhase("deep_dive");
@@ -280,10 +284,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     setPhase("analyzing");
 
     try {
-      const data = await completeSession(sessionId, deepDiveAnswers);
+      const data = await completeSession(sessionId, deepDiveAnswers, token);
 
       const supabase = createClient();
-      await supabase
+      const { error: updateError } = await supabase
         .from("test_invitations")
         .update({
           status: "completed",
@@ -291,6 +295,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
           results_snapshot: data.results,
         })
         .eq("token", token);
+
+      if (updateError) {
+        console.error("Test sonuçları kaydedilemedi:", updateError);
+      }
 
       setPhase("done");
     } catch (e) {

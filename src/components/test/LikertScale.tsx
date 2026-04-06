@@ -9,7 +9,7 @@ interface LikertScaleProps {
   accentColor?: string;
 }
 
-const DEFAULT_LABELS = ["Hiç", "Biraz", "Orta", "Çoğunlukla", "Tamamen"];
+const DEFAULT_LABELS = ["Çok kötü", "Kötü", "Orta", "İyi", "Çok iyi"];
 
 const SCALE_COLORS = [
   { bg: "bg-red-50", border: "border-red-200", active: "bg-red-500", text: "text-red-600", ring: "ring-red-200" },
@@ -21,42 +21,36 @@ const SCALE_COLORS = [
 
 export function LikertScale({ value, onChange, labels = DEFAULT_LABELS, accentColor }: LikertScaleProps) {
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2.5 sm:gap-3">
+    <div className="space-y-3">
+      <div className="flex gap-1.5 sm:gap-2">
         {[1, 2, 3, 4, 5].map((num) => {
           const isSelected = value === num;
           const colors = SCALE_COLORS[num - 1];
+          const label = labels[num - 1];
 
           return (
             <button
               key={num}
               onClick={() => onChange(num)}
               className={clsx(
-                "flex-1 py-4 sm:py-5 rounded-2xl font-bold text-lg sm:text-xl transition-all duration-200",
+                "flex-1 py-3 sm:py-4 rounded-2xl font-bold text-xs sm:text-sm transition-all duration-200",
                 "border-2 focus:outline-none focus:ring-2 focus:ring-offset-2",
+                "flex flex-col items-center justify-center gap-0.5 leading-tight",
                 isSelected
-                  ? `${colors.active} text-white border-transparent shadow-xl scale-110 ${colors.ring}`
-                  : `${colors.bg} ${colors.border} ${colors.text} hover:scale-105 hover:shadow-md active:scale-100`
+                  ? `${colors.active} text-white border-transparent shadow-xl scale-105 ${colors.ring}`
+                  : `${colors.bg} ${colors.border} ${colors.text} hover:scale-102 hover:shadow-md active:scale-100`
               )}
               style={isSelected && accentColor ? { boxShadow: `0 8px 25px ${accentColor}30` } : undefined}
             >
-              {num}
+              <span className="text-[10px] sm:text-xs font-black opacity-60">{num}</span>
+              {label && (
+                <span className="text-[9px] sm:text-[11px] font-semibold text-center px-0.5 leading-tight">
+                  {label}
+                </span>
+              )}
             </button>
           );
         })}
-      </div>
-      <div className="grid grid-cols-5 gap-1 px-0.5">
-        {labels.map((label, idx) => (
-          <span
-            key={idx}
-            className={clsx(
-              "text-[10px] sm:text-xs font-medium transition-all duration-200 text-center leading-tight",
-              value === idx + 1 ? `${SCALE_COLORS[idx].text} font-bold` : "text-gray-400"
-            )}
-          >
-            {label}
-          </span>
-        ))}
       </div>
     </div>
   );

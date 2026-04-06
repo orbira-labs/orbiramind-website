@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useProContext } from "@/lib/context";
 import { TopBar } from "@/components/layout/TopBar";
@@ -12,7 +11,6 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { SPECIALIZATIONS } from "@/lib/constants";
-import { staggerContainer, cardReveal } from "@/lib/animations";
 import { 
   User, 
   Shield, 
@@ -93,14 +91,9 @@ export default function SettingsPage() {
               <Skeleton className="h-40 w-full" />
             </>
           ) : (
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="space-y-6"
-            >
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {/* Profil Bilgileri */}
-              <motion.div variants={cardReveal}>
+              <div>
                 <Card padding="lg" variant="elevated">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="h-9 w-9 rounded-lg bg-pro-primary-light flex items-center justify-center">
@@ -194,10 +187,10 @@ export default function SettingsPage() {
                     </Button>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Plan & Krediler */}
-              <motion.div variants={cardReveal}>
+              <div>
                 <Card padding="lg" variant="elevated">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-9 w-9 rounded-lg bg-pro-accent-light flex items-center justify-center">
@@ -227,10 +220,10 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Gizlilik & Güvenlik */}
-              <motion.div variants={cardReveal}>
+              <div>
                 <Card padding="lg" variant="elevated">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-9 w-9 rounded-lg bg-pro-success-light flex items-center justify-center">
@@ -266,10 +259,10 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Hesap */}
-              <motion.div variants={cardReveal}>
+              <div>
                 <Card padding="lg">
                   <h2 className="text-base font-semibold text-pro-text mb-2">
                     Hesap
@@ -286,8 +279,8 @@ export default function SettingsPage() {
                     </p>
                   </div>
                 </Card>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           )}
         </div>
       </main>

@@ -12,11 +12,15 @@ export default async function TestPage({ params }: TestPageProps) {
   const { token } = await params;
   const supabase = await createClient();
 
-  const { data: invitation } = await supabase
+  const { data: invitation, error } = await supabase
     .from("test_invitations")
     .select("*, client:clients(first_name, last_name)")
     .eq("token", token)
     .single();
+
+  if (error) {
+    console.error("Test daveti sorgulanamadı:", error);
+  }
 
   if (!invitation) {
     return notFound();

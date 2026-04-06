@@ -118,7 +118,7 @@
   --color-status-live: var(--status-live);
   --color-status-progress: var(--status-progress);
   --color-status-concept: var(--status-concept);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-nunito);
   --font-mono: var(--font-geist-mono);
 
   --color-pro-surface: var(--pro-surface, #FFFFFF);
@@ -185,16 +185,10 @@ body {
   color: var(--foreground);
 }
 
-/* Pro tema için Nunito font'u zorla uygula */
-[data-theme="pro"],
-[data-theme="pro"] * {
-  font-family: var(--font-nunito), "Nunito", system-ui, -apple-system, sans-serif !important;
-}
-
 [data-theme="pro"] code,
 [data-theme="pro"] pre,
 [data-theme="pro"] .font-mono {
-  font-family: var(--font-geist-mono), ui-monospace, monospace !important;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @keyframes modal-in {

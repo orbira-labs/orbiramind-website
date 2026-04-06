@@ -35,8 +35,13 @@ export function useCompletedAnalysisNotifications() {
   const { professional } = useProContext();
   const [rows, setRows] = useState<CompletedRow[]>([]);
   const [readIds, setReadIds] = useState<Set<string>>(() => loadReadIds());
+  const [enabled, setEnabled] = useState(false);
   const supabase = useRef(createClient());
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>["channel"]> | null>(null);
+
+  const triggerLoad = useCallback(() => {
+    setEnabled(true);
+  }, []);
 
   const fetchCompleted = useCallback(async () => {
     if (!professional?.id) return;
@@ -58,8 +63,9 @@ export function useCompletedAnalysisNotifications() {
   }, [professional?.id]);
 
   useEffect(() => {
+    if (!enabled) return;
     fetchCompleted();
-  }, [fetchCompleted]);
+  }, [enabled, fetchCompleted]);
 
   useEffect(() => {
     if (!professional?.id) return;
@@ -128,5 +134,5 @@ export function useCompletedAnalysisNotifications() {
     [rows, readIds]
   );
 
-  return { notifications, markAsRead, markAllAsRead };
+  return { notifications, markAsRead, markAllAsRead, triggerLoad };
 }

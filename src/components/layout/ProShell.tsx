@@ -2,6 +2,7 @@
 
 import { Sidebar } from "./Sidebar";
 import { BottomNav } from "./BottomNav";
+import { TrustFooter } from "./TrustFooter";
 import { PageDecoration } from "../ui/PageDecoration";
 import { ProProvider } from "@/lib/context";
 import type { Professional } from "@/lib/types";
@@ -24,6 +25,7 @@ export function ProShell({
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 relative z-[1]">
           {children}
+          <TrustFooter showBadges={false} />
           <div className="h-20 lg:hidden" />
         </div>
         <BottomNav />

@@ -5,6 +5,8 @@ const PUBLIC_PATHS = [
   "/auth/register",
   "/auth/verify",
   "/auth/callback",
+  "/privacy",
+  "/terms",
 ];
 
 export function middleware(request: NextRequest) {
@@ -31,8 +33,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  // Auth varsa ve public auth sayfasındaysa (callback hariç) dashboard'a yönlendir
-  if (hasAuthCookie && isPublicPath && pathname !== "/auth/callback") {
+  const AUTH_ONLY_PUBLIC = ["/auth/login", "/auth/register", "/auth/verify"];
+  const isAuthOnlyPublic = AUTH_ONLY_PUBLIC.some((p) => pathname.startsWith(p));
+
+  // Auth varsa ve login/register/verify sayfasındaysa dashboard'a yönlendir
+  if (hasAuthCookie && isAuthOnlyPublic) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

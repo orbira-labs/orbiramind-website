@@ -99,6 +99,54 @@ export default function RegisterPage() {
               {...reg("confirmPassword")}
             />
 
+            <div className="space-y-3 pt-1">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  {...reg("kvkk_accepted")}
+                />
+                <span className="text-xs text-pro-text-secondary leading-relaxed">
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    className="text-pro-primary underline hover:text-pro-primary-hover"
+                  >
+                    KVKK Aydınlatma Metni
+                  </Link>
+                  &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.
+                </span>
+              </label>
+              {errors.kvkk_accepted?.message && (
+                <p className="text-xs text-pro-danger pl-7">
+                  {errors.kvkk_accepted.message}
+                </p>
+              )}
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  {...reg("terms_accepted")}
+                />
+                <span className="text-xs text-pro-text-secondary leading-relaxed">
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="text-pro-primary underline hover:text-pro-primary-hover"
+                  >
+                    Kullanım Koşulları
+                  </Link>
+                  &apos;nı okudum ve kabul ediyorum.
+                </span>
+              </label>
+              {errors.terms_accepted?.message && (
+                <p className="text-xs text-pro-danger pl-7">
+                  {errors.terms_accepted.message}
+                </p>
+              )}
+            </div>
+
             <Button type="submit" fullWidth loading={loading} size="lg">
               <Sparkles className="h-4 w-4" />
               Ücretsiz Başla
@@ -106,7 +154,7 @@ export default function RegisterPage() {
           </form>
         </div>
 
-        <div className="space-y-2 text-center">
+        <div className="text-center">
           <p className="text-sm text-pro-text-secondary">
             Zaten üye misiniz?{" "}
             <Link
@@ -115,13 +163,6 @@ export default function RegisterPage() {
             >
               Giriş yapın
             </Link>
-          </p>
-          <p className="text-xs text-pro-text-tertiary leading-relaxed">
-            Kayıt olarak{" "}
-            <Link href="/privacy" className="underline hover:text-pro-text-secondary transition-colors">
-              KVKK Aydınlatma Metni
-            </Link>
-            &apos;ni kabul etmiş olursunuz.
           </p>
         </div>
       </div>

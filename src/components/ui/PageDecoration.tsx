@@ -1,8 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 export function PageDecoration() {
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      aria-hidden
+      style={{ contain: "strict" }}
+    >
       {/* Soft radial gradients */}
       <div
         className="absolute inset-0"
@@ -262,48 +278,52 @@ export function PageDecoration() {
           <circle cx="940" cy="830" r="1.5" />
         </g>
 
-        {/* ═══ LAYER 3: Breathing shines — grow from tiny + fade in, then shrink + fade out ═══ */}
-        <defs>
-          <filter id="shineGlow" x="-200%" y="-200%" width="500%" height="500%">
-            <feGaussianBlur stdDeviation="10" />
-          </filter>
-        </defs>
+        {/* ═══ LAYER 3: Breathing shines — skipped when prefers-reduced-motion ═══ */}
+        {!reduceMotion && (
+          <>
+            <defs>
+              <filter id="shineGlow" x="-200%" y="-200%" width="500%" height="500%">
+                <feGaussianBlur stdDeviation="10" />
+              </filter>
+            </defs>
 
-        {/* Purple — upper-mid */}
-        <circle cx="550" cy="168" fill="#8B5CF6" opacity="0" filter="url(#shineGlow)">
-          <animate attributeName="r" values="2;2;20;20;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="14s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0;0;0.35;0.35;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="14s" repeatCount="indefinite" />
-        </circle>
+            {/* Purple — upper-mid */}
+            <circle cx="550" cy="168" fill="#8B5CF6" opacity="0" filter="url(#shineGlow)">
+              <animate attributeName="r" values="2;2;20;20;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="14s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0;0;0.35;0.35;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="14s" repeatCount="indefinite" />
+            </circle>
 
-        {/* Blue — center-right */}
-        <circle cx="850" cy="385" fill="#4A90D9" opacity="0" filter="url(#shineGlow)">
-          <animate attributeName="r" values="2;2;18;18;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="6s" />
-          <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="6s" />
-        </circle>
+            {/* Blue — center-right */}
+            <circle cx="850" cy="385" fill="#4A90D9" opacity="0" filter="url(#shineGlow)">
+              <animate attributeName="r" values="2;2;18;18;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="6s" />
+              <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="6s" />
+            </circle>
 
-        {/* Pink — lower-left */}
-        <circle cx="300" cy="575" fill="#EC4899" opacity="0" filter="url(#shineGlow)">
-          <animate attributeName="r" values="2;2;20;20;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="3s" />
-          <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="3s" />
-        </circle>
+            {/* Pink — lower-left */}
+            <circle cx="300" cy="575" fill="#EC4899" opacity="0" filter="url(#shineGlow)">
+              <animate attributeName="r" values="2;2;20;20;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="3s" />
+              <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="3s" />
+            </circle>
 
-        {/* Green — mid-left */}
-        <circle cx="385" cy="325" fill="#34D399" opacity="0" filter="url(#shineGlow)">
-          <animate attributeName="r" values="2;2;16;16;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="17s" repeatCount="indefinite" begin="9s" />
-          <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="17s" repeatCount="indefinite" begin="9s" />
-        </circle>
+            {/* Green — mid-left */}
+            <circle cx="385" cy="325" fill="#34D399" opacity="0" filter="url(#shineGlow)">
+              <animate attributeName="r" values="2;2;16;16;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="17s" repeatCount="indefinite" begin="9s" />
+              <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="17s" repeatCount="indefinite" begin="9s" />
+            </circle>
 
-        {/* Purple — bottom-center */}
-        <circle cx="715" cy="735" fill="#A78BFA" opacity="0" filter="url(#shineGlow)">
-          <animate attributeName="r" values="2;2;15;15;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="12s" />
-          <animate attributeName="opacity" values="0;0;0.28;0.28;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="12s" />
-        </circle>
+            {/* Purple — bottom-center */}
+            <circle cx="715" cy="735" fill="#A78BFA" opacity="0" filter="url(#shineGlow)">
+              <animate attributeName="r" values="2;2;15;15;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="12s" />
+              <animate attributeName="opacity" values="0;0;0.28;0.28;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="15s" repeatCount="indefinite" begin="12s" />
+            </circle>
 
-        {/* Blue — far right */}
-        <circle cx="1020" cy="345" fill="#5B8FD4" opacity="0" filter="url(#shineGlow)">
-          <animate attributeName="r" values="2;2;14;14;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="4.5s" />
-          <animate attributeName="opacity" values="0;0;0.28;0.28;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="4.5s" />
-        </circle>
+            {/* Blue — far right */}
+            <circle cx="1020" cy="345" fill="#5B8FD4" opacity="0" filter="url(#shineGlow)">
+              <animate attributeName="r" values="2;2;14;14;2;2" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="4.5s" />
+              <animate attributeName="opacity" values="0;0;0.28;0.28;0;0" keyTimes="0;0.65;0.8;0.88;0.97;1" dur="16s" repeatCount="indefinite" begin="4.5s" />
+            </circle>
+          </>
+        )}
       </svg>
     </div>
   );

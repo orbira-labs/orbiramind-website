@@ -42,6 +42,7 @@ export default function OnboardingPage() {
       work_type: "individual",
       specializations: [],
       kvkk_accepted: false as unknown as true,
+      terms_accepted: false as unknown as true,
     },
   });
 
@@ -81,6 +82,10 @@ export default function OnboardingPage() {
         company_name: data.work_type === "company" ? data.company_name : null,
         specializations: data.specializations,
         onboarding_completed: true,
+        kvkk_accepted: true,
+        kvkk_accepted_at: new Date().toISOString(),
+        terms_accepted: true,
+        terms_accepted_at: new Date().toISOString(),
       });
 
       if (error) {
@@ -215,24 +220,45 @@ export default function OnboardingPage() {
               )}
             </div>
 
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary"
-                {...register("kvkk_accepted")}
-              />
-              <span className="text-sm text-pro-text-secondary">
-                <a href="/privacy" target="_blank" className="text-pro-primary underline">
-                  KVKK Aydınlatma Metni
-                </a>
-                &apos;ni okudum ve kabul ediyorum.
-              </span>
-            </label>
-            {errors.kvkk_accepted?.message && (
-              <p className="text-xs text-pro-danger">
-                {errors.kvkk_accepted.message}
-              </p>
-            )}
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  {...register("kvkk_accepted")}
+                />
+                <span className="text-sm text-pro-text-secondary">
+                  <a href="/privacy" target="_blank" className="text-pro-primary underline">
+                    KVKK Aydınlatma Metni
+                  </a>
+                  &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.
+                </span>
+              </label>
+              {errors.kvkk_accepted?.message && (
+                <p className="text-xs text-pro-danger pl-7">
+                  {errors.kvkk_accepted.message}
+                </p>
+              )}
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  {...register("terms_accepted")}
+                />
+                <span className="text-sm text-pro-text-secondary">
+                  <a href="/terms" target="_blank" className="text-pro-primary underline">
+                    Kullanım Koşulları
+                  </a>
+                  &apos;nı okudum ve kabul ediyorum.
+                </span>
+              </label>
+              {errors.terms_accepted?.message && (
+                <p className="text-xs text-pro-danger pl-7">
+                  {errors.terms_accepted.message}
+                </p>
+              )}
+            </div>
 
             <Button type="submit" fullWidth size="lg" loading={loading}>
               Tamamla ve Başla

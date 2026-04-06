@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Calendar, User, Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/layout/TopBar";
@@ -13,13 +13,19 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { WellnessGauge } from "@/components/results/WellnessGauge";
-import { DimensionRadar } from "@/components/results/DimensionRadar";
 import { StrengthWeaknessGrid } from "@/components/results/StrengthWeaknessGrid";
 import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
 import { BlindSpotCard } from "@/components/results/BlindSpotCard";
 import { CoachingTimeline } from "@/components/results/CoachingTimeline";
+
+const DimensionRadar = dynamic(
+  () => import("@/components/results/DimensionRadar").then((m) => m.DimensionRadar),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[350px] w-full rounded-xl" />,
+  }
+);
 import { formatDate, formatDateTime } from "@/lib/utils";
-import { staggerContainer, cardReveal } from "@/lib/animations";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
 
 type Tab = "overview" | "character" | "blindspots" | "roadmap";
@@ -222,71 +228,48 @@ export default function TestResultPage() {
           </div>
 
           {activeTab === "overview" && (
-            <motion.div
-              variants={staggerContainer}
-              initial="initial"
-              animate="animate"
-              className="space-y-6"
-            >
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="grid md:grid-cols-2 gap-6">
-                <motion.div variants={cardReveal}>
-                  <Card padding="lg">
-                    <WellnessGauge score={analysis.wellness_score} size="lg" />
-                  </Card>
-                </motion.div>
-                <motion.div variants={cardReveal}>
-                  <Card padding="lg">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">10 Boyut Karakter Analizi</h3>
-                    <DimensionRadar scores={analysis.dimension_scores} />
-                  </Card>
-                </motion.div>
+                <Card padding="lg">
+                  <WellnessGauge score={analysis.wellness_score} size="lg" />
+                </Card>
+                <Card padding="lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">10 Boyut Karakter Analizi</h3>
+                  <DimensionRadar scores={analysis.dimension_scores} />
+                </Card>
               </div>
 
-              <motion.div variants={cardReveal}>
-                <Card padding="lg">
-                  <StrengthWeaknessGrid
-                    strengths={report.top5_and_weak5.top5}
-                    weaknesses={report.top5_and_weak5.weak5}
-                  />
-                </Card>
-              </motion.div>
-            </motion.div>
+              <Card padding="lg">
+                <StrengthWeaknessGrid
+                  strengths={report.top5_and_weak5.top5}
+                  weaknesses={report.top5_and_weak5.weak5}
+                />
+              </Card>
+            </div>
           )}
 
           {activeTab === "character" && (
-            <motion.div
-              variants={cardReveal}
-              initial="initial"
-              animate="animate"
-            >
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <Card padding="lg">
                 <CharacterAnalysis text={report.character_analysis} />
               </Card>
-            </motion.div>
+            </div>
           )}
 
           {activeTab === "blindspots" && (
-            <motion.div
-              variants={cardReveal}
-              initial="initial"
-              animate="animate"
-            >
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <Card padding="lg">
                 <BlindSpotCard blindSpots={report.blind_spots} />
               </Card>
-            </motion.div>
+            </div>
           )}
 
           {activeTab === "roadmap" && (
-            <motion.div
-              variants={cardReveal}
-              initial="initial"
-              animate="animate"
-            >
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <Card padding="lg">
                 <CoachingTimeline roadmap={report.coaching_roadmap} />
               </Card>
-            </motion.div>
+            </div>
           )}
 
           <div className="text-center text-xs text-gray-400 py-4">

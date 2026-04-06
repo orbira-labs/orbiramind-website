@@ -128,24 +128,67 @@ class EngineAPIError extends Error {
   }
 }
 
+const ENGINE_REQUEST_TIMEOUT_MS = 30_000;
+
 async function secureApiFetch<T>(
   endpoint: string,
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
+  testToken?: string
 ): Promise<T> {
-  const res = await fetch(`/api/engine/${endpoint}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (testToken) {
+    headers["x-test-token"] = testToken;
+  }
 
-  const data = await res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ENGINE_REQUEST_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(`/api/engine/${endpoint}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new EngineAPIError("İstek zaman aşımına uğradı", "TIMEOUT", 408);
+    }
+    throw new EngineAPIError(
+      err instanceof Error ? err.message : "Ağ hatası",
+      "NETWORK_ERROR",
+      0
+    );
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  let data: Record<string, unknown>;
+  try {
+    data = await res.json();
+  } catch {
+    throw new EngineAPIError(
+      "Sunucudan geçersiz yanıt alındı",
+      "INVALID_RESPONSE",
+      res.status
+    );
+  }
 
   if (!res.ok || data.error) {
+    const errVal = data.error;
     throw new EngineAPIError(
-      data.error?.message ?? data.error ?? "API error",
-      data.error?.code ?? "UNKNOWN_ERROR",
+      typeof errVal === "object" && errVal !== null && "message" in errVal
+        ? String((errVal as Record<string, unknown>).message)
+        : typeof errVal === "string"
+          ? errVal
+          : "API error",
+      typeof errVal === "object" && errVal !== null && "code" in errVal
+        ? String((errVal as Record<string, unknown>).code)
+        : "UNKNOWN_ERROR",
       res.status
     );
   }
@@ -154,32 +197,34 @@ async function secureApiFetch<T>(
   return (data.data ?? data) as T;
 }
 
-export async function createSession(): Promise<SessionData> {
-  return secureApiFetch<SessionData>("session", {});
+export async function createSession(testToken?: string): Promise<SessionData> {
+  return secureApiFetch<SessionData>("session", {}, testToken);
 }
 
 export async function submitAnswers(
   sessionId: string,
   profile: Record<string, unknown>,
   coreAnswers: Record<string, number>,
-  measurements: Record<string, unknown>
+  measurements: Record<string, unknown>,
+  testToken?: string
 ): Promise<SubmitAnswersResponse> {
   return secureApiFetch<SubmitAnswersResponse>("answers", {
     session_id: sessionId,
     profile,
     core_answers: coreAnswers,
     measurements,
-  });
+  }, testToken);
 }
 
 export async function completeSession(
   sessionId: string,
-  deepDiveAnswers: Record<string, number>
+  deepDiveAnswers: Record<string, number>,
+  testToken?: string
 ): Promise<CompleteSessionResponse> {
   return secureApiFetch<CompleteSessionResponse>("complete", {
     session_id: sessionId,
     deep_dive_answers: deepDiveAnswers,
-  });
+  }, testToken);
 }
 
 export { EngineAPIError };

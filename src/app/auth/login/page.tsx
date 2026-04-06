@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { LogIn } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginInput } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +16,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const {
     register,
@@ -48,6 +49,7 @@ export default function LoginPage() {
         return;
       }
 
+      setRedirecting(true);
       router.push("/dashboard");
       router.refresh();
     } catch {
@@ -58,6 +60,17 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+      {redirecting && (
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[var(--background)]">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center shadow-lg">
+              <span className="text-white text-2xl font-bold">O</span>
+            </div>
+            <Loader2 className="h-5 w-5 animate-spin text-pro-primary" />
+          </div>
+        </div>
+      )}
     <AuthLayout>
       <div className="space-y-6">
         <div>
@@ -108,5 +121,6 @@ export default function LoginPage() {
         </div>
       </div>
     </AuthLayout>
+    </>
   );
 }

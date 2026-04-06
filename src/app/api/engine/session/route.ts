@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { authorizeEngineRequest } from "@/lib/engine-auth";
 
 export const runtime = "nodejs";
 
@@ -7,6 +8,11 @@ const ENGINE_API_KEY = process.env.ENGINE_API_KEY;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export async function POST(request: Request) {
+  const auth = await authorizeEngineRequest(request);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+
   try {
     if (!ENGINE_API_URL || !ENGINE_API_KEY) {
       console.error("Missing ENGINE_API_URL or ENGINE_API_KEY");
@@ -28,7 +34,16 @@ export async function POST(request: Request) {
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
+    let data: unknown;
+    try {
+      data = await response.json();
+    } catch {
+      console.error("Engine session: yanıt JSON parse edilemedi, status:", response.status);
+      return NextResponse.json(
+        { error: "Engine servisinden geçersiz yanıt alındı" },
+        { status: 502 }
+      );
+    }
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });

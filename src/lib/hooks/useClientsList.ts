@@ -48,66 +48,87 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
   const fetchCounts = useCallback(async () => {
     if (!professional?.id) return;
 
-    const [totalRes, activeRes, passiveRes] = await Promise.all([
-      supabase.current
-        .from("clients")
-        .select("id", { count: "exact", head: true })
-        .eq("professional_id", professional.id),
-      supabase.current
-        .from("clients")
-        .select("id", { count: "exact", head: true })
-        .eq("professional_id", professional.id)
-        .eq("status", "active"),
-      supabase.current
-        .from("clients")
-        .select("id", { count: "exact", head: true })
-        .eq("professional_id", professional.id)
-        .in("status", ["passive", "archived"]),
-    ]);
+    try {
+      const [totalRes, activeRes, passiveRes] = await Promise.all([
+        supabase.current
+          .from("clients")
+          .select("id", { count: "exact", head: true })
+          .eq("professional_id", professional.id),
+        supabase.current
+          .from("clients")
+          .select("id", { count: "exact", head: true })
+          .eq("professional_id", professional.id)
+          .eq("status", "active"),
+        supabase.current
+          .from("clients")
+          .select("id", { count: "exact", head: true })
+          .eq("professional_id", professional.id)
+          .in("status", ["passive", "archived"]),
+      ]);
 
-    setCounts({
-      total: totalRes.count ?? 0,
-      active: activeRes.count ?? 0,
-      passive: passiveRes.count ?? 0,
-    });
+      if (totalRes.error || activeRes.error || passiveRes.error) {
+        console.error("Danışan sayıları alınamadı:", totalRes.error ?? activeRes.error ?? passiveRes.error);
+        return;
+      }
+
+      setCounts({
+        total: totalRes.count ?? 0,
+        active: activeRes.count ?? 0,
+        passive: passiveRes.count ?? 0,
+      });
+    } catch (err) {
+      console.error("fetchCounts beklenmedik hata:", err);
+    }
   }, [professional?.id]);
 
   const fetchList = useCallback(async () => {
     if (!professional?.id) return;
     setListLoading(true);
 
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
+    try {
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
 
-    let query = supabase.current
-      .from("clients")
-      .select("*", { count: "exact" })
-      .eq("professional_id", professional.id)
-      .order("updated_at", { ascending: false })
-      .range(from, to);
+      let query = supabase.current
+        .from("clients")
+        .select("*", { count: "exact" })
+        .eq("professional_id", professional.id)
+        .order("updated_at", { ascending: false })
+        .range(from, to);
 
-    if (statusFilter === "active") {
-      query = query.eq("status", "active");
-    } else if (statusFilter === "passive") {
-      query = query.in("status", ["passive", "archived"]);
-    }
-
-    if (debouncedSearch) {
-      const cleanTerm = sanitizeIlikeTerm(debouncedSearch);
-      if (cleanTerm) {
-        const likePattern = `%${cleanTerm}%`;
-        query = query.or(
-          `first_name.ilike.${likePattern},last_name.ilike.${likePattern},email.ilike.${likePattern},phone.ilike.${likePattern}`
-        );
+      if (statusFilter === "active") {
+        query = query.eq("status", "active");
+      } else if (statusFilter === "passive") {
+        query = query.in("status", ["passive", "archived"]);
       }
+
+      if (debouncedSearch) {
+        const cleanTerm = sanitizeIlikeTerm(debouncedSearch);
+        if (cleanTerm) {
+          const likePattern = `%${cleanTerm}%`;
+          query = query.or(
+            `first_name.ilike.${likePattern},last_name.ilike.${likePattern},email.ilike.${likePattern},phone.ilike.${likePattern}`
+          );
+        }
+      }
+
+      const { data, count, error } = await query;
+
+      if (error) {
+        console.error("Danışan listesi alınamadı:", error);
+        setListLoading(false);
+        setLoading(false);
+        return;
+      }
+
+      setClients((data as Client[]) || []);
+      setTotalMatching(count ?? 0);
+    } catch (err) {
+      console.error("fetchList beklenmedik hata:", err);
+    } finally {
+      setListLoading(false);
+      setLoading(false);
     }
-
-    const { data, count } = await query;
-
-    setClients((data as Client[]) || []);
-    setTotalMatching(count ?? 0);
-    setListLoading(false);
-    setLoading(false);
   }, [professional?.id, page, pageSize, statusFilter, debouncedSearch]);
 
   useEffect(() => {

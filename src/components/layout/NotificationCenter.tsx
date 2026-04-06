@@ -21,6 +21,7 @@ interface NotificationCenterProps {
   onMarkAsRead?: (id: string) => void;
   onMarkAllAsRead?: () => void;
   onNotificationClick?: (notification: ProPanelNotification) => void;
+  onOpen?: () => void;
   triggerClassName?: string;
 }
 
@@ -43,6 +44,7 @@ export function NotificationCenter({
   onMarkAsRead,
   onMarkAllAsRead,
   onNotificationClick,
+  onOpen,
   triggerClassName,
 }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +74,11 @@ export function NotificationCenter({
     <div ref={ref} className="relative">
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const next = !isOpen;
+          setIsOpen(next);
+          if (next) onOpen?.();
+        }}
         className={clsx(
           "relative p-2 transition-colors",
           triggerClassName ? "rounded-xl" : "rounded-lg",

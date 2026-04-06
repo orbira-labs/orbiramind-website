@@ -124,10 +124,14 @@ Bu e-posta Orbira Labs Karakter Analizi sistemi tarafından otomatik olarak gön
     }
 
     if (body.invitationId) {
-      await supabase
+      const { error: updateError } = await supabase
         .from("test_invitations")
         .update({ sent_via: "email" })
         .eq("id", body.invitationId);
+
+      if (updateError) {
+        console.error("Davet sent_via güncellenemedi:", updateError);
+      }
     }
 
     return NextResponse.json({ success: true });

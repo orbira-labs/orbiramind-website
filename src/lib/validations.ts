@@ -10,6 +10,12 @@ export const registerSchema = z
     email: z.string().email("Geçerli bir email adresi girin"),
     password: z.string().min(8, "Şifre en az 8 karakter olmalı"),
     confirmPassword: z.string(),
+    kvkk_accepted: z.literal(true, {
+      error: "KVKK Aydınlatma Metni'ni kabul etmelisiniz",
+    }),
+    terms_accepted: z.literal(true, {
+      error: "Kullanım Koşulları'nı kabul etmelisiniz",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Şifreler eşleşmiyor",
@@ -30,7 +36,10 @@ export const onboardingSchema = z.object({
   company_name: z.string().optional(),
   specializations: z.array(z.string()).min(1, "En az bir uzmanlık alanı seçin"),
   kvkk_accepted: z.literal(true, {
-    error: "KVKK Aydınlatma Metnini kabul etmelisiniz",
+    error: "KVKK Aydınlatma Metni'ni kabul etmelisiniz",
+  }),
+  terms_accepted: z.literal(true, {
+    error: "Kullanım Koşulları'nı kabul etmelisiniz",
   }),
 });
 

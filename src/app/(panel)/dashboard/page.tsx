@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -17,7 +16,6 @@ import { Users, Calendar, FlaskConical, CheckCircle2, Eye, Share2, Copy, Mail, M
 import { useProContext } from "@/lib/context";
 import { useDashboard } from "@/lib/hooks/useDashboard";
 import { formatTime, formatRelative, formatDayLabel, generateWhatsAppLink, buildTestMessage } from "@/lib/utils";
-import { staggerContainer, cardReveal } from "@/lib/animations";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -178,16 +176,8 @@ export default function DashboardPage() {
         onUpdated={() => { setEditApt(null); refresh(); }}
       />
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
-        <motion.div 
-          className="mx-auto max-w-6xl"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div 
-            variants={cardReveal}
-            className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4"
-          >
+        <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4">
             <QuickStats stats={statCards} loading={loading} />
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -319,8 +309,8 @@ export default function DashboardPage() {
 
               <NotesCard />
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </main>
     </>
   );

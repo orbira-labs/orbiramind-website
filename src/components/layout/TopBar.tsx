@@ -43,7 +43,7 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
   const [showSendModal, setShowSendModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(formatTime());
 
-  const { notifications, markAsRead, markAllAsRead } = useCompletedAnalysisNotifications();
+  const { notifications, markAsRead, markAllAsRead, triggerLoad } = useCompletedAnalysisNotifications();
 
   useEffect(() => {
     if (!showGreeting) return;
@@ -104,6 +104,7 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
             onMarkAsRead={markAsRead}
             onMarkAllAsRead={markAllAsRead}
             onNotificationClick={handleNotificationClick}
+            onOpen={triggerLoad}
             triggerClassName="text-[#6B8F7B] hover:bg-white/60 hover:text-[#3D5A4C]"
           />
 

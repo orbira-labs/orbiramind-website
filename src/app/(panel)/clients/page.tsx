@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -15,7 +14,6 @@ import { ClientCard } from "@/components/clients";
 import { Users, Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { clientSchema, type ClientInput } from "@/lib/validations";
-import { staggerContainer, cardReveal } from "@/lib/animations";
 import { useClientsList } from "@/lib/hooks/useClientsList";
 import type { Client } from "@/lib/types";
 
@@ -97,14 +95,18 @@ export default function ClientsPage() {
 
   const handleSetStatus = useCallback(
     async (client: Client, status: "active" | "passive") => {
-      const supabase = createSupabase();
-      const { error } = await supabase.from("clients").update({ status }).eq("id", client.id);
-      if (error) {
-        toast.error("Durum güncellenemedi");
-        return;
+      try {
+        const supabase = createSupabase();
+        const { error } = await supabase.from("clients").update({ status }).eq("id", client.id);
+        if (error) {
+          toast.error("Durum güncellenemedi");
+          return;
+        }
+        toast.success(`Danışan ${status === "active" ? "aktife" : "pasife"} alındı`);
+        await refresh();
+      } catch {
+        toast.error("Bir hata oluştu");
       }
-      toast.success(`Danışan ${status === "active" ? "aktife" : "pasife"} alındı`);
-      await refresh();
     },
     [refresh]
   );
@@ -226,26 +228,20 @@ export default function ClientsPage() {
                   onAction={counts.total === 0 ? () => setShowModal(true) : undefined}
                 />
               ) : (
-                <motion.div
-                  className="space-y-2"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
-                >
+                <div className="space-y-2 animate-in fade-in duration-200">
                   {clients.map((client) => (
-                    <motion.div key={client.id} variants={cardReveal}>
-                      <ClientCard
-                        client={client}
-                        viewMode="row"
-                        lastContactAt={client.updated_at}
-                        rowActions={{
-                          onSetStatus: (status) => handleSetStatus(client, status),
-                          onDelete: () => setDeleteTarget(client),
-                        }}
-                      />
-                    </motion.div>
+                    <ClientCard
+                      key={client.id}
+                      client={client}
+                      viewMode="row"
+                      lastContactAt={client.updated_at}
+                      rowActions={{
+                        onSetStatus: (status) => handleSetStatus(client, status),
+                        onDelete: () => setDeleteTarget(client),
+                      }}
+                    />
                   ))}
-                </motion.div>
+                </div>
               )}
 
               {/* Pagination */}
@@ -345,7 +341,13 @@ export default function ClientsPage() {
               {...register("birth_date")}
             />
 
-            <div className="flex gap-3 pt-2">
+            <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800 leading-relaxed">
+              <strong>KVKK Hatırlatması:</strong> Danışanınızın kişisel verilerini
+              bu sisteme girerken, danışanınızı KVKK kapsamında aydınlatmış ve
+              gerekli rızayı almış olduğunuzu teyit etmiş sayılırsınız.
+            </div>
+
+            <div className="flex gap-3">
               <Button
                 type="button"
                 variant="secondary"
