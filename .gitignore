@@ -30,8 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files — committing .env.local intentionally (private repo, single developer, cross-device sync)
-# .env*
+# env files
+.env*
+.env.local
 
 # vercel
 .vercel
