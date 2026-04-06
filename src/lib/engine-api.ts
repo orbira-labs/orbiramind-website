@@ -1,11 +1,11 @@
 // API calls go through our secure server-side routes
 // No API keys are exposed to the client
 
-export type ProfileCategory = "demographic" | "lifestyle" | "health" | "habit" | "nutrition";
+export type ProfileCategory = "demographic" | "lifestyle" | "health" | "habit" | "nutrition" | "identity";
 
 export interface ProfileField {
   id: string;
-  answer_type: "single_choice" | "boolean" | "text";
+  answer_type: "single_choice" | "boolean" | "text" | "multi_select";
   text: string;
   category?: ProfileCategory | string;
   options?: { value: string | boolean; label: string }[];
@@ -25,6 +25,7 @@ const CATEGORY_META: Record<string, { label: string; description: string; order:
   health: { label: "Sağlık Durumu", description: "Genel sağlık profiliniz hakkında.", order: 2 },
   habit: { label: "Alışkanlıklar", description: "Günlük alışkanlıklarınız.", order: 3 },
   nutrition: { label: "Beslenme", description: "Beslenme tercihleriniz.", order: 4 },
+  identity: { label: "Kimlik & İlgi Alanları", description: "Sizi tanımlayan özellikler ve tercihleriniz.", order: 5 },
 };
 
 export function groupProfileFields(fields: ProfileField[]): ProfileGroup[] {
@@ -64,7 +65,9 @@ export interface DeepDiveQuestion {
   id: string;
   text: string;
   pool: string;
+  answer_type?: "scale" | "single_choice" | "multi_select";
   scale_labels?: string[];
+  options?: { value: string; label: string }[];
 }
 
 export interface SessionData {

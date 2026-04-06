@@ -18,7 +18,7 @@ import { MeasurementInput } from "@/components/test/MeasurementInput";
 import { AnalysisLoading } from "@/components/test/AnalysisLoading";
 import { AnimatePresence, motion } from "framer-motion";
 import { clsx } from "clsx";
-import { User, Heart, Shield, Coffee, Apple, Sparkles, Activity, Ruler } from "lucide-react";
+import { User, Heart, Shield, Coffee, Apple, Sparkles, Activity, Ruler, Fingerprint } from "lucide-react";
 import { celebrateCompletion } from "@/lib/confetti";
 import { celebrationPop } from "@/lib/animations";
 
@@ -35,6 +35,7 @@ const CATEGORY_ICONS: Record<string, typeof User> = {
   health: Shield,
   habit: Coffee,
   nutrition: Apple,
+  identity: Fingerprint,
 };
 
 const slideVariants = {
@@ -195,7 +196,13 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   function handleProfileGroupNext() {
     const group = profileGroups[profileGroupIndex];
-    const missing = group.fields.filter((f) => f.required !== false && profile[f.id] == null);
+    const missing = group.fields.filter((f) => {
+      if (f.required === false) return false;
+      const val = profile[f.id];
+      if (val == null) return true;
+      if (f.answer_type === "multi_select" && Array.isArray(val) && val.length === 0) return true;
+      return false;
+    });
     if (missing.length > 0) {
       setError("Lütfen tüm zorunlu alanları doldurun.");
       return;
