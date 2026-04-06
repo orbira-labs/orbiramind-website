@@ -93,6 +93,25 @@ export default function OnboardingPage() {
         return;
       }
 
+      // Ücretsiz ilk test kredisi: yalnızca daha önce hiç bonus verilmemişse ekle
+      const { data: existingBonus } = await supabase
+        .from("credit_transactions")
+        .select("id")
+        .eq("professional_id", user.id)
+        .eq("type", "bonus")
+        .limit(1)
+        .single();
+
+      if (!existingBonus) {
+        await supabase.from("credit_transactions").insert({
+          professional_id: user.id,
+          amount: 1,
+          balance_after: 1,
+          type: "bonus",
+          description: "Hoş geldin hediyesi – 1 ücretsiz test",
+        });
+      }
+
       toast.success("Hoş geldiniz!");
       router.push("/dashboard");
       router.refresh();
