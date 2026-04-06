@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
+import { SidebarBrand } from "./SidebarBrand";
 import {
   LayoutDashboard,
   Users,
@@ -51,16 +52,7 @@ export function Sidebar() {
           collapsed ? "justify-center" : "justify-between"
         )}
       >
-        {!collapsed && (
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <span className="text-white text-sm font-bold">K</span>
-            </div>
-            <div className="leading-tight">
-              <span className="text-sm font-semibold text-white">Karakter Analizi</span>
-            </div>
-          </Link>
-        )}
+        {!collapsed && <SidebarBrand />}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={clsx(

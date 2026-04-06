@@ -3,28 +3,30 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { nanoid } from "nanoid";
+
 import { addDays } from "date-fns";
 import { useProContext } from "@/lib/context";
 import { useClients } from "@/lib/hooks/useClients";
 import { Modal } from "@/components/ui/Modal";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import {
-  Send,
-  Search,
-  MessageCircle,
-  Mail,
-  UserPlus,
-  Users,
-  Check,
-} from "lucide-react";
+import { Send, Search, UserPlus, Users, Check } from "lucide-react";
 import { createClient as createSupabase } from "@/lib/supabase/client";
-import { generateWhatsAppLink, buildTestMessage } from "@/lib/utils";
 import { PRO_CONFIG } from "@/lib/constants";
 import { clsx } from "clsx";
+import { TestCreatingOverlay } from "@/components/tests/TestCreatingOverlay";
 
-type SendStep = "client" | "method" | "link_ready";
+// 0/O ve 1/I gibi karıştırılan karakterler çıkarıldı → 32 karakter havuzu
+// 8 hane = 32^8 ≈ 1 trilyon ihtimal
+const TOKEN_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function generateToken(): string {
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => TOKEN_CHARS[b % TOKEN_CHARS.length]).join("");
+}
+
+type SendStep = "client" | "confirm" | "creating" | "link_ready";
 type ClientMode = "existing" | "new";
 
 interface SendTestModalProps {
@@ -41,7 +43,6 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
   const [step, setStep] = useState<SendStep>("client");
   const [clientMode, setClientMode] = useState<ClientMode>("existing");
   const [selectedClientId, setSelectedClientId] = useState("");
-  const [sendVia, setSendVia] = useState<"email" | "whatsapp">("email");
   const [clientSearch, setClientSearch] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -50,7 +51,9 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
   const [newEmail, setNewEmail] = useState("");
   const [newClientId, setNewClientId] = useState<string | null>(null);
   const [generatedTestLink, setGeneratedTestLink] = useState<string | null>(null);
+  const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [idCopied, setIdCopied] = useState(false);
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
 
@@ -69,32 +72,36 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
       ? { first: selectedClient.first_name, last: selectedClient.last_name }
       : { first: newFirstName, last: newLastName };
 
-  const effectiveClientEmail =
-    clientMode === "existing" && selectedClient
-      ? selectedClient.email
-      : newEmail.trim() || null;
-
   function handleClose() {
     setStep("client");
     setClientMode("existing");
     setSelectedClientId("");
-    setSendVia("email");
     setClientSearch("");
     setNewFirstName("");
     setNewLastName("");
     setNewEmail("");
     setNewClientId(null);
     setGeneratedTestLink(null);
+    setGeneratedToken(null);
     setLinkCopied(false);
+    setIdCopied(false);
     onClose();
   }
 
-  async function copyTestLink() {
+  async function copyLink() {
     if (!generatedTestLink) return;
     await navigator.clipboard.writeText(generatedTestLink);
     setLinkCopied(true);
     toast.success("Link kopyalandı!");
     setTimeout(() => setLinkCopied(false), 2000);
+  }
+
+  async function copyId() {
+    if (!generatedToken) return;
+    await navigator.clipboard.writeText(generatedToken);
+    setIdCopied(true);
+    toast.success("Test ID kopyalandı!");
+    setTimeout(() => setIdCopied(false), 2000);
   }
 
   async function handleSend() {
@@ -112,8 +119,13 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
       return;
     }
 
+    // Animasyon ekranını hemen göster
+    setStep("creating");
     setSending(true);
-    try {
+
+    const MIN_ANIMATION_MS = 5000;
+
+    async function runApiCall() {
       const supabase = createSupabase();
       const {
         data: { user },
@@ -140,11 +152,7 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
           .select()
           .single();
 
-        if (clientError || !newClient) {
-          toast.error("Danışan oluşturulamadı");
-          setSending(false);
-          return;
-        }
+        if (clientError || !newClient) throw new Error("Danışan oluşturulamadı");
 
         clientId = newClient.id;
         firstName = newClient.first_name;
@@ -152,27 +160,18 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
         setNewClientId(newClient.id);
       }
 
-      const token = nanoid(12);
+      const token = generateToken();
       const testLink = `${window.location.origin}/t/${token}`;
-      const message = buildTestMessage(
-        firstName,
-        `${professional.first_name} ${professional.last_name}`,
-        testLink
-      );
 
       const { error } = await supabase.from("test_invitations").insert({
         professional_id: user!.id,
         client_id: clientId,
         token,
-        sent_via: sendVia,
-        message_text: message,
+        sent_via: "manual",
         expires_at: addDays(new Date(), PRO_CONFIG.testExpiryDays).toISOString(),
       });
 
-      if (error) {
-        toast.error("Test gönderilemedi");
-        return;
-      }
+      if (error) throw new Error("Test oluşturulamadı");
 
       await supabase.from("credit_transactions").insert({
         professional_id: user!.id,
@@ -183,27 +182,33 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
         description: `Test: ${firstName} ${lastName}`,
       });
 
-      setGeneratedTestLink(testLink);
-      setStep("link_ready");
-
-      if (sendVia === "whatsapp") {
-        window.open(generateWhatsAppLink("", message), "_blank");
-      }
-
-      if (clientMode === "new") {
-        refreshClients();
-      }
-
+      if (clientMode === "new") refreshClients();
       refreshCredits();
       onSent?.();
-    } catch {
-      toast.error("Bir hata oluştu");
+
+      return { token, testLink };
+    }
+
+    try {
+      const [result] = await Promise.all([
+        runApiCall(),
+        new Promise<void>((resolve) => setTimeout(resolve, MIN_ANIMATION_MS)),
+      ]);
+
+      setGeneratedTestLink(result.testLink);
+      setGeneratedToken(result.token);
+      setStep("link_ready");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Bir hata oluştu");
+      setStep("confirm");
     } finally {
       setSending(false);
     }
   }
 
   return (
+    <>
+    <TestCreatingOverlay visible={step === "creating"} />
     <Modal open={open} onClose={handleClose} title="Test Gönder" size="md">
       {step === "client" && (
         <div className="space-y-4">
@@ -252,7 +257,7 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
                     key={c.id}
                     onClick={() => {
                       setSelectedClientId(c.id);
-                      setStep("method");
+                      setStep("confirm");
                     }}
                     className={clsx(
                       "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
@@ -306,9 +311,7 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
               <div>
                 <label className="block text-sm font-medium text-pro-text mb-1.5">
                   E-posta{" "}
-                  <span className="text-pro-text-tertiary font-normal">
-                    (email ile göndermek için)
-                  </span>
+                  <span className="text-pro-text-tertiary font-normal">(isteğe bağlı)</span>
                 </label>
                 <input
                   type="email"
@@ -320,7 +323,7 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
               </div>
               <Button
                 className="w-full mt-2"
-                onClick={() => setStep("method")}
+                onClick={() => setStep("confirm")}
                 disabled={!newFirstName.trim() || !newLastName.trim()}
               >
                 Devam Et
@@ -330,7 +333,7 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
         </div>
       )}
 
-      {step === "method" && (
+      {step === "confirm" && (
         <div className="space-y-4">
           <div className="flex items-center gap-3 p-3 bg-pro-surface-alt rounded-lg">
             <Avatar
@@ -356,52 +359,10 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
             </button>
           </div>
 
-          <p className="text-sm font-medium text-pro-text">Gönderim Yöntemi</p>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setSendVia("email")}
-              className={clsx(
-                "flex flex-col items-center gap-2 p-4 rounded-xl border transition-colors",
-                sendVia === "email"
-                  ? "border-pro-primary bg-pro-primary-light"
-                  : "border-pro-border hover:border-pro-border-strong"
-              )}
-            >
-              <Mail
-                className={clsx(
-                  "h-6 w-6",
-                  sendVia === "email" ? "text-pro-primary" : "text-pro-text-tertiary"
-                )}
-              />
-              <span className="text-sm font-medium text-pro-text">Email</span>
-            </button>
-            <button
-              onClick={() => setSendVia("whatsapp")}
-              className={clsx(
-                "flex flex-col items-center gap-2 p-4 rounded-xl border transition-colors",
-                sendVia === "whatsapp"
-                  ? "border-pro-primary bg-pro-primary-light"
-                  : "border-pro-border hover:border-pro-border-strong"
-              )}
-            >
-              <MessageCircle
-                className={clsx(
-                  "h-6 w-6",
-                  sendVia === "whatsapp" ? "text-pro-primary" : "text-pro-text-tertiary"
-                )}
-              />
-              <span className="text-sm font-medium text-pro-text">WhatsApp</span>
-            </button>
-          </div>
-
-          {sendVia === "email" && !effectiveClientEmail && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800 font-medium">Email adresi yok</p>
-              <p className="text-xs text-amber-700/80 mt-1">
-                Test linki clipboard&apos;a kopyalanacak. Manuel olarak göndermeniz gerekecek.
-              </p>
-            </div>
-          )}
+          <p className="text-sm text-pro-text-secondary">
+            Bu danışan için bir test ID ve link oluşturulacak. Linki istediğin yöntemle
+            gönderebilirsin.
+          </p>
 
           {creditBalance <= 0 && (
             <div className="p-3 bg-pro-danger-light rounded-lg">
@@ -423,13 +384,13 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
               loading={sending}
               disabled={creditBalance <= 0}
             >
-              <Send className="h-4 w-4" /> Gönder
+              <Send className="h-4 w-4" /> Test Oluştur
             </Button>
           </div>
         </div>
       )}
 
-      {step === "link_ready" && generatedTestLink && (
+      {step === "link_ready" && generatedTestLink && generatedToken && (
         <div className="space-y-5">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -449,76 +410,100 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
             </div>
             <h3 className="text-lg font-semibold text-pro-text">Test Hazır!</h3>
             <p className="text-sm text-pro-text-secondary mt-1">
-              {effectiveClientName.first} {effectiveClientName.last} için test linki
-              oluşturuldu.
+              {effectiveClientName.first} {effectiveClientName.last} için test oluşturuldu.
             </p>
           </div>
 
-          <div className="p-4 bg-pro-surface-alt rounded-xl space-y-3">
-            <p className="text-xs text-pro-text-tertiary font-medium uppercase tracking-wide">
-              Test Linki
-            </p>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={generatedTestLink}
-                readOnly
-                className="flex-1 px-3 py-2.5 rounded-lg border border-pro-border bg-white text-sm text-pro-text font-mono select-all"
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-              />
-              <Button
-                variant={linkCopied ? "accent" : "secondary"}
-                size="sm"
-                onClick={copyTestLink}
-                className="shrink-0"
-              >
-                {linkCopied ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Kopyalandı
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                      />
-                    </svg>
-                    Kopyala
-                  </>
-                )}
-              </Button>
+          <div className="p-4 bg-pro-surface-alt rounded-xl space-y-4">
+            <div className="space-y-2">
+              <p className="text-xs text-pro-text-tertiary font-medium uppercase tracking-wide">
+                Test ID
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={generatedToken}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-lg border border-pro-border bg-white text-sm text-pro-text font-mono select-all"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <Button
+                  variant={idCopied ? "accent" : "secondary"}
+                  size="sm"
+                  onClick={copyId}
+                  className="shrink-0"
+                >
+                  {idCopied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Kopyalandı
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Kopyala
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-            <p className="text-xs text-pro-text-tertiary">
-              Bu linki danışanınıza WhatsApp, SMS veya başka bir yolla gönderebilirsiniz.
-            </p>
-          </div>
 
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              className="flex-1"
-              onClick={() => {
-                if (!generatedTestLink) return;
-                const msg = buildTestMessage(
-                  effectiveClientName.first,
-                  `${professional?.first_name} ${professional?.last_name}`,
-                  generatedTestLink
-                );
-                window.open(generateWhatsAppLink("", msg), "_blank");
-              }}
-            >
-              <MessageCircle className="h-4 w-4" />
-              WhatsApp ile Gönder
-            </Button>
+            <div className="space-y-2">
+              <p className="text-xs text-pro-text-tertiary font-medium uppercase tracking-wide">
+                Test Linki
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={generatedTestLink}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-lg border border-pro-border bg-white text-sm text-pro-text font-mono select-all"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <Button
+                  variant={linkCopied ? "accent" : "secondary"}
+                  size="sm"
+                  onClick={copyLink}
+                  className="shrink-0"
+                >
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Kopyalandı
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Kopyala
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
 
           {clientMode === "new" && newClientId && (
@@ -547,5 +532,6 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
         </div>
       )}
     </Modal>
+    </>
   );
 }

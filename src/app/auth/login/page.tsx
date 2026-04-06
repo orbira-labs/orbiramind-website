@@ -6,17 +6,21 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2, ClipboardList, ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginInput } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 
+type Mode = "choice" | "login" | "test_code";
+
 export default function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>("choice");
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [testCode, setTestCode] = useState("");
 
   const {
     register,
@@ -59,6 +63,16 @@ export default function LoginPage() {
     }
   }
 
+  function handleTestCodeSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const code = testCode.trim().toUpperCase();
+    if (!code) {
+      toast.error("Lütfen test kodunuzu girin");
+      return;
+    }
+    router.push(`/t/${code}`);
+  }
+
   return (
     <>
       {redirecting && (
@@ -71,56 +85,168 @@ export default function LoginPage() {
           </div>
         </div>
       )}
-    <AuthLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
-            Tekrar hoş geldiniz
-          </h1>
-          <p className="mt-1.5 text-[15px] text-pro-text-secondary leading-relaxed">
-            Danışanlarınız sizi bekliyor.
-          </p>
-        </div>
 
-        <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input
-              label="Email"
-              type="email"
-              placeholder="ornek@email.com"
-              autoComplete="email"
-              error={errors.email?.message}
-              {...register("email")}
-            />
-            <Input
-              label="Şifre"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              error={errors.password?.message}
-              {...register("password")}
-            />
+      <AuthLayout>
+        {mode === "choice" && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+                Hoş geldiniz
+              </h1>
+              <p className="mt-1.5 text-[15px] text-pro-text-secondary leading-relaxed">
+                Nasıl devam etmek istersiniz?
+              </p>
+            </div>
 
-            <Button type="submit" fullWidth loading={loading} size="lg">
-              <LogIn className="h-4 w-4" />
-              Giriş Yap
-            </Button>
-          </form>
-        </div>
+            <div className="space-y-3">
+              <button
+                onClick={() => setMode("test_code")}
+                className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-pro-primary/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
+              >
+                <div className="h-12 w-12 rounded-xl bg-pro-primary-light flex items-center justify-center shrink-0 group-hover:bg-pro-primary/15 transition-colors">
+                  <ClipboardList className="h-6 w-6 text-pro-primary" />
+                </div>
+                <div>
+                  <p className="text-[15px] font-semibold text-pro-text">Test Kodumu Gir</p>
+                  <p className="text-sm text-pro-text-tertiary mt-0.5">
+                    Uzmanınızdan aldığınız kodu girin
+                  </p>
+                </div>
+              </button>
 
-        <div className="space-y-2 text-center">
-          <p className="text-sm text-pro-text-secondary">
-            Henüz üye değil misiniz?{" "}
-            <Link
-              href="/auth/register"
-              className="text-pro-primary font-medium hover:underline"
-            >
-              Hemen başlayın
-            </Link>
-          </p>
-        </div>
-      </div>
-    </AuthLayout>
+              <button
+                onClick={() => setMode("login")}
+                className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-pro-primary/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
+              >
+                <div className="h-12 w-12 rounded-xl bg-pro-surface-alt flex items-center justify-center shrink-0 group-hover:bg-pro-surface-alt/80 transition-colors">
+                  <LogIn className="h-6 w-6 text-pro-text-secondary" />
+                </div>
+                <div>
+                  <p className="text-[15px] font-semibold text-pro-text">Uzman Girişi</p>
+                  <p className="text-sm text-pro-text-tertiary mt-0.5">
+                    Profesyonel hesabınızla giriş yapın
+                  </p>
+                </div>
+              </button>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-pro-text-secondary">
+                Henüz üye değil misiniz?{" "}
+                <Link
+                  href="/auth/register"
+                  className="text-pro-primary font-medium hover:underline"
+                >
+                  Hemen başlayın
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
+
+        {mode === "test_code" && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMode("choice")}
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div>
+                <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+                  Test Kodunu Gir
+                </h1>
+                <p className="mt-0.5 text-[15px] text-pro-text-secondary leading-relaxed">
+                  Uzmanınızın size verdiği kodu girin.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
+              <form onSubmit={handleTestCodeSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-pro-text mb-1.5">
+                    Test Kodu
+                  </label>
+                  <input
+                    type="text"
+                    value={testCode}
+                    onChange={(e) => setTestCode(e.target.value.toUpperCase())}
+                    placeholder="Örn: abc123def456"
+                    autoComplete="off"
+                    autoFocus
+                    className="w-full px-4 py-2.5 rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary font-mono tracking-wide"
+                  />
+                </div>
+                <Button type="submit" fullWidth size="lg" disabled={!testCode.trim()}>
+                  <ClipboardList className="h-4 w-4" />
+                  Teste Başla
+                </Button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {mode === "login" && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMode("choice")}
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div>
+                <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+                  Tekrar hoş geldiniz
+                </h1>
+                <p className="mt-0.5 text-[15px] text-pro-text-secondary leading-relaxed">
+                  Danışanlarınız sizi bekliyor.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="ornek@email.com"
+                  autoComplete="email"
+                  error={errors.email?.message}
+                  {...register("email")}
+                />
+                <Input
+                  label="Şifre"
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  error={errors.password?.message}
+                  {...register("password")}
+                />
+
+                <Button type="submit" fullWidth loading={loading} size="lg">
+                  <LogIn className="h-4 w-4" />
+                  Giriş Yap
+                </Button>
+              </form>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-pro-text-secondary">
+                Henüz üye değil misiniz?{" "}
+                <Link
+                  href="/auth/register"
+                  className="text-pro-primary font-medium hover:underline"
+                >
+                  Hemen başlayın
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
+      </AuthLayout>
     </>
   );
 }

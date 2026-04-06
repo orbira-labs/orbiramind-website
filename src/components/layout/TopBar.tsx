@@ -15,13 +15,6 @@ interface TopBarProps {
   showGreeting?: boolean;
 }
 
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Günaydın";
-  if (h < 18) return "İyi günler";
-  return "İyi akşamlar";
-}
-
 function formatTodayDate(): string {
   return new Date().toLocaleDateString("tr-TR", {
     day: "numeric",
@@ -76,13 +69,7 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
               <Clock className="h-3.5 w-3.5" />
               <span className="text-sm font-medium tabular-nums">{currentTime}</span>
             </div>
-            <div>
-              <h1 className="text-base sm:text-lg font-semibold text-[#3D5A4C]">
-                {getGreeting()},{" "}
-                <span className="text-[#5B7B6A]">{professional?.first_name || "Hoş geldiniz"}</span>
-              </h1>
-              <p className="text-xs text-[#6B8F7B]">{formatTodayDate()}</p>
-            </div>
+            <p className="text-sm text-[#3D5A4C] font-medium">{formatTodayDate()}</p>
           </div>
         ) : (
           <h1 className="text-lg font-semibold text-[#3D5A4C]">{title}</h1>

@@ -1,11 +1,45 @@
 import { createClient } from "@/lib/supabase/server";
 import { TestFlow } from "./TestFlow";
-import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 interface TestPageProps {
   params: Promise<{ token: string }>;
+}
+
+function ErrorCard({
+  icon,
+  iconBg,
+  iconColor,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+        <div
+          className={`w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mx-auto mb-4`}
+        >
+          <svg
+            className={`w-8 h-8 ${iconColor}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {icon}
+          </svg>
+        </div>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">{title}</h1>
+        <p className="text-gray-600">{description}</p>
+      </div>
+    </div>
+  );
 }
 
 export default async function TestPage({ params }: TestPageProps) {
@@ -23,38 +57,59 @@ export default async function TestPage({ params }: TestPageProps) {
   }
 
   if (!invitation) {
-    return notFound();
+    return (
+      <ErrorCard
+        iconBg="bg-gray-100"
+        iconColor="text-gray-500"
+        icon={
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        }
+        title="Test Bulunamadı"
+        description="Girdiğiniz kod geçersiz veya bu test artık mevcut değil. Lütfen uzmanınızdan yeni bir link isteyin."
+      />
+    );
   }
 
   if (invitation.status === "completed") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Test Tamamlandı</h1>
-          <p className="text-gray-600">Bu test zaten tamamlandı. Sonuçlarınız uzmanınızla paylaşıldı.</p>
-        </div>
-      </div>
+      <ErrorCard
+        iconBg="bg-green-100"
+        iconColor="text-green-600"
+        icon={
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 13l4 4L19 7"
+          />
+        }
+        title="Test Tamamlandı"
+        description="Bu test zaten tamamlandı. Sonuçlarınız uzmanınızla paylaşıldı."
+      />
     );
   }
 
   if (invitation.status === "expired" || new Date(invitation.expires_at) < new Date()) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Süre Doldu</h1>
-          <p className="text-gray-600">Bu test linkinin süresi dolmuş. Lütfen uzmanınızla iletişime geçin.</p>
-        </div>
-      </div>
+      <ErrorCard
+        iconBg="bg-amber-100"
+        iconColor="text-amber-600"
+        icon={
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        }
+        title="Süre Doldu"
+        description="Bu test linkinin süresi dolmuş. Lütfen uzmanınızla iletişime geçerek yeni bir test linki isteyin."
+      />
     );
   }
 

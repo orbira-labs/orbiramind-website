@@ -7,9 +7,13 @@ async function getSessionData() {
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (error || !user) {
+    await supabase.auth.signOut();
+    return null;
+  }
 
   const [{ data: professional }, { data: credits }] = await Promise.all([
     supabase.from("professionals").select("*").eq("id", user.id).single(),

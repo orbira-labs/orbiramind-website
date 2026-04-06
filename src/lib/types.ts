@@ -56,7 +56,7 @@ export interface TestInvitation {
   token: string;
   test_type: string;
   status: "sent" | "started" | "completed" | "expired";
-  sent_via: "whatsapp" | "email";
+  sent_via: "whatsapp" | "email" | "manual";
   message_text: string | null;
   expires_at: string;
   session_id: string | null;
