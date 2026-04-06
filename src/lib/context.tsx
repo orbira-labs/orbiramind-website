@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   useCallback,
   type ReactNode,
 } from "react";
@@ -38,6 +39,19 @@ export function ProProvider({
   const [professional, setProfessional] = useState(initialProfessional);
   const [creditBalance, setCreditBalance] = useState(initialCredits);
   const [loading, setLoading] = useState(false);
+
+  // initialCredits=0 geldiğinde mount sonrası lazy olarak çek
+  useEffect(() => {
+    if (professional?.id && initialCredits === 0) {
+      const supabase = createClient();
+      supabase
+        .rpc("get_credit_balance", { p_professional_id: professional.id })
+        .then(({ data }) => {
+          if (typeof data === "number") setCreditBalance(data);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [professional?.id]);
 
   const refreshCredits = useCallback(async () => {
     if (!professional?.id) return;

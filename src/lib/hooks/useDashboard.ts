@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useProContext } from "@/lib/context";
 
-interface DashboardAppointment {
+export interface DashboardAppointment {
   id: string;
   client_id: string;
   starts_at: string;
@@ -14,7 +14,7 @@ interface DashboardAppointment {
   client: { first_name: string; last_name: string } | null;
 }
 
-interface DashboardTest {
+export interface DashboardTest {
   id: string;
   token: string;
   status: string;
@@ -29,13 +29,16 @@ export interface DashboardStats {
   completed_tests: number;
 }
 
-const CACHE_KEY = "pro_dashboard_cache";
-const CACHE_TTL = 60_000;
-
-interface CacheData {
+export interface DashboardInitialData {
   upcomingAppointments: DashboardAppointment[];
   recentTests: DashboardTest[];
   stats: DashboardStats;
+}
+
+const CACHE_KEY = "pro_dashboard_cache";
+const CACHE_TTL = 60_000;
+
+interface CacheData extends DashboardInitialData {
   timestamp: number;
 }
 
@@ -59,35 +62,56 @@ function getCache(): CacheData | null {
   }
 }
 
-function setCache(data: Omit<CacheData, "timestamp">) {
+function setCache(data: DashboardInitialData) {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ...data, timestamp: Date.now() }));
+    sessionStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({ ...data, timestamp: Date.now() })
+    );
   } catch {}
 }
 
-export function useDashboard() {
+export function useDashboard(initialData?: DashboardInitialData) {
   const { professional } = useProContext();
-  const initialCache = useRef<CacheData | null>(null);
   const isMounted = useRef(false);
-  const channelRef = useRef<ReturnType<ReturnType<typeof createClient>["channel"]> | null>(null);
+  const channelRef = useRef<ReturnType<
+    ReturnType<typeof createClient>["channel"]
+  > | null>(null);
 
-  if (!isMounted.current && typeof window !== "undefined") {
-    initialCache.current = getCache();
+  // SSR'dan gelen initialData varsa önce onu kullan,
+  // yoksa sessionStorage cache'e bak, yoksa default
+  const resolveInitial = (): DashboardInitialData => {
+    if (initialData) return initialData;
+    if (typeof window !== "undefined") {
+      const cached = getCache();
+      if (cached) return cached;
+    }
+    return {
+      upcomingAppointments: [],
+      recentTests: [],
+      stats: DEFAULT_STATS,
+    };
+  };
+
+  const initial = useRef<DashboardInitialData | null>(null);
+  if (!isMounted.current) {
+    initial.current = resolveInitial();
   }
 
   const supabase = useRef(createClient());
 
-  const [upcomingAppointments, setUpcomingAppointments] = useState<DashboardAppointment[]>(
-    initialCache.current?.upcomingAppointments ?? []
-  );
+  const [upcomingAppointments, setUpcomingAppointments] = useState<
+    DashboardAppointment[]
+  >(initial.current?.upcomingAppointments ?? []);
   const [recentTests, setRecentTests] = useState<DashboardTest[]>(
-    initialCache.current?.recentTests ?? []
+    initial.current?.recentTests ?? []
   );
   const [stats, setStats] = useState<DashboardStats>(
-    initialCache.current?.stats ?? DEFAULT_STATS
+    initial.current?.stats ?? DEFAULT_STATS
   );
-  const [loading, setLoading] = useState(!initialCache.current);
+  // SSR initialData varsa veya cache varsa loading=false ile başla
+  const [loading, setLoading] = useState(!initial.current?.stats.total_clients && !initialData);
 
   const fetchData = useCallback(async () => {
     if (!professional?.id) return;
@@ -97,60 +121,73 @@ export function useDashboard() {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    const [aptsRes, testsRes, clientsCountRes, completedCountRes, todayAptsRes, creditRes] =
-      await Promise.all([
-        supabase.current
-          .from("appointments")
-          .select("id, client_id, starts_at, duration_minutes, note, status, client:clients(first_name, last_name)")
-          .eq("professional_id", professional.id)
-          .eq("status", "scheduled")
-          .gte("starts_at", new Date().toISOString())
-          .order("starts_at", { ascending: true })
-          .limit(5),
-        supabase.current
-          .from("test_invitations")
-          .select("id, token, status, created_at, client:clients(first_name, last_name)")
-          .eq("professional_id", professional.id)
-          .order("created_at", { ascending: false })
-          .limit(5),
-        supabase.current
-          .from("clients")
-          .select("id", { count: "exact", head: true })
-          .eq("professional_id", professional.id)
-          .eq("status", "active"),
-        supabase.current
-          .from("test_invitations")
-          .select("id", { count: "exact", head: true })
-          .eq("professional_id", professional.id)
-          .eq("status", "completed"),
-        supabase.current
-          .from("appointments")
-          .select("id", { count: "exact", head: true })
-          .eq("professional_id", professional.id)
-          .eq("status", "scheduled")
-          .gte("starts_at", todayStart.toISOString())
-          .lte("starts_at", todayEnd.toISOString()),
-        supabase.current
-          .from("credit_balance")
-          .select("balance")
-          .eq("professional_id", professional.id)
-          .maybeSingle(),
-      ]);
+    const [
+      aptsRes,
+      testsRes,
+      clientsCountRes,
+      completedCountRes,
+      todayAptsRes,
+      creditRes,
+    ] = await Promise.all([
+      supabase.current
+        .from("appointments")
+        .select(
+          "id, client_id, starts_at, duration_minutes, note, status, client:clients(first_name, last_name)"
+        )
+        .eq("professional_id", professional.id)
+        .eq("status", "scheduled")
+        .gte("starts_at", new Date().toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(5),
+      supabase.current
+        .from("test_invitations")
+        .select(
+          "id, token, status, created_at, client:clients(first_name, last_name)"
+        )
+        .eq("professional_id", professional.id)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      supabase.current
+        .from("clients")
+        .select("id", { count: "exact", head: true })
+        .eq("professional_id", professional.id)
+        .eq("status", "active"),
+      supabase.current
+        .from("test_invitations")
+        .select("id", { count: "exact", head: true })
+        .eq("professional_id", professional.id)
+        .eq("status", "completed"),
+      supabase.current
+        .from("appointments")
+        .select("id", { count: "exact", head: true })
+        .eq("professional_id", professional.id)
+        .eq("status", "scheduled")
+        .gte("starts_at", todayStart.toISOString())
+        .lte("starts_at", todayEnd.toISOString()),
+      supabase.current
+        .from("credit_balance")
+        .select("balance")
+        .eq("professional_id", professional.id)
+        .maybeSingle(),
+    ]);
 
     const newApts = (aptsRes.data || []).map((a: Record<string, unknown>) => ({
       ...a,
       client: Array.isArray(a.client) ? a.client[0] || null : a.client,
     })) as DashboardAppointment[];
 
-    const newTests = (testsRes.data || []).map((t: Record<string, unknown>) => ({
-      ...t,
-      client: Array.isArray(t.client) ? t.client[0] || null : t.client,
-    })) as DashboardTest[];
+    const newTests = (testsRes.data || []).map(
+      (t: Record<string, unknown>) => ({
+        ...t,
+        client: Array.isArray(t.client) ? t.client[0] || null : t.client,
+      })
+    ) as DashboardTest[];
 
     const newStats: DashboardStats = {
       total_clients: clientsCountRes.count ?? 0,
       todays_appointments: todayAptsRes.count ?? 0,
-      remaining_tests: (creditRes.data as { balance?: number } | null)?.balance ?? 0,
+      remaining_tests:
+        (creditRes.data as { balance?: number } | null)?.balance ?? 0,
       completed_tests: completedCountRes.count ?? 0,
     };
 
@@ -159,15 +196,26 @@ export function useDashboard() {
     setStats(newStats);
     setLoading(false);
 
-    setCache({ upcomingAppointments: newApts, recentTests: newTests, stats: newStats });
+    setCache({
+      upcomingAppointments: newApts,
+      recentTests: newTests,
+      stats: newStats,
+    });
   }, [professional?.id]);
 
   useEffect(() => {
     isMounted.current = true;
     if (!professional?.id) return;
-    if (initialCache.current) setLoading(false);
+    // SSR'dan data geldiyse skeleton gösterme, arka planda güncelle
+    if (initialData) {
+      setLoading(false);
+      fetchData();
+      return;
+    }
+    const cached = getCache();
+    if (cached) setLoading(false);
     fetchData();
-  }, [professional?.id, fetchData]);
+  }, [professional?.id, fetchData, initialData]);
 
   useEffect(() => {
     if (!professional?.id) return;
@@ -180,12 +228,22 @@ export function useDashboard() {
       .channel(`dashboard-${professional.id}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "pro", table: "test_invitations", filter: `professional_id=eq.${professional.id}` },
+        {
+          event: "*",
+          schema: "pro",
+          table: "test_invitations",
+          filter: `professional_id=eq.${professional.id}`,
+        },
         () => fetchData()
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "pro", table: "appointments", filter: `professional_id=eq.${professional.id}` },
+        {
+          event: "*",
+          schema: "pro",
+          table: "appointments",
+          filter: `professional_id=eq.${professional.id}`,
+        },
         () => fetchData()
       )
       .subscribe();

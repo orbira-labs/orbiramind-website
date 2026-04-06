@@ -70,9 +70,7 @@ export function DimensionRadar({ scores }: DimensionRadarProps) {
             fill="#5B7B6A"
             fillOpacity={0.3}
             strokeWidth={2}
-            isAnimationActive={true}
-            animationDuration={1200}
-            animationEasing="ease-out"
+            isAnimationActive={false}
           />
         </RadarChart>
       </ResponsiveContainer>

@@ -1,26 +1,16 @@
+import { getServerUser } from "@/lib/supabase/auth-cache";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ProShell } from "@/components/layout/ProShell";
 
-async function getSessionData() {
+async function getProfessional(userId: string) {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    await supabase.auth.signOut();
-    return null;
-  }
-
-  const [{ data: professional }, { data: credits }] = await Promise.all([
-    supabase.from("professionals").select("*").eq("id", user.id).single(),
-    supabase.rpc("get_credit_balance", { p_professional_id: user.id }),
-  ]);
-
-  return { user, professional, credits };
+  const { data } = await supabase
+    .from("professionals")
+    .select("*")
+    .eq("id", userId)
+    .single();
+  return data;
 }
 
 export default async function PanelLayout({
@@ -28,23 +18,24 @@ export default async function PanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sessionData = await getSessionData();
+  const user = await getServerUser();
 
-  if (!sessionData) {
+  if (!user) {
     redirect("/auth/login");
   }
 
-  const { professional, credits } = sessionData;
+  const professional = await getProfessional(user.id);
 
-  if (!professional?.onboarding_completed) {
+  if (!professional) {
+    redirect("/auth/login");
+  }
+
+  if (!professional.onboarding_completed) {
     redirect("/onboarding");
   }
 
   return (
-    <ProShell
-      initialProfessional={professional}
-      initialCredits={credits || 0}
-    >
+    <ProShell initialProfessional={professional} initialCredits={0}>
       {children}
     </ProShell>
   );
