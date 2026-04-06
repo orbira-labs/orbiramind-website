@@ -1,0 +1,338 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Marketing site (dark theme)
+   ============================================================ */
+:root {
+  --background: #09090b;
+  --background-secondary: #0f0f12;
+  --foreground: #fafafa;
+  --foreground-muted: #a1a1aa;
+  --foreground-subtle: #71717a;
+  --brand-primary: #6366f1;
+  --brand-secondary: #8b5cf6;
+  --brand-accent: #22d3ee;
+  --gradient-brand: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #22d3ee 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --glass-bg: rgba(15, 15, 18, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --status-live: #22c55e;
+  --status-progress: #f59e0b;
+  --status-concept: #6366f1;
+}
+
+/* ============================================================
+   Orbira Pro panel (light / wellness theme)
+   ============================================================ */
+[data-theme="pro"] {
+  --background: #FAFAF7;
+  --background-secondary: #F5F3EF;
+  --foreground: #2D3436;
+  --foreground-muted: #6B7C85;
+  --foreground-subtle: #9CAAAF;
+  --brand-primary: #5B7B6A;
+  --brand-secondary: #4A6A59;
+  --brand-accent: #C4956A;
+  --gradient-brand: linear-gradient(135deg, #5B7B6A 0%, #4A6A59 100%);
+  --border: #E5E0DB;
+  --border-hover: #D1CBC3;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: #E5E0DB;
+
+  --pro-surface: #FFFFFF;
+  --pro-surface-alt: #F5F3EF;
+  --pro-surface-sunken: #EFEAE4;
+  --pro-primary: #5B7B6A;
+  --pro-primary-hover: #4A6A59;
+  --pro-primary-light: #E8F0EB;
+  --pro-accent: #C4956A;
+  --pro-accent-hover: #B38459;
+  --pro-accent-light: #FDF5EE;
+  --pro-text: #2D3436;
+  /* Daha koyu, daha okunur secondary/tertiary renkler */
+  --pro-text-secondary: #4A5568;
+  --pro-text-tertiary: #718096;
+  --pro-text-on-primary: #FFFFFF;
+  --pro-border: #E5E0DB;
+  --pro-border-strong: #D1CBC3;
+  --pro-ring: #5B7B6A;
+  --pro-success: #27AE60;
+  --pro-success-light: #E9F7EF;
+  --pro-warning: #F39C12;
+  --pro-warning-light: #FEF5E7;
+  --pro-danger: #E74C3C;
+  --pro-danger-light: #FDEDEC;
+  --pro-info: #5B7B6A;
+  --pro-info-light: #E8F0EB;
+  --pro-purple: #7C5CBA;
+  --pro-purple-light: #EDE8F7;
+
+  /* Tema Renkleri - Tutarlı Kullanım */
+  /* Danışan = Pembe/Rose */
+  --pro-client: #E91E8C;
+  --pro-client-hover: #D41A7F;
+  --pro-client-light: #FDF2F8;
+  --pro-client-muted: #FCE7F3;
+  
+  /* Randevu = Mor/Purple */
+  --pro-appointment: #8B5CF6;
+  --pro-appointment-hover: #7C3AED;
+  --pro-appointment-light: #F3E8FF;
+  --pro-appointment-muted: #EDE9FE;
+  
+  /* Analiz/Test = Mavi/Blue */
+  --pro-analysis: #3B82F6;
+  --pro-analysis-hover: #2563EB;
+  --pro-analysis-light: #EFF6FF;
+  --pro-analysis-muted: #DBEAFE;
+
+  /* Shadow katmanları - premium his için */
+  --pro-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --pro-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --pro-shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+  --pro-shadow-elevated: 0 12px 40px -8px rgba(0,0,0,0.12);
+  --pro-shadow-hover: 0 8px 30px -4px rgba(0,0,0,0.14);
+
+  /* Tipografi ağırlıkları */
+  --pro-heading-weight: 700;
+  --pro-subheading-weight: 600;
+  --pro-body-weight: 500;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+  --color-status-live: var(--status-live);
+  --color-status-progress: var(--status-progress);
+  --color-status-concept: var(--status-concept);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-pro-surface: var(--pro-surface, #FFFFFF);
+  --color-pro-surface-alt: var(--pro-surface-alt, #F5F3EF);
+  --color-pro-primary: var(--pro-primary, #5B7B6A);
+  --color-pro-primary-hover: var(--pro-primary-hover, #4A6A59);
+  --color-pro-primary-light: var(--pro-primary-light, #E8F0EB);
+  --color-pro-accent: var(--pro-accent, #C4956A);
+  --color-pro-accent-hover: var(--pro-accent-hover, #B38459);
+  --color-pro-accent-light: var(--pro-accent-light, #FDF5EE);
+  --color-pro-text: var(--pro-text, #2D3436);
+  --color-pro-text-secondary: var(--pro-text-secondary, #4A5568);
+  --color-pro-text-tertiary: var(--pro-text-tertiary, #718096);
+  --color-pro-border: var(--pro-border, #E5E0DB);
+  --color-pro-border-strong: var(--pro-border-strong, #D1CBC3);
+  --color-pro-success: var(--pro-success, #27AE60);
+  --color-pro-success-light: var(--pro-success-light, #E9F7EF);
+  --color-pro-warning: var(--pro-warning, #F39C12);
+  --color-pro-warning-light: var(--pro-warning-light, #FEF5E7);
+  --color-pro-danger: var(--pro-danger, #E74C3C);
+  --color-pro-danger-light: var(--pro-danger-light, #FDEDEC);
+  --color-pro-purple: var(--pro-purple, #7C5CBA);
+  --color-pro-purple-light: var(--pro-purple-light, #EDE8F7);
+  
+  /* Tema Renkleri */
+  --color-pro-client: var(--pro-client, #E91E8C);
+  --color-pro-client-hover: var(--pro-client-hover, #D41A7F);
+  --color-pro-client-light: var(--pro-client-light, #FDF2F8);
+  --color-pro-client-muted: var(--pro-client-muted, #FCE7F3);
+  
+  --color-pro-appointment: var(--pro-appointment, #8B5CF6);
+  --color-pro-appointment-hover: var(--pro-appointment-hover, #7C3AED);
+  --color-pro-appointment-light: var(--pro-appointment-light, #F3E8FF);
+  --color-pro-appointment-muted: var(--pro-appointment-muted, #EDE9FE);
+  
+  --color-pro-analysis: var(--pro-analysis, #3B82F6);
+  --color-pro-analysis-hover: var(--pro-analysis-hover, #2563EB);
+  --color-pro-analysis-light: var(--pro-analysis-light, #EFF6FF);
+  --color-pro-analysis-muted: var(--pro-analysis-muted, #DBEAFE);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+[data-theme="marketing"] {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+[data-theme="pro"] {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Pro tema için Nunito font'u zorla uygula */
+[data-theme="pro"],
+[data-theme="pro"] * {
+  font-family: var(--font-nunito), "Nunito", system-ui, -apple-system, sans-serif !important;
+}
+
+[data-theme="pro"] code,
+[data-theme="pro"] pre,
+[data-theme="pro"] .font-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace !important;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism base */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Subtle glow effect */
+.glow {
+  box-shadow: 0 0 60px rgba(99, 102, 241, 0.1);
+}
+
+/* Focus visible styles */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: white;
+}
+
+
+/* Mobile-optimized touch feedback */
+@media (hover: none) {
+  .touch-highlight {
+    -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+  }
+  
+  .touch-highlight:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* Ensure smooth animations on mobile */
+@media (prefers-reduced-motion: no-preference) {
+  .motion-safe {
+    will-change: transform, opacity;
+  }
+}
+
+/* Reduced motion preference — erişilebilirlik için */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Transition utilities */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-fast {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Section spacing - optimized for mobile */
+.section-padding {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-padding {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-padding {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* Hide scrollbar for horizontal scroll areas on mobile */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

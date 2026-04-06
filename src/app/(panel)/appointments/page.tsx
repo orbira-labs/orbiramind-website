@@ -1,0 +1,242 @@
+"use client";
+
+import { useState } from "react";
+import { isToday, isFuture, isPast } from "date-fns";
+import { useAppointments } from "@/lib/hooks/useAppointments";
+import { TopBar } from "@/components/layout/TopBar";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { CreateAppointmentModal } from "@/components/appointments";
+import { AppointmentDetailModal, type AppointmentSlim } from "@/components/appointments/AppointmentDetailModal";
+import { EditAppointmentModal } from "@/components/appointments/EditAppointmentModal";
+import { AppointmentCalendar } from "@/components/appointments/AppointmentCalendar";
+import { Calendar, Plus, Clock, CalendarDays, List } from "lucide-react";
+import { formatDateTime } from "@/lib/utils";
+import { clsx } from "clsx";
+
+type ViewMode = "calendar" | "list";
+type Filter = "upcoming" | "past" | "all";
+
+export default function AppointmentsPage() {
+  const { appointments, loading, refresh } = useAppointments();
+  const [showModal, setShowModal] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("calendar");
+  const [filter, setFilter] = useState<Filter>("upcoming");
+  const [selectedApt, setSelectedApt] = useState<AppointmentSlim | null>(null);
+  const [editApt, setEditApt] = useState<AppointmentSlim | null>(null);
+  const [preselectedDate, setPreselectedDate] = useState<Date | undefined>(undefined);
+
+  const filtered = appointments.filter((a) => {
+    const d = new Date(a.starts_at);
+    if (filter === "upcoming") return isFuture(d) || isToday(d);
+    if (filter === "past") return isPast(d) && !isToday(d);
+    return true;
+  });
+
+  const handleCreateAppointment = (date?: Date) => {
+    setPreselectedDate(date);
+    setShowModal(true);
+  };
+
+  return (
+    <>
+      <TopBar title="Randevular" />
+      <CreateAppointmentModal
+        open={showModal}
+        onClose={() => { setShowModal(false); setPreselectedDate(undefined); }}
+        onCreated={refresh}
+        preselectedDate={preselectedDate}
+      />
+      <AppointmentDetailModal
+        appointment={selectedApt}
+        onClose={() => setSelectedApt(null)}
+        onUpdated={() => { setSelectedApt(null); refresh(); }}
+        onEditRequest={(apt) => { setSelectedApt(null); setEditApt(apt); }}
+      />
+      <EditAppointmentModal
+        appointment={editApt}
+        onClose={() => setEditApt(null)}
+        onUpdated={() => { setEditApt(null); refresh(); }}
+      />
+      <main className="flex-1 p-3 sm:p-5 lg:p-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5">
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+              <div className="flex items-center gap-4">
+                <h1 className="text-xl font-bold text-pro-text flex items-center gap-2">
+                  <span className="h-5 w-1 rounded-full bg-[var(--pro-appointment)]" />
+                  Randevular
+                </h1>
+                
+                {/* View Mode Toggle */}
+                <div className="flex gap-1 bg-pro-surface rounded-xl p-1 shadow-sm border border-pro-border">
+                    <button
+                      onClick={() => setViewMode("calendar")}
+                      className={clsx(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                        viewMode === "calendar"
+                          ? "bg-pro-primary text-white shadow-sm"
+                          : "text-pro-text-secondary hover:text-pro-text hover:bg-pro-surface-alt"
+                      )}
+                    >
+                      <CalendarDays className="h-4 w-4" />
+                      Takvim
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={clsx(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                        viewMode === "list"
+                          ? "bg-pro-primary text-white shadow-sm"
+                          : "text-pro-text-secondary hover:text-pro-text hover:bg-pro-surface-alt"
+                      )}
+                    >
+                      <List className="h-4 w-4" />
+                      Liste
+                    </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleCreateAppointment()}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-pro-primary hover:bg-pro-primary-hover text-white text-sm font-medium transition-all shadow-sm hover:shadow-md"
+              >
+                <Plus className="h-4 w-4" />
+                Randevu Ekle
+              </button>
+            </div>
+
+            {/* Calendar View */}
+            {viewMode === "calendar" && (
+              loading ? (
+                <Card padding="lg" variant="elevated">
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-8 w-48 bg-pro-border rounded" />
+                    <div className="grid grid-cols-7 gap-2">
+                      {[...Array(35)].map((_, i) => (
+                        <div key={i} className="h-24 bg-pro-surface-alt rounded-lg" />
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+              ) : (
+                <AppointmentCalendar
+                  appointments={appointments as AppointmentSlim[]}
+                  onSelectAppointment={setSelectedApt}
+                  onCreateAppointment={handleCreateAppointment}
+                />
+              )
+            )}
+
+            {/* List View */}
+            {viewMode === "list" && (
+              <Card padding="lg" variant="elevated">
+                {/* List Filter */}
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex gap-1 bg-pro-surface-alt rounded-lg p-1">
+                    {(["upcoming", "past", "all"] as Filter[]).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setFilter(f)}
+                        className={clsx(
+                          "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                          filter === f
+                            ? "bg-pro-surface text-pro-text shadow-sm"
+                            : "text-pro-text-secondary hover:text-pro-text"
+                        )}
+                      >
+                        {f === "upcoming" ? "Yaklaşan" : f === "past" ? "Geçmiş" : "Tümü"}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-xs text-pro-text-tertiary">
+                    {filtered.length} randevu
+                  </span>
+                </div>
+
+                {/* List Content */}
+                {loading ? (
+                  <div className="space-y-3">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-pro-surface-alt">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
+                        <Skeleton className="h-6 w-20" />
+                      </div>
+                    ))}
+                  </div>
+                ) : filtered.length === 0 ? (
+                  <EmptyState
+                    icon={Calendar}
+                    title="Randevu yok"
+                    description={
+                      filter === "upcoming"
+                        ? "Yaklaşan randevunuz bulunmuyor"
+                        : "Randevu kaydınız bulunmuyor"
+                    }
+                    actionLabel="Randevu Ekle"
+                    onAction={() => handleCreateAppointment()}
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    {filtered.map((apt) => (
+                      <button
+                        key={apt.id}
+                        type="button"
+                        onClick={() => setSelectedApt(apt as AppointmentSlim)}
+                        className="w-full flex items-center gap-3 p-3 rounded-lg bg-pro-surface-alt hover:bg-pro-primary-light transition-colors text-left group"
+                      >
+                        <Avatar
+                          firstName={apt.client?.first_name || "?"}
+                          lastName={apt.client?.last_name || ""}
+                          size="sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-pro-text">
+                            {apt.client?.first_name} {apt.client?.last_name}
+                          </p>
+                          <p className="text-xs text-pro-text-tertiary">{apt.duration_minutes} dk</p>
+                        </div>
+                        <div className="text-right shrink-0 flex items-center gap-3">
+                          <div>
+                            <p className="text-sm font-medium text-pro-text group-hover:text-pro-primary transition-colors flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5" />
+                              {formatDateTime(apt.starts_at)}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              apt.status === "completed"
+                                ? "success"
+                                : apt.status === "cancelled"
+                                  ? "danger"
+                                  : "info"
+                            }
+                            size="sm"
+                          >
+                            {apt.status === "scheduled"
+                              ? "Planlandı"
+                              : apt.status === "completed"
+                                ? "Tamamlandı"
+                                : "İptal"}
+                          </Badge>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
