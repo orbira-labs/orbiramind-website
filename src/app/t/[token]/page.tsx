@@ -1,4 +1,4 @@
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { TestFlow } from "./TestFlow";
 
 export const dynamic = "force-dynamic";
@@ -45,10 +45,7 @@ function ErrorCard({
 export default async function TestPage({ params }: TestPageProps) {
   const { token: rawToken } = await params;
   const token = rawToken.toUpperCase();
-  
-  // Service client kullanıyoruz - RLS bypass, server-side only
-  // Bu güvenli çünkü: 1) Sadece server'da çalışır 2) Token bilinmeden erişilemez
-  const supabase = createServiceClient();
+  const supabase = await createClient();
 
   const { data: invitation, error } = await supabase
     .from("test_invitations")
