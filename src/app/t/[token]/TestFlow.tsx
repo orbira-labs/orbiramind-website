@@ -11,7 +11,6 @@ import {
   type ProfileGroup,
 } from "@/lib/engine-api";
 import { getDimensionTheme, getPoolTheme, getDimensionLabel, getPoolLabel } from "@/lib/dimension-colors";
-import { createClient } from "@/lib/supabase/client";
 import { LikertScale } from "@/components/test/LikertScale";
 import { ProfileField } from "@/components/test/ProfileField";
 import { AnalysisLoading } from "@/components/test/AnalysisLoading";
@@ -354,18 +353,19 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     setPhase("loading");
 
     try {
-      const supabase = createClient();
-      const { error: updateError } = await supabase
-        .from("test_invitations")
-        .update({
+      // Update status via API (server-side, bypasses RLS)
+      const statusRes = await fetch("/api/test/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
           status: "started",
-          started_at: new Date().toISOString(),
           session_id: sessionId,
-        })
-        .eq("token", token);
+        }),
+      });
 
-      if (updateError) {
-        console.error("Test başlangıcı kaydedilemedi:", updateError);
+      if (!statusRes.ok) {
+        console.error("Test başlangıcı kaydedilemedi");
       }
 
       // measurements is now empty - height/weight are part of profile
@@ -405,18 +405,19 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     try {
       const data = await completeSession(sessionId, deepDiveAnswers, token);
 
-      const supabase = createClient();
-      const { error: updateError } = await supabase
-        .from("test_invitations")
-        .update({
+      // Update status via API (server-side, bypasses RLS)
+      const statusRes = await fetch("/api/test/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
           status: "completed",
-          completed_at: new Date().toISOString(),
           results_snapshot: data.results,
-        })
-        .eq("token", token);
+        }),
+      });
 
-      if (updateError) {
-        console.error("Test sonuçları kaydedilemedi:", updateError);
+      if (!statusRes.ok) {
+        console.error("Test sonuçları kaydedilemedi");
       }
 
       setPhase("done");
