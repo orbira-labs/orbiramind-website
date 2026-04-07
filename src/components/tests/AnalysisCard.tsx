@@ -8,10 +8,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { 
   Eye, 
   Link2, 
-  Copy, 
   Check, 
-  Mail, 
-  MessageCircle,
   Clock,
   RefreshCw,
   ChevronRight
@@ -32,7 +29,6 @@ interface AnalysisCardProps {
     id: string;
     token: string;
     status: string;
-    sent_via: "email" | "whatsapp";
     created_at: string;
     started_at?: string | null;
     completed_at?: string | null;
@@ -77,15 +73,6 @@ export function AnalysisCard({ test, onCopyLink, onResend, onPreview }: Analysis
               </p>
               <div className="flex items-center gap-2 mt-1 text-xs text-pro-text-tertiary">
                 <span>{formatDate(test.created_at)}</span>
-                <span className="h-1 w-1 rounded-full bg-pro-text-tertiary" />
-                <span className="flex items-center gap-1">
-                  {test.sent_via === "email" ? (
-                    <Mail className="h-3 w-3" />
-                  ) : (
-                    <MessageCircle className="h-3 w-3" />
-                  )}
-                  {test.sent_via === "email" ? "Email" : "WhatsApp"}
-                </span>
               </div>
             </div>
             

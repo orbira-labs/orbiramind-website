@@ -322,7 +322,7 @@ export default function ClientDetailPage() {
                             Karakter Analizi
                           </p>
                           <p className="text-xs text-pro-text-tertiary">
-                            {formatDate(test.created_at)} · {test.sent_via === "email" ? "Email" : "WhatsApp"}
+                            {formatDate(test.created_at)}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">

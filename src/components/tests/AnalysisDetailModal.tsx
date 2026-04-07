@@ -6,17 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   Calendar,
-  Clock,
-  Send,
   Eye,
   Trash2,
   AlertTriangle,
   CheckCircle2,
-  Mail,
-  MessageCircle,
-  ChevronRight,
   Link2,
-  Copy,
   Check,
   FlaskConical,
 } from "lucide-react";
@@ -131,13 +125,6 @@ export function AnalysisDetailModal({
   const isCompleted = test.status === "completed";
   const isPending = test.status === "sent" || test.status === "started";
 
-  const sentViaLabel =
-    test.sent_via === "email"
-      ? "E-posta"
-      : test.sent_via === "whatsapp"
-        ? "WhatsApp"
-        : "Manuel";
-  const SentViaIcon = test.sent_via === "email" ? Mail : MessageCircle;
 
   return (
     <AnimatePresence>
@@ -189,19 +176,18 @@ export function AnalysisDetailModal({
                     {clientName}
                   </h3>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <Badge
-                      variant={statusInfo.variant}
+                    <span
                       className={clsx(
-                        "text-white border-white/30",
-                        statusInfo.variant === "success" && "bg-green-500/30",
-                        statusInfo.variant === "warning" && "bg-amber-500/30",
-                        statusInfo.variant === "info" && "bg-blue-500/30",
-                        statusInfo.variant === "danger" && "bg-red-500/30"
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold",
+                        statusInfo.variant === "success" && "bg-green-500 text-white",
+                        statusInfo.variant === "warning" && "bg-amber-500 text-white",
+                        statusInfo.variant === "info" && "bg-blue-500 text-white",
+                        statusInfo.variant === "danger" && "bg-red-500 text-white"
                       )}
-                      dot
                     >
+                      <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
                       {statusInfo.label}
-                    </Badge>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -210,10 +196,10 @@ export function AnalysisDetailModal({
             {/* Body */}
             <div className="overflow-y-auto flex-1">
               <div className="p-5 space-y-4">
-                {/* Gönderim Bilgileri */}
+                {/* Tarih Bilgileri */}
                 <div className="rounded-xl border border-pro-border bg-pro-surface-alt p-4">
                   <p className="text-xs font-semibold text-pro-text-secondary uppercase tracking-wide mb-3">
-                    Gönderim Bilgileri
+                    Tarih Bilgileri
                   </p>
                   <div className="space-y-3">
                     {/* Gönderilme Tarihi */}
@@ -233,43 +219,27 @@ export function AnalysisDetailModal({
                       </div>
                     </div>
 
-                    {/* Gönderim Yöntemi */}
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-lg bg-pro-accent/10 flex items-center justify-center">
-                        <SentViaIcon className="h-4 w-4 text-pro-accent" />
+                    {/* Tamamlanma Tarihi - inline göster */}
+                    {isCompleted && completedDate && (
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-lg bg-pro-success/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-4 w-4 text-pro-success" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-pro-text-tertiary">
+                            Tamamlanma Tarihi
+                          </p>
+                          <p className="text-sm font-medium text-pro-success">
+                            {format(completedDate, "d MMMM yyyy, HH:mm", {
+                              locale: tr,
+                            })}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-pro-text-tertiary">
-                          Gönderim Yöntemi
-                        </p>
-                        <p className="text-sm font-medium text-pro-text">
-                          {sentViaLabel}
-                        </p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Tamamlanma Bilgisi (sadece completed durumunda) */}
-                {isCompleted && completedDate && (
-                  <div className="rounded-xl border border-pro-success/30 bg-green-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-lg bg-pro-success/20 flex items-center justify-center">
-                        <CheckCircle2 className="h-4 w-4 text-pro-success" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-pro-success/80">
-                          Tamamlanma Tarihi
-                        </p>
-                        <p className="text-sm font-medium text-pro-success">
-                          {format(completedDate, "d MMMM yyyy, HH:mm", {
-                            locale: tr,
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* Silme onayı */}
                 <AnimatePresence>
