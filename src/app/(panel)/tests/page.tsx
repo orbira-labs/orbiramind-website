@@ -163,7 +163,11 @@ export default function TestsPage() {
                     return (
                       <div
                         key={test.id}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-pro-surface-alt hover:bg-pro-surface-alt/80 transition-colors"
+                        onClick={() => canViewResults && router.push(`/tests/${test.id}`)}
+                        className={clsx(
+                          "flex items-center gap-3 p-3 rounded-lg bg-pro-surface-alt hover:bg-pro-surface-alt/80 transition-colors",
+                          canViewResults && "cursor-pointer"
+                        )}
                       >
                         <Avatar
                           firstName={test.client?.first_name || "?"}
@@ -184,7 +188,10 @@ export default function TestsPage() {
                           </Badge>
                           {isPending && (
                             <button
-                              onClick={() => copyTestLinkById(test.token, test.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyTestLinkById(test.token, test.id);
+                              }}
                               className={clsx(
                                 "p-1.5 rounded-lg transition-colors",
                                 isCopied
@@ -199,6 +206,7 @@ export default function TestsPage() {
                           {canViewResults && (
                             <Link
                               href={`/tests/${test.id}`}
+                              onClick={(e) => e.stopPropagation()}
                               className="p-1.5 rounded-lg text-[var(--pro-analysis)] hover:bg-[var(--pro-analysis-light)] transition-colors"
                               title="Sonuçları Gör"
                             >

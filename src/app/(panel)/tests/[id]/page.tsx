@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ArrowLeft, Calendar, User, Download } from "lucide-react";
+import { ArrowLeft, Calendar, User, Download, CheckCircle, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -43,6 +44,7 @@ export default function TestResultPage() {
   const [loading, setLoading] = useState(true);
   const [test, setTest] = useState<(TestInvitation & { client: Client }) | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [markingComplete, setMarkingComplete] = useState(false);
 
   useEffect(() => {
     async function fetchTest() {
@@ -60,20 +62,6 @@ export default function TestResultPage() {
         .single();
 
       const testData = data as (TestInvitation & { client: Client }) | null;
-      
-      // Eğer test completed durumundaysa ve henüz reviewed değilse, reviewed yap
-      if (testData && testData.status === "completed" && testData.results_snapshot) {
-        await supabase
-          .from("test_invitations")
-          .update({ 
-            status: "reviewed",
-            reviewed_at: new Date().toISOString()
-          })
-          .eq("id", id);
-        
-        testData.status = "reviewed";
-        testData.reviewed_at = new Date().toISOString();
-      }
 
       setTest(testData);
       setLoading(false);
@@ -81,6 +69,31 @@ export default function TestResultPage() {
 
     fetchTest();
   }, [id]);
+
+  async function markAsCompleted() {
+    if (!test || markingComplete) return;
+    
+    setMarkingComplete(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("test_invitations")
+        .update({ 
+          status: "reviewed",
+          reviewed_at: new Date().toISOString()
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setTest({ ...test, status: "reviewed", reviewed_at: new Date().toISOString() });
+      toast.success("Analiz tamamlandı olarak işaretlendi");
+    } catch {
+      toast.error("Bir hata oluştu");
+    } finally {
+      setMarkingComplete(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -221,9 +234,31 @@ export default function TestResultPage() {
                   )}
                 </div>
               </div>
-              <Badge variant="success" className="self-start sm:self-center">
-                Tamamlandı
-              </Badge>
+              <div className="flex items-center gap-2 self-start sm:self-center">
+                {test.status === "reviewed" ? (
+                  <Badge variant="success">
+                    Tamamlandı
+                  </Badge>
+                ) : (
+                  <>
+                    <Badge variant="accent">
+                      Analiz Hazır
+                    </Badge>
+                    <button
+                      onClick={markAsCompleted}
+                      disabled={markingComplete}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-pro-success hover:bg-pro-success/90 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {markingComplete ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4" />
+                      )}
+                      Tamamla
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </Card>
 
@@ -250,7 +285,7 @@ export default function TestResultPage() {
                   <WellnessGauge score={analysis.wellness_score} size="lg" />
                 </Card>
                 <Card padding="lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">10 Boyut Karakter Analizi</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Boyut Skorları</h3>
                   <DimensionRadar scores={analysis.dimension_scores} />
                 </Card>
               </div>
