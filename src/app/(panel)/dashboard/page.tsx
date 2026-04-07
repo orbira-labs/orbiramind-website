@@ -32,7 +32,7 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     supabase
       .from("test_invitations")
       .select(
-        "id, token, status, created_at, client:clients(first_name, last_name)"
+        "id, token, status, created_at, sent_via, started_at, completed_at, client:clients(first_name, last_name)"
       )
       .eq("professional_id", userId)
       .order("created_at", { ascending: false })
@@ -66,13 +66,16 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     last_name: string;
   }
 
+  type AppointmentStatus = "scheduled" | "completed" | "cancelled";
+  type TestSentVia = "email" | "whatsapp" | "manual";
+
   interface AppointmentRow {
     id: string;
     client_id: string;
     starts_at: string;
     duration_minutes: number;
     note: string | null;
-    status: string;
+    status: AppointmentStatus;
     client: ClientInfo | ClientInfo[] | null;
   }
 
@@ -81,18 +84,21 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     token: string;
     status: string;
     created_at: string;
+    sent_via: TestSentVia;
+    started_at: string | null;
+    completed_at: string | null;
     client: ClientInfo | ClientInfo[] | null;
   }
 
-  const upcomingAppointments = (aptsRes.data || []).map(
-    (a: AppointmentRow) => ({
+  const upcomingAppointments = (aptsRes.data as AppointmentRow[] || []).map(
+    (a) => ({
       ...a,
       client: Array.isArray(a.client) ? a.client[0] || null : a.client,
     })
   );
 
-  const recentTests = (testsRes.data || []).map(
-    (t: TestRow) => ({
+  const recentTests = (testsRes.data as TestRow[] || []).map(
+    (t) => ({
       ...t,
       client: Array.isArray(t.client) ? t.client[0] || null : t.client,
     })
