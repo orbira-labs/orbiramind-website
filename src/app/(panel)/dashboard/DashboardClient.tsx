@@ -26,7 +26,6 @@ import {
   Eye,
   Share2,
   Copy,
-  Mail,
   MessageCircle,
   Check,
   Plus,
@@ -135,16 +134,6 @@ function SharePopover({
       label: "WhatsApp ile Gönder",
       onClick: () => {
         window.open(generateWhatsAppLink("", message), "_blank");
-        onClose();
-      },
-    },
-    {
-      icon: Mail,
-      label: "E-posta Gönder",
-      onClick: () => {
-        const subject = encodeURIComponent("Karakter Analizi Testi");
-        const body = encodeURIComponent(message);
-        window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
         onClose();
       },
     },
@@ -371,7 +360,6 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                               token: test.token,
                               status: test.status,
                               created_at: test.created_at,
-                              sent_via: test.sent_via,
                               started_at: test.started_at,
                               completed_at: test.completed_at,
                               client: test.client,

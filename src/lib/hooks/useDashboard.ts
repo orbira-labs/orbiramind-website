@@ -19,7 +19,6 @@ export interface DashboardTest {
   token: string;
   status: string;
   created_at: string;
-  sent_via: "email" | "whatsapp" | "manual";
   started_at: string | null;
   completed_at: string | null;
   client: { first_name: string; last_name: string } | null;
@@ -131,7 +130,7 @@ export function useDashboard(initialData?: DashboardInitialData) {
       supabase.current
         .from("test_invitations")
         .select(
-          "id, token, status, created_at, sent_via, started_at, completed_at, client:clients(first_name, last_name)"
+          "id, token, status, created_at, started_at, completed_at, client:clients(first_name, last_name)"
         )
         .eq("professional_id", professional.id)
         .order("created_at", { ascending: false })

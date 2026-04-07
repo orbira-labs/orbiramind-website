@@ -167,7 +167,6 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
         professional_id: user!.id,
         client_id: clientId,
         token,
-        sent_via: "manual",
         expires_at: addDays(new Date(), PRO_CONFIG.testExpiryDays).toISOString(),
       });
 

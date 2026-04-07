@@ -29,7 +29,6 @@ export interface AnalysisSlim {
   created_at: string;
   started_at?: string | null;
   completed_at?: string | null;
-  sent_via?: "email" | "whatsapp" | "manual";
   client?: { first_name: string; last_name: string } | null;
 }
 
