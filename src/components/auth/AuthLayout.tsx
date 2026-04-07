@@ -61,8 +61,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-[10px] text-white/40 tracking-wide uppercase">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-white/40 tracking-wide">
               <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
               Powered by Orbira Labs
             </span>
