@@ -11,9 +11,11 @@ import { useEffect, useState } from "react";
  * - prefers-reduced-motion: animasyonlar tamamen kapalı
  */
 export function PageDecoration() {
+  const [mounted, setMounted] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(true);
 
   useEffect(() => {
+    setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReduceMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
@@ -120,8 +122,8 @@ export function PageDecoration() {
           <circle cx="1080" cy="455" r="1.5" />
         </g>
 
-        {/* Parlayan node'lar — sadece motion tercih yoksa */}
-        {!reduceMotion && (
+        {/* Parlayan node'lar — sadece client mount sonrası ve motion tercih yoksa */}
+        {mounted && !reduceMotion && (
           <>
             {/* blur filter kullanmadan opacity animasyonu */}
             <circle cx="550" cy="168" r="6" fill="#8B5CF6" opacity="0">

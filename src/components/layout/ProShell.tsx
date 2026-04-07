@@ -1,11 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Sidebar } from "./Sidebar";
 import { BottomNav } from "./BottomNav";
 import { TrustFooter } from "./TrustFooter";
-import { PageDecoration } from "../ui/PageDecoration";
 import { ProProvider } from "@/lib/context";
 import type { Professional } from "@/lib/types";
+
+const PageDecoration = dynamic(
+  () => import("../ui/PageDecoration").then((m) => m.PageDecoration),
+  { ssr: false }
+);
 
 interface ProShellProps {
   children: React.ReactNode;

@@ -5,7 +5,6 @@ import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import {
   Check,
-  Zap,
   Fingerprint,
   Eye,
   Route,
@@ -103,7 +102,7 @@ export default function BillingPage() {
 
               {/* White card — 5 adet */}
               <div className="rounded-2xl border-2 border-pro-border bg-white overflow-hidden flex flex-col">
-                <div className="bg-gradient-to-br from-[#EDF5F0] to-[#E0EDE4] px-6 py-5">
+                <div className="bg-gradient-to-br from-[#EDF5F0] to-[#E0EDE4] px-6 py-5 border-b border-pro-border">
                   <p className="text-xs font-semibold text-pro-primary uppercase tracking-wide mb-2">Başlangıç</p>
                   <div className="flex items-end gap-1">
                     <span className="text-4xl font-bold text-pro-text">5</span>
@@ -139,7 +138,7 @@ export default function BillingPage() {
                   <span className="text-[11px] font-bold text-[#8B6914] tracking-wide">%18 tasarruf</span>
                 </div>
 
-                <div className="relative px-6 py-5">
+                <div className="relative px-6 py-5 border-b border-white/20">
                   <p className="text-xs font-semibold text-white/80 uppercase tracking-wide mb-2">Profesyonel</p>
                   <div className="flex items-end gap-1">
                     <span className="text-4xl font-bold text-white">20</span>
@@ -156,10 +155,6 @@ export default function BillingPage() {
                         {item}
                       </li>
                     ))}
-                    <li className="flex items-center gap-2 text-sm text-white font-medium">
-                      <Zap className="h-4 w-4 text-white shrink-0" />
-                      Analiz başına ₺5,99 daha ucuz
-                    </li>
                   </ul>
                   <button
                     onClick={() => toast.info("Ödeme sistemi yakında aktif olacak")}

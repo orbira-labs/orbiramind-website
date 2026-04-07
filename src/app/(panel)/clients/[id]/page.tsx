@@ -8,19 +8,20 @@ import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton, StatCardSkeleton, ListItemSkeleton } from "@/components/ui/Skeleton";
 import {
   ArrowLeft,
-  Mail,
-  Phone,
   FileText,
   FlaskConical,
   Calendar,
   Plus,
-  Send,
   Eye,
+  Pencil,
+  Mail,
+  Phone,
+  Cake,
+  User,
 } from "lucide-react";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { formatDate, formatDateTime, formatRelative } from "@/lib/utils";
@@ -33,14 +34,21 @@ import type {
 } from "@/lib/types";
 import Link from "next/link";
 import { clsx } from "clsx";
+import { EditClientModal } from "@/components/clients/EditClientModal";
 
-type Tab = "overview" | "tests" | "appointments" | "notes";
+const GENDERS: Record<string, string> = {
+  female: "Kadın",
+  male: "Erkek",
+  other: "Diğer",
+  prefer_not_to_say: "Belirtilmemiş",
+};
+
+type Tab = "notes" | "appointments" | "tests";
 
 const TABS: { id: Tab; label: string; icon: typeof FileText }[] = [
-  { id: "overview", label: "Genel", icon: FileText },
-  { id: "tests", label: "Analizler", icon: FlaskConical },
-  { id: "appointments", label: "Randevular", icon: Calendar },
   { id: "notes", label: "Notlar", icon: FileText },
+  { id: "appointments", label: "Randevular", icon: Calendar },
+  { id: "tests", label: "Analizler", icon: FlaskConical },
 ];
 
 export default function ClientDetailPage() {
@@ -55,9 +63,10 @@ export default function ClientDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [activeTab, setActiveTab] = useState<Tab>("notes");
   const [noteText, setNoteText] = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -208,45 +217,66 @@ export default function ClientDetailPage() {
             Danışanlara Dön
           </Link>
 
-          <Card padding="lg">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <Avatar
-                firstName={client.first_name}
-                lastName={client.last_name}
-                size="lg"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-semibold text-pro-text">
-                    {client.first_name} {client.last_name}
-                  </h2>
-                  <Badge
-                    variant={statusInfo?.color as "success" | "warning" | "muted" || "muted"}
-                    dot
+          <div className="rounded-2xl border border-pro-border-strong bg-pro-surface-alt p-6">
+            <div className="flex flex-col sm:flex-row justify-between gap-6">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl font-bold text-pro-text tracking-tight">
+                      {client.first_name} {client.last_name}
+                    </h2>
+                    <span className={clsx(
+                      "text-xs font-medium",
+                      client.status === "active" ? "text-pro-success" : "text-pro-warning"
+                    )}>
+                      {statusInfo?.label}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setEditModalOpen(true)}
+                    className="flex items-center gap-1 text-pro-primary hover:text-pro-primary-hover text-xs font-medium transition-colors"
                   >
-                    {statusInfo?.label}
-                  </Badge>
+                    <Pencil className="h-3 w-3" />
+                    Bilgileri düzenle
+                  </button>
                 </div>
-                <div className="flex flex-wrap gap-4 mt-2 text-sm text-pro-text-secondary">
-                  {client.email && (
-                    <span className="flex items-center gap-1.5">
-                      <Mail className="h-3.5 w-3.5" /> {client.email}
-                    </span>
-                  )}
-                  {client.phone && (
-                    <span className="flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5" /> {client.phone}
-                    </span>
-                  )}
+
+                <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                    <span className="text-pro-text">{client.gender ? GENDERS[client.gender] : "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Cake className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                    <span className="text-pro-text">{client.birth_date ? formatDate(client.birth_date) : "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                    <span className="text-pro-text">{client.phone || "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                    <span className="text-pro-text truncate">{client.email || "—"}</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-2">
+
+              <div className="flex flex-col gap-2 shrink-0">
                 <Button variant="secondary" size="sm">
-                  <Send className="h-3.5 w-3.5" /> Analiz Gönder
+                  <FlaskConical className="h-4 w-4" />
+                  Test Gönder
+                </Button>
+                <Button variant="secondary" size="sm" onClick={() => setActiveTab("notes")}>
+                  <FileText className="h-4 w-4" />
+                  Not Ekle
+                </Button>
+                <Button variant="secondary" size="sm">
+                  <Calendar className="h-4 w-4" />
+                  Randevu Ekle
                 </Button>
               </div>
             </div>
-          </Card>
+          </div>
 
           <div className="flex gap-1 bg-pro-surface-alt rounded-lg p-1">
             {TABS.map((tab) => (
@@ -265,23 +295,6 @@ export default function ClientDetailPage() {
               </button>
             ))}
           </div>
-
-          {activeTab === "overview" && (
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Card padding="sm">
-                <p className="text-xs text-pro-text-secondary">Analizler</p>
-                <p className="text-2xl font-bold text-pro-text mt-1">{tests.length}</p>
-              </Card>
-              <Card padding="sm">
-                <p className="text-xs text-pro-text-secondary">Randevular</p>
-                <p className="text-2xl font-bold text-pro-text mt-1">{appointments.length}</p>
-              </Card>
-              <Card padding="sm">
-                <p className="text-xs text-pro-text-secondary">Notlar</p>
-                <p className="text-2xl font-bold text-pro-text mt-1">{notes.length}</p>
-              </Card>
-            </div>
-          )}
 
           {activeTab === "tests" && (
             <div className="space-y-3">
@@ -413,6 +426,13 @@ export default function ClientDetailPage() {
           )}
         </div>
       </main>
+
+      <EditClientModal
+        client={client}
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onUpdated={(updated) => setClient(updated)}
+      />
     </>
   );
 }
