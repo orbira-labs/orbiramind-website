@@ -14,7 +14,6 @@ import { getDimensionTheme, getPoolTheme, getDimensionLabel, getPoolLabel } from
 import { createClient } from "@/lib/supabase/client";
 import { LikertScale } from "@/components/test/LikertScale";
 import { ProfileField } from "@/components/test/ProfileField";
-import { MeasurementInput } from "@/components/test/MeasurementInput";
 import { AnalysisLoading } from "@/components/test/AnalysisLoading";
 import { PreparationScreen } from "@/components/test/PreparationScreen";
 import { JourneyMap } from "@/components/test/JourneyMap";
@@ -36,7 +35,6 @@ type Phase =
   | "stage_complete"
   | "core" 
   | "core_midway"
-  | "measurements" 
   | "deep_dive" 
   | "analyzing" 
   | "done" 
@@ -49,6 +47,7 @@ interface TestFlowProps {
 
 const CATEGORY_ICONS: Record<string, typeof User> = {
   demographic: User,
+  physical: Ruler,
   lifestyle: Heart,
   health: Shield,
   habit: Coffee,
@@ -154,7 +153,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   const [profile, setProfile] = useState<Record<string, unknown>>({});
   const [coreAnswers, setCoreAnswers] = useState<Record<string, number>>({});
-  const [measurements, setMeasurements] = useState<Record<string, unknown>>({});
   const [deepDiveAnswers, setDeepDiveAnswers] = useState<Record<string, number>>({});
 
   const [profileGroupIndex, setProfileGroupIndex] = useState(0);
@@ -204,21 +202,16 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     } else if (currentStage === 2) {
       setPhase("core");
     } else if (currentStage === 3) {
-      setPhase("measurements");
-    } else if (currentStage === 4) {
       setPhase("deep_dive");
     }
   }
 
   function handleStageCompleteContinue() {
     if (currentStage === 1) {
-      setCurrentStage(2);
-      setPhase("stage_intro");
+      // After profile, submit answers and move to core
+      handleProfileSubmit();
     } else if (currentStage === 2) {
       setCurrentStage(3);
-      setPhase("stage_intro");
-    } else if (currentStage === 3) {
-      setCurrentStage(4);
       setPhase("stage_intro");
     }
   }
@@ -241,11 +234,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         };
       case 3:
         return {
-          title: "Fiziksel Ölçümler",
-          subtitle: "Boy, kilo gibi fiziksel verilerle devam ediyoruz.",
-        };
-      case 4:
-        return {
           title: "Derinlemesine Keşif",
           subtitle: "Son aşama! Sana özel detaylı sorularla bitiriyoruz.",
         };
@@ -256,10 +244,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   function handleProfileChange(fieldId: string, value: unknown) {
     setProfile((prev) => ({ ...prev, [fieldId]: value }));
-  }
-
-  function handleMeasurementChange(fieldId: string, value: unknown) {
-    setMeasurements((prev) => ({ ...prev, [fieldId]: value }));
   }
 
   function handleCoreAnswer(questionId: string, value: number) {
@@ -353,14 +337,15 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
-  async function handleMeasurementsSubmit() {
+  async function handleProfileSubmit() {
     if (!sessionId || !sessionData) return;
 
-    const requiredMeasurements = sessionData.measurement_context.filter(
-      (m) => m.id === "height" || m.id === "weight"
+    // Check if height and weight are filled (if they exist in profile_fields)
+    const requiredPhysical = sessionData.profile_fields.filter(
+      (f) => (f.id === "height" || f.id === "weight") && f.required !== false
     );
-    const missingMeasurements = requiredMeasurements.filter((m) => !measurements[m.id]);
-    if (missingMeasurements.length > 0) {
+    const missingPhysical = requiredPhysical.filter((f) => !profile[f.id]);
+    if (missingPhysical.length > 0) {
       setError("Lütfen boy ve kilo bilgilerinizi girin.");
       return;
     }
@@ -383,15 +368,17 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         console.error("Test başlangıcı kaydedilemedi:", updateError);
       }
 
-      const data = await submitAnswers(sessionId, profile, coreAnswers, measurements, token);
+      // measurements is now empty - height/weight are part of profile
+      const data = await submitAnswers(sessionId, profile, coreAnswers, {}, token);
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
-      // Measurements stage complete - show completion card before deep_dive
-      setPhase("stage_complete");
+      // Move to core stage
+      setCurrentStage(2);
+      setPhase("stage_intro");
     } catch (e) {
       console.error("Submit answers error:", e);
       setError("Cevaplar gönderilemedi. Lütfen tekrar deneyin.");
-      setPhase("measurements");
+      setPhase("profile");
     }
   }
 
@@ -442,7 +429,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   // --- Progress calculation ---
   const totalProfileGroups = profileGroups.length;
-  const totalPhases = totalProfileGroups + 3; // profile groups + core + measurements + deep_dive
+  const totalPhases = totalProfileGroups + 2; // profile groups + core + deep_dive
 
   function getProgress(): { current: number; total: number; label: string } {
     switch (phase) {
@@ -450,10 +437,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         return { current: profileGroupIndex + 1, total: totalPhases, label: "Profil" };
       case "core":
         return { current: totalProfileGroups + 1, total: totalPhases, label: "Değerlendirme" };
-      case "measurements":
-        return { current: totalProfileGroups + 2, total: totalPhases, label: "Ölçümler" };
       case "deep_dive":
-        return { current: totalProfileGroups + 3, total: totalPhases, label: "Derinlemesine" };
+        return { current: totalProfileGroups + 2, total: totalPhases, label: "Derinlemesine" };
       default:
         return { current: 0, total: totalPhases, label: "" };
     }
@@ -517,13 +502,11 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   if (phase === "journey_map" && sessionData) {
     const profileFieldCount = sessionData.profile_fields.length;
     const coreCount = sessionData.core_questions.length;
-    const measurementCount = sessionData.measurement_context.length;
     
     return (
       <JourneyMap
         profileGroupCount={profileFieldCount}
         coreQuestionCount={coreCount}
-        measurementCount={measurementCount}
         onStart={handleJourneyMapStart}
       />
     );
@@ -542,9 +525,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   if (phase === "stage_complete") {
-    // After stage 3 (measurements), go to stage 4 intro (deep_dive)
-    // After stage 4 (deep_dive), go to analyzing
-    const isDeepDiveComplete = currentStage === 4;
+    // After stage 3 (deep_dive), go to analyzing
+    const isDeepDiveComplete = currentStage === 3;
     
     return (
       <StageCompletion
@@ -778,54 +760,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
               </motion.div>
             )}
 
-            {/* MEASUREMENTS */}
-            {phase === "measurements" && sessionData && (
-              <motion.div
-                key="measurements"
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-8"
-              >
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#5B7B6A]/10 mb-4">
-                    <Ruler className="w-7 h-7 text-[#5B7B6A]" />
-                  </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1.5">Ölçümler</h2>
-                  <p className="text-gray-500 text-sm">Fiziksel verileriniz analizi tamamlamak için gerekli.</p>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-7 space-y-6">
-                  {sessionData.measurement_context.map((field) => (
-                    <MeasurementInput
-                      key={field.id}
-                      field={field}
-                      value={measurements[field.id]}
-                      onChange={(value) => handleMeasurementChange(field.id, value)}
-                    />
-                  ))}
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { setDirection(-1); setPhase("core"); }}
-                    className="px-6 py-4 rounded-2xl font-semibold text-gray-500 hover:bg-white/80 transition-all active:scale-[0.98]"
-                  >
-                    Geri
-                  </button>
-                  <button
-                    onClick={handleMeasurementsSubmit}
-                    className="flex-1 py-4 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#5B7B6A]/20 hover:shadow-2xl hover:shadow-[#5B7B6A]/30 transition-all active:scale-[0.98]"
-                  >
-                    Devam Et
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
             {/* DEEP DIVE QUESTIONS */}
             {phase === "deep_dive" && currentDeepDiveQuestion && deepDiveTheme && (
               <motion.div
@@ -916,8 +850,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         return 0;
       case "core":
         return sessionData ? (Object.keys(coreAnswers).length / sessionData.core_questions.length) * 100 : 0;
-      case "measurements":
-        return sessionData ? (Object.keys(measurements).length / sessionData.measurement_context.length) * 100 : 0;
       case "deep_dive":
         return deepDiveQuestions.length > 0 ? (Object.keys(deepDiveAnswers).length / deepDiveQuestions.length) * 100 : 0;
       default:

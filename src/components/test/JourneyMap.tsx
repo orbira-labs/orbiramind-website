@@ -1,12 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Brain, Ruler, Compass, Clock, Bookmark } from "lucide-react";
+import { User, Brain, Compass, Clock, Bookmark } from "lucide-react";
 
 interface JourneyMapProps {
   profileGroupCount: number;
   coreQuestionCount: number;
-  measurementCount: number;
   onStart: () => void;
 }
 
@@ -14,7 +13,7 @@ const STAGES = [
   {
     number: 1,
     title: "Temel Bilgiler",
-    subtitle: "Seni tanımak için demografik ve yaşam tarzı bilgileri",
+    subtitle: "Demografik ve yaşam tarzı bilgileri (boy, kilo dahil)",
     icon: User,
     color: "#E8915A",
   },
@@ -27,13 +26,6 @@ const STAGES = [
   },
   {
     number: 3,
-    title: "Fiziksel Ölçümler",
-    subtitle: "Boy, kilo ve fiziksel veriler",
-    icon: Ruler,
-    color: "#5B7B6A",
-  },
-  {
-    number: 4,
     title: "Derinlemesine Keşif",
     subtitle: "Sana özel detaylı sorular",
     icon: Compass,
@@ -44,10 +36,9 @@ const STAGES = [
 export function JourneyMap({
   profileGroupCount,
   coreQuestionCount,
-  measurementCount,
   onStart,
 }: JourneyMapProps) {
-  const totalQuestions = profileGroupCount + coreQuestionCount + measurementCount + 15; // ~15 deep dive estimate
+  const totalQuestions = profileGroupCount + coreQuestionCount + 15; // ~15 deep dive estimate
   const estimatedMinutes = Math.ceil(totalQuestions / 5);
 
   return (
@@ -65,7 +56,7 @@ export function JourneyMap({
           transition={{ delay: 0.2 }}
           className="text-xl font-bold text-gray-900 text-center mb-6"
         >
-          4 Aşamada Seni Tanıyacağız
+          3 Aşamada Seni Tanıyacağız
         </motion.h1>
 
         {/* Stages */}
@@ -75,7 +66,6 @@ export function JourneyMap({
             const questionCount =
               stage.number === 1 ? `~${profileGroupCount}` :
               stage.number === 2 ? `~${coreQuestionCount}` :
-              stage.number === 3 ? `~${measurementCount}` :
               "~15";
 
             return (

@@ -1,15 +1,17 @@
 // API calls go through our secure server-side routes
 // No API keys are exposed to the client
 
-export type ProfileCategory = "demographic" | "lifestyle" | "health" | "habit" | "nutrition" | "identity";
+export type ProfileCategory = "demographic" | "physical" | "lifestyle" | "health" | "habit" | "nutrition" | "identity";
 
 export interface ProfileField {
   id: string;
-  answer_type: "single_choice" | "boolean" | "text" | "multi_select";
+  answer_type: "single_choice" | "boolean" | "text" | "multi_select" | "numeric";
   text: string;
   category?: ProfileCategory | string;
   options?: { value: string | boolean; label: string }[];
+  numeric_range?: { min: number; max: number } | null;
   required?: boolean;
+  stage?: number;
 }
 
 export interface ProfileGroup {
@@ -21,11 +23,12 @@ export interface ProfileGroup {
 
 const CATEGORY_META: Record<string, { label: string; description: string; order: number }> = {
   demographic: { label: "Temel Bilgiler", description: "Sizi daha iyi tanımamız için birkaç temel bilgi.", order: 0 },
-  lifestyle: { label: "Yaşam Tarzı", description: "Günlük yaşamınızı şekillendiren tercihler.", order: 1 },
-  health: { label: "Sağlık Durumu", description: "Genel sağlık profiliniz hakkında.", order: 2 },
-  habit: { label: "Alışkanlıklar", description: "Günlük alışkanlıklarınız.", order: 3 },
-  nutrition: { label: "Beslenme", description: "Beslenme tercihleriniz.", order: 4 },
-  identity: { label: "Kimlik & İlgi Alanları", description: "Sizi tanımlayan özellikler ve tercihleriniz.", order: 5 },
+  physical: { label: "Fiziksel Bilgiler", description: "Boy ve kilo bilgileriniz.", order: 1 },
+  lifestyle: { label: "Yaşam Tarzı", description: "Günlük yaşamınızı şekillendiren tercihler.", order: 2 },
+  health: { label: "Sağlık Durumu", description: "Genel sağlık profiliniz hakkında.", order: 3 },
+  habit: { label: "Alışkanlıklar", description: "Günlük alışkanlıklarınız.", order: 4 },
+  nutrition: { label: "Beslenme", description: "Beslenme tercihleriniz.", order: 5 },
+  identity: { label: "Kimlik & İlgi Alanları", description: "Sizi tanımlayan özellikler ve tercihleriniz.", order: 6 },
 };
 
 export function groupProfileFields(fields: ProfileField[]): ProfileGroup[] {

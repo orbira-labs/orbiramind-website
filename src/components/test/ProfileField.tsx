@@ -125,5 +125,42 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
     );
   }
 
+  if (field.answer_type === "numeric") {
+    const minVal = field.numeric_range?.min;
+    const maxVal = field.numeric_range?.max;
+    
+    return (
+      <div className="space-y-3">
+        <label className="block text-sm font-semibold text-gray-800">
+          {field.text}
+          {field.required !== false && <span className="text-red-400 ml-1">*</span>}
+        </label>
+        <div className="flex items-center gap-3">
+          <input
+            type="number"
+            value={(value as number) ?? ""}
+            onChange={(e) => {
+              const num = parseInt(e.target.value, 10);
+              if (!isNaN(num)) {
+                onChange(num);
+              } else if (e.target.value === "") {
+                onChange(undefined);
+              }
+            }}
+            min={minVal}
+            max={maxVal}
+            className="w-32 px-4 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-900 text-center text-lg font-semibold placeholder:text-gray-400 focus:border-[#5B7B6A] focus:outline-none focus:ring-2 focus:ring-[#5B7B6A]/20 transition-all"
+            placeholder={minVal ? String(minVal) : "0"}
+          />
+          {minVal != null && maxVal != null && (
+            <span className="text-sm text-gray-400">
+              {minVal} - {maxVal} arası
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }

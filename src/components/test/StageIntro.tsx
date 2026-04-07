@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Brain, Ruler, Compass, type LucideIcon } from "lucide-react";
+import { User, Brain, Compass, type LucideIcon } from "lucide-react";
 
 interface StageIntroProps {
   stageNumber: number;
@@ -13,8 +13,7 @@ interface StageIntroProps {
 const STAGE_CONFIG: Record<number, { icon: LucideIcon; color: string }> = {
   1: { icon: User, color: "#E8915A" },
   2: { icon: Brain, color: "#7C3AED" },
-  3: { icon: Ruler, color: "#5B7B6A" },
-  4: { icon: Compass, color: "#059669" },
+  3: { icon: Compass, color: "#059669" },
 };
 
 export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntroProps) {
@@ -41,7 +40,7 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
             border: `1px solid ${config.color}30`,
           }}
         >
-          Aşama {stageNumber}/4
+          Aşama {stageNumber}/3
         </motion.div>
 
         {/* Icon */}

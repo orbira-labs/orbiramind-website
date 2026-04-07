@@ -10,7 +10,7 @@ interface StageCompletionProps {
   onContinue: () => void;
 }
 
-const STAGE_COLORS = ["#E8915A", "#7C3AED", "#5B7B6A", "#059669"];
+const STAGE_COLORS = ["#E8915A", "#7C3AED", "#059669"];
 
 export function StageCompletion({ stageNumber, isLastStage = false, onContinue }: StageCompletionProps) {
   const color = STAGE_COLORS[stageNumber - 1] ?? STAGE_COLORS[0];
@@ -31,9 +31,7 @@ export function StageCompletion({ stageNumber, isLastStage = false, onContinue }
     : stageNumber === 1
     ? "Temel bilgilerini aldık. Şimdi seni daha yakından tanıyacağız."
     : stageNumber === 2
-    ? "Çekirdek analizini tamamladın. Ölçümlerle devam edelim."
-    : stageNumber === 3
-    ? "Ölçümlerin tamam. Son aşama için hazırsın!"
+    ? "Çekirdek analizini tamamladın. Son aşama için hazırsın!"
     : "Bir adım daha tamamlandı!";
 
   const buttonText = isLastStage ? "Devam Et" : "Sonraki Aşamaya Geç";
@@ -75,7 +73,7 @@ export function StageCompletion({ stageNumber, isLastStage = false, onContinue }
             className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold mb-4"
             style={{ backgroundColor: `${color}15`, color }}
           >
-            {stageNumber}/4 Tamamlandı
+            {stageNumber}/3 Tamamlandı
           </motion.div>
         )}
 
@@ -107,7 +105,7 @@ export function StageCompletion({ stageNumber, isLastStage = false, onContinue }
             transition={{ delay: 0.6 }}
             className="flex justify-center gap-2 mb-8"
           >
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className={`h-2.5 rounded-full transition-all ${
