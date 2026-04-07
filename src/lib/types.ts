@@ -102,10 +102,9 @@ export interface ProNotification {
 }
 
 export interface DashboardStats {
-  total_clients: number;
+  active_clients: number;
   todays_appointments: number;
-  remaining_tests: number;
-  completed_tests: number;
+  pending_analyses: number;
 }
 
 export interface Trait {

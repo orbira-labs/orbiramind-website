@@ -65,6 +65,7 @@ export function useTests() {
   }, [professional?.id, refresh]);
 
   const completedCount = tests.filter((t) => t.status === "completed").length;
+  const pendingCount = tests.filter((t) => t.status === "sent" || t.status === "started").length;
 
-  return { tests, loading, refresh, completedCount };
+  return { tests, loading, refresh, completedCount, pendingCount };
 }

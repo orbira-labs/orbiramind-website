@@ -26,10 +26,9 @@ export interface DashboardTest {
 }
 
 export interface DashboardStats {
-  total_clients: number;
+  active_clients: number;
   todays_appointments: number;
-  remaining_tests: number;
-  completed_tests: number;
+  pending_analyses: number;
 }
 
 export interface DashboardInitialData {
@@ -46,10 +45,9 @@ interface CacheData extends DashboardInitialData {
 }
 
 const DEFAULT_STATS: DashboardStats = {
-  total_clients: 0,
+  active_clients: 0,
   todays_appointments: 0,
-  remaining_tests: 0,
-  completed_tests: 0,
+  pending_analyses: 0,
 };
 
 function getCache(): CacheData | null {
@@ -114,7 +112,7 @@ export function useDashboard(initialData?: DashboardInitialData) {
     initial.current?.stats ?? DEFAULT_STATS
   );
   // SSR initialData varsa veya cache varsa loading=false ile başla
-  const [loading, setLoading] = useState(!initial.current?.stats.total_clients && !initialData);
+  const [loading, setLoading] = useState(!initial.current?.stats.active_clients && !initialData);
 
   const fetchData = useCallback(async () => {
     if (!professional?.id) return;
@@ -128,9 +126,8 @@ export function useDashboard(initialData?: DashboardInitialData) {
       aptsRes,
       testsRes,
       clientsCountRes,
-      completedCountRes,
+      pendingAnalysesRes,
       todayAptsRes,
-      creditRes,
     ] = await Promise.all([
       supabase.current
         .from("appointments")
@@ -159,7 +156,7 @@ export function useDashboard(initialData?: DashboardInitialData) {
         .from("test_invitations")
         .select("id", { count: "exact", head: true })
         .eq("professional_id", professional.id)
-        .eq("status", "completed"),
+        .in("status", ["sent", "started"]),
       supabase.current
         .from("appointments")
         .select("id", { count: "exact", head: true })
@@ -167,11 +164,6 @@ export function useDashboard(initialData?: DashboardInitialData) {
         .eq("status", "scheduled")
         .gte("starts_at", todayStart.toISOString())
         .lte("starts_at", todayEnd.toISOString()),
-      supabase.current
-        .from("credit_balance")
-        .select("balance")
-        .eq("professional_id", professional.id)
-        .maybeSingle(),
     ]);
 
     const newApts = (aptsRes.data || []).map((a: Record<string, unknown>) => ({
@@ -187,11 +179,9 @@ export function useDashboard(initialData?: DashboardInitialData) {
     ) as DashboardTest[];
 
     const newStats: DashboardStats = {
-      total_clients: clientsCountRes.count ?? 0,
+      active_clients: clientsCountRes.count ?? 0,
       todays_appointments: todayAptsRes.count ?? 0,
-      remaining_tests:
-        (creditRes.data as { balance?: number } | null)?.balance ?? 0,
-      completed_tests: completedCountRes.count ?? 0,
+      pending_analyses: pendingAnalysesRes.count ?? 0,
     };
 
     setUpcomingAppointments(newApts);

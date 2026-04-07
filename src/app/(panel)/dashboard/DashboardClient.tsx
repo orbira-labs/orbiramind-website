@@ -23,7 +23,6 @@ import {
   Users,
   Calendar,
   FlaskConical,
-  CheckCircle2,
   Eye,
   Share2,
   Copy,
@@ -49,17 +48,6 @@ import Link from "next/link";
 
 const STAT_CARDS = [
   {
-    key: "total_clients" as const,
-    label: "Danışan",
-    icon: Users,
-    href: "/clients",
-    gradient: "from-[#E8F0EB] to-[#D4E5DA]",
-    iconBg: "bg-[#5B7B6A]",
-    iconColor: "text-white",
-    accentBar: "bg-[#5B7B6A]",
-    valueColor: "text-[#3D5A4C]",
-  },
-  {
     key: "todays_appointments" as const,
     label: "Bugünkü Randevu",
     icon: Calendar,
@@ -71,8 +59,8 @@ const STAT_CARDS = [
     valueColor: "text-[#8B5E3C]",
   },
   {
-    key: "remaining_tests" as const,
-    label: "Kullanılabilir Analiz",
+    key: "pending_analyses" as const,
+    label: "İşlenmemiş Analizler",
     icon: FlaskConical,
     href: "/tests",
     gradient: "from-[#EBF0F8] to-[#D8E3F1]",
@@ -82,15 +70,15 @@ const STAT_CARDS = [
     valueColor: "text-[#3A5270]",
   },
   {
-    key: "completed_tests" as const,
-    label: "Tamamlanan Analiz",
-    icon: CheckCircle2,
-    href: "/tests",
-    gradient: "from-[#E9F7EF] to-[#D0EDDB]",
-    iconBg: "bg-[#27AE60]",
+    key: "active_clients" as const,
+    label: "Aktif Danışan",
+    icon: Users,
+    href: "/clients",
+    gradient: "from-[#E8F0EB] to-[#D4E5DA]",
+    iconBg: "bg-[#5B7B6A]",
     iconColor: "text-white",
-    accentBar: "bg-[#27AE60]",
-    valueColor: "text-[#1B7A43]",
+    accentBar: "bg-[#5B7B6A]",
+    valueColor: "text-[#3D5A4C]",
   },
 ];
 

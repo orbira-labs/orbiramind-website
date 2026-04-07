@@ -28,8 +28,8 @@ interface QuickStatsProps {
 export function QuickStats({ stats, loading = false }: QuickStatsProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-pro-surface rounded-xl border border-pro-border p-4 sm:p-5">
             <div className="animate-pulse">
               <div className="h-4 w-20 bg-pro-surface-alt rounded mb-3" />
@@ -46,7 +46,7 @@ export function QuickStats({ stats, loading = false }: QuickStatsProps) {
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+      className="grid grid-cols-3 gap-3 sm:gap-4"
     >
       {stats.map((stat) => (
         <motion.div key={stat.key} variants={cardReveal}>

@@ -29,7 +29,7 @@ function getVisiblePages(current: number, total: number): (number | "dots")[] {
 export default function ClientsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "passive">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "passive">("active");
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
@@ -159,26 +159,20 @@ export default function ClientsPage() {
             <Card padding="lg" variant="elevated">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-                <div className="flex items-center gap-3">
-                  <h2 className="font-semibold text-pro-text flex items-center gap-2">
-                    <span className="h-4 w-0.5 rounded-full bg-[var(--pro-client)]" />
-                    Danışanlar
-                  </h2>
-                  <div className="flex gap-1 bg-pro-surface-alt rounded-lg p-1">
-                    {(["all", "active", "passive"] as const).map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => setStatusFilter(f)}
-                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                          statusFilter === f
-                            ? "bg-pro-surface text-pro-text shadow-sm"
-                            : "text-pro-text-secondary hover:text-pro-text"
-                        }`}
-                      >
-                        {f === "all" ? "Tümü" : f === "active" ? "Aktif" : "Pasif"}
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex gap-1 bg-pro-surface-alt rounded-lg p-1">
+                  {(["active", "passive", "all"] as const).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setStatusFilter(f)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                        statusFilter === f
+                          ? "bg-pro-surface text-pro-text shadow-sm"
+                          : "text-pro-text-secondary hover:text-pro-text"
+                      }`}
+                    >
+                      {f === "active" ? "Aktif" : f === "passive" ? "Pasif" : "Tümü"}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -204,8 +198,8 @@ export default function ClientsPage() {
 
               {/* Content */}
               {loading ? (
-                <div className="space-y-2">
-                  {Array.from({ length: 6 }).map((_, i) => (
+                <div className="space-y-2 min-h-[320px]">
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-pro-surface-alt">
                       <div className="h-10 w-10 rounded-full bg-pro-border animate-pulse" />
                       <div className="flex-1 space-y-2">
@@ -216,6 +210,7 @@ export default function ClientsPage() {
                   ))}
                 </div>
               ) : totalMatching === 0 ? (
+                <div className="min-h-[320px] flex items-center justify-center">
                 <EmptyState
                   icon={Users}
                   title={counts.total === 0 ? "Henüz danışan yok" : "Sonuç bulunamadı"}
@@ -227,8 +222,9 @@ export default function ClientsPage() {
                   actionLabel={counts.total === 0 ? "Danışan Ekle" : undefined}
                   onAction={counts.total === 0 ? () => setShowModal(true) : undefined}
                 />
+                </div>
               ) : (
-                <div className="space-y-2 animate-in fade-in duration-200">
+                <div className="space-y-2 animate-in fade-in duration-200 min-h-[320px]">
                   {clients.map((client) => (
                     <ClientCard
                       key={client.id}

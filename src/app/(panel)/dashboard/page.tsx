@@ -15,9 +15,8 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     aptsRes,
     testsRes,
     clientsCountRes,
-    completedCountRes,
+    pendingAnalysesRes,
     todayAptsRes,
-    creditRes,
   ] = await Promise.all([
     supabase
       .from("appointments")
@@ -46,7 +45,7 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
       .from("test_invitations")
       .select("id", { count: "exact", head: true })
       .eq("professional_id", userId)
-      .eq("status", "completed"),
+      .in("status", ["sent", "started"]),
     supabase
       .from("appointments")
       .select("id", { count: "exact", head: true })
@@ -54,11 +53,6 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
       .eq("status", "scheduled")
       .gte("starts_at", todayStart.toISOString())
       .lte("starts_at", todayEnd.toISOString()),
-    supabase
-      .from("credit_balance")
-      .select("balance")
-      .eq("professional_id", userId)
-      .maybeSingle(),
   ]);
 
   interface ClientInfo {
@@ -108,11 +102,9 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     upcomingAppointments,
     recentTests,
     stats: {
-      total_clients: clientsCountRes.count ?? 0,
+      active_clients: clientsCountRes.count ?? 0,
       todays_appointments: todayAptsRes.count ?? 0,
-      remaining_tests:
-        (creditRes.data as { balance?: number } | null)?.balance ?? 0,
-      completed_tests: completedCountRes.count ?? 0,
+      pending_analyses: pendingAnalysesRes.count ?? 0,
     },
   };
 }
@@ -125,10 +117,9 @@ export default async function DashboardPage() {
         upcomingAppointments: [],
         recentTests: [],
         stats: {
-          total_clients: 0,
+          active_clients: 0,
           todays_appointments: 0,
-          remaining_tests: 0,
-          completed_tests: 0,
+          pending_analyses: 0,
         },
       };
 

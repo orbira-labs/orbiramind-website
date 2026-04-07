@@ -23,7 +23,7 @@ type Filter = "all" | "pending" | "completed";
 export default function TestsPage() {
   const router = useRouter();
   const { creditBalance } = useProContext();
-  const { tests, loading, refresh, completedCount } = useTests();
+  const { tests, loading, refresh, completedCount, pendingCount } = useTests();
   const [showSendModal, setShowSendModal] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
   const [copiedTestId, setCopiedTestId] = useState<string | null>(null);
@@ -88,12 +88,12 @@ export default function TestsPage() {
               )}
               <Card padding="md" variant="elevated">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-pro-surface-alt flex items-center justify-center">
-                    <Send className="h-5 w-5 text-pro-text-secondary" />
+                  <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                    <Send className="h-5 w-5 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-pro-text-secondary font-medium">Gönderilen</p>
-                    <p className="text-2xl font-bold text-pro-text">{tests.length}</p>
+                    <p className="text-xs text-pro-text-secondary font-medium">İşlenmemiş Analizler</p>
+                    <p className="text-2xl font-bold text-amber-600">{pendingCount}</p>
                   </div>
                 </div>
               </Card>
@@ -131,7 +131,7 @@ export default function TestsPage() {
                             : "text-pro-text-secondary hover:text-pro-text"
                         )}
                       >
-                        {f === "all" ? "Tümü" : f === "pending" ? "Bekleyen" : "Tamamlanan"}
+                        {f === "all" ? "Tümü" : f === "pending" ? "İşlenmemiş" : "Tamamlanan"}
                       </button>
                     ))}
                   </div>
