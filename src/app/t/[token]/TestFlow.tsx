@@ -259,6 +259,9 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   function handleMidwayContinue() {
+    // Midway'den sonra bir sonraki soruya geç
+    setDirection(1);
+    setCurrentIndex((i) => i + 1);
     setPhase("core");
   }
 
