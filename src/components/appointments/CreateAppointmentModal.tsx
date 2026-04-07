@@ -10,6 +10,7 @@ import { Select } from "@/components/ui/Select";
 import { useClients } from "@/lib/hooks/useClients";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { APPOINTMENT_DURATIONS } from "@/lib/constants";
+import { formatDateForInput, getTodayDateString, toTurkeyTime, parseDateTimeToISO } from "@/lib/utils";
 import { UserPlus, Users } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -30,19 +31,13 @@ interface CreateAppointmentModalProps {
   preselectedDate?: Date;
 }
 
-function formatDateForInput(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-function getTodayDate(): string {
-  return formatDateForInput(new Date());
-}
-
 function getDefaultTime(): string {
-  const now = new Date();
-  now.setMinutes(0, 0, 0);
-  now.setHours(now.getHours() + 1);
-  return now.toTimeString().slice(0, 5);
+  const nowTurkey = toTurkeyTime(new Date());
+  nowTurkey.setMinutes(0, 0, 0);
+  nowTurkey.setHours(nowTurkey.getHours() + 1);
+  const hours = String(nowTurkey.getHours()).padStart(2, "0");
+  const minutes = String(nowTurkey.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
 }
 
 export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDate }: CreateAppointmentModalProps) {
@@ -58,7 +53,7 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
   } = useForm<AppointmentInput>({
     defaultValues: {
       duration_minutes: 60,
-      date: getTodayDate(),
+      date: getTodayDateString(),
       time: getDefaultTime(),
     },
   });
@@ -69,7 +64,7 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
     if (open) {
       reset({
         duration_minutes: 60,
-        date: preselectedDateStr ?? getTodayDate(),
+        date: preselectedDateStr ?? getTodayDateString(),
         time: getDefaultTime(),
       });
       setClientMode("existing");
@@ -129,7 +124,7 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
         return;
       }
 
-      const startsAt = new Date(`${data.date}T${data.time}:00`).toISOString();
+      const startsAt = parseDateTimeToISO(data.date, data.time);
 
       const { error } = await supabase.from("appointments").insert({
         professional_id: user.id,

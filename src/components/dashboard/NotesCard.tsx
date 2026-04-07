@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { useNotes, type Note, type NoteColor } from "@/lib/hooks/useNotes";
+import { Button } from "@/components/ui/Button";
 import { StickyNote, Plus, Pin, Trash2, X, Check, Pencil, Sparkles } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
@@ -249,6 +250,16 @@ interface NoteDetailModalProps {
 
 function NoteDetailModal({ note, open, onClose, onEdit, onTogglePin, onDelete }: NoteDetailModalProps) {
   const colorStyles = getColorStyles(note.color);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = () => {
+    if (showDeleteConfirm) {
+      onDelete();
+      setShowDeleteConfirm(false);
+    } else {
+      setShowDeleteConfirm(true);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -257,81 +268,192 @@ function NoteDetailModal({ note, open, onClose, onEdit, onTogglePin, onDelete }:
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={onClose}
         >
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" 
+          />
+          
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            initial={{ opacity: 0, scale: 0.9, y: 40, rotate: -3 }}
+            animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 2 }}
+            transition={{ 
+              type: "spring", 
+              damping: 22, 
+              stiffness: 280,
+              mass: 0.9
+            }}
             onClick={(e) => e.stopPropagation()}
             className={clsx(
-              "w-full max-w-md rounded-2xl p-5 shadow-2xl border-2 relative",
-              colorStyles.bg,
-              colorStyles.border
+              "relative w-full max-w-md rounded-3xl overflow-hidden",
+              "bg-white"
             )}
             style={{
-              transform: "rotate(-1deg)",
-              boxShadow: "0 10px 40px -10px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05)",
+              boxShadow: "0 30px 60px -15px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.03)"
             }}
           >
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-black/10 transition-colors"
-            >
-              <X className="h-4 w-4 opacity-60" />
-            </button>
-
-            <div className="pr-8">
-              <div className="flex items-start gap-2 mb-3">
-                {note.pinned && <Pin className="h-4 w-4 text-pro-primary shrink-0 mt-1" />}
-                <h3 className={clsx("font-semibold text-lg", colorStyles.text)}>{note.title}</h3>
+            <div className={clsx("h-1.5 w-full", colorStyles.accent)} />
+            
+            <div className={clsx("p-6", colorStyles.bg)}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    {note.pinned && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -45 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", damping: 12 }}
+                      >
+                        <Pin className="h-4 w-4 text-pro-primary" />
+                      </motion.div>
+                    )}
+                    <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                      Not
+                    </span>
+                  </div>
+                  <motion.h3 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className={clsx("font-semibold text-xl leading-tight", colorStyles.text)}
+                  >
+                    {note.title}
+                  </motion.h3>
+                </div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onClose}
+                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-white/60 transition-all"
+                >
+                  <X className="h-5 w-5" />
+                </motion.button>
               </div>
 
               {note.content && (
-                <p className={clsx("text-sm whitespace-pre-wrap leading-relaxed", colorStyles.text, "opacity-80")}>
-                  {note.content}
-                </p>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="mt-4"
+                >
+                  <p className={clsx(
+                    "text-sm whitespace-pre-wrap leading-relaxed",
+                    colorStyles.text,
+                    "opacity-80"
+                  )}>
+                    {note.content}
+                  </p>
+                </motion.div>
               )}
 
-              <div className="flex items-center justify-between mt-5 pt-4 border-t border-black/10">
-                <span className="text-xs opacity-50">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="mt-4 pt-3 border-t border-black/5"
+              >
+                <span className="text-xs text-gray-400">
                   {new Date(note.updated_at).toLocaleDateString("tr-TR", {
                     day: "numeric",
-                    month: "short",
+                    month: "long",
+                    year: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
                 </span>
-                <div className="flex gap-1">
-                  <button
-                    onClick={onTogglePin}
-                    className={clsx(
-                      "p-2 rounded-lg transition-colors",
-                      note.pinned ? "bg-pro-primary/20 text-pro-primary" : "hover:bg-black/10 opacity-60"
-                    )}
-                    title={note.pinned ? "Sabitlemeyi Kaldır" : "Sabitle"}
-                  >
-                    <Pin className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={onEdit}
-                    className="p-2 rounded-lg hover:bg-black/10 opacity-60 transition-colors"
-                    title="Düzenle"
-                  >
-                    <StickyNote className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={onDelete}
-                    className="p-2 rounded-lg hover:bg-red-500/20 text-red-600 opacity-60 hover:opacity-100 transition-colors"
-                    title="Sil"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+              </motion.div>
             </div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between"
+            >
+              <div className="flex gap-1">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onTogglePin}
+                  className={clsx(
+                    "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all",
+                    note.pinned 
+                      ? "bg-pro-primary/10 text-pro-primary" 
+                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  )}
+                >
+                  <Pin className="h-4 w-4" />
+                  {note.pinned ? "Sabitli" : "Sabitle"}
+                </motion.button>
+              </div>
+
+              <div className="flex gap-2">
+                <AnimatePresence mode="wait">
+                  {showDeleteConfirm ? (
+                    <motion.div
+                      key="confirm"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="text-xs text-red-500">Silmek istediğinize emin misiniz?</span>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        İptal
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleDelete}
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                      >
+                        Evet, Sil
+                      </motion.button>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="actions"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex gap-2"
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleDelete}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Sil
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onEdit}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-white bg-pro-primary hover:bg-pro-primary-hover transition-all shadow-sm"
+                      >
+                        <Pencil className="h-4 w-4" />
+                        Düzenle
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       )}

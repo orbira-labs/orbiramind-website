@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { APPOINTMENT_DURATIONS } from "@/lib/constants";
+import { formatDateForInput, formatTimeForInput, parseDateTimeToISO } from "@/lib/utils";
 import { clsx } from "clsx";
 import type { AppointmentSlim } from "./AppointmentDetailModal";
 
@@ -38,12 +39,9 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
   useEffect(() => {
     if (appointment) {
       const d = new Date(appointment.starts_at);
-      const dateStr = d.toISOString().slice(0, 10);
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mm = String(d.getMinutes()).padStart(2, "0");
       reset({
-        date: dateStr,
-        time: `${hh}:${mm}`,
+        date: formatDateForInput(d),
+        time: formatTimeForInput(d),
         duration_minutes: appointment.duration_minutes,
         note: appointment.note ?? "",
       });
@@ -55,7 +53,7 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
     setSaving(true);
     try {
       const supabase = createSupabase();
-      const startsAt = new Date(`${data.date}T${data.time}:00`).toISOString();
+      const startsAt = parseDateTimeToISO(data.date, data.time);
       const { error } = await supabase
         .from("appointments")
         .update({
