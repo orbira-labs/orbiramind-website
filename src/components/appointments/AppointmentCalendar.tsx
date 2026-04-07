@@ -58,6 +58,8 @@ export function AppointmentCalendar({
     return map;
   }, [appointments]);
 
+  const numWeeks = calendarDays.length / 7;
+
   const goToPreviousMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
   const goToNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
   const goToToday = () => setCurrentMonth(new Date());
@@ -76,7 +78,7 @@ export function AppointmentCalendar({
   };
 
   return (
-    <div className="bg-pro-surface rounded-2xl border border-pro-border overflow-hidden">
+    <div className="h-full flex flex-col bg-pro-surface rounded-2xl border border-pro-border overflow-hidden">
       {/* Calendar Header */}
       <div className="px-4 py-4 border-b border-pro-border bg-pro-surface-alt/50">
         <div className="flex items-center justify-between">
@@ -122,7 +124,10 @@ export function AppointmentCalendar({
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7">
+      <div
+        className="flex-1 min-h-0 grid grid-cols-7"
+        style={{ gridTemplateRows: `repeat(${numWeeks}, minmax(0, 1fr))` }}
+      >
         {calendarDays.map((day, index) => {
           const dateKey = format(day, "yyyy-MM-dd");
           const dayAppointments = appointmentsByDate.get(dateKey) || [];
@@ -133,7 +138,7 @@ export function AppointmentCalendar({
             <div
               key={index}
               className={clsx(
-                "min-h-[120px] border-b border-r border-pro-border/50 p-2 transition-colors group",
+                "overflow-hidden border-b border-r border-pro-border/50 p-2 transition-colors group",
                 !isCurrentMonth && "bg-pro-surface-alt/30",
                 isDayToday && "bg-pro-primary-light/70 border-l-2 border-l-pro-primary",
                 isCurrentMonth && !isDayToday && "bg-pro-surface hover:bg-pro-surface-alt/20",

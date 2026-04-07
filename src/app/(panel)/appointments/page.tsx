@@ -61,9 +61,9 @@ export default function AppointmentsPage() {
         onClose={() => setEditApt(null)}
         onUpdated={() => { setEditApt(null); refresh(); }}
       />
-      <main className="flex-1 p-3 sm:p-5 lg:p-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5">
+      <main className="flex-1 min-h-0 flex flex-col p-3 sm:p-5 lg:p-6">
+        <div className="w-full mx-auto max-w-6xl flex-1 min-h-0 flex flex-col">
+          <div className="flex-1 min-h-0 flex flex-col bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5">
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
               <div className="flex items-center gap-4">
@@ -112,24 +112,26 @@ export default function AppointmentsPage() {
 
             {/* Calendar View */}
             {viewMode === "calendar" && (
-              loading ? (
-                <Card padding="lg" variant="elevated">
-                  <div className="animate-pulse space-y-4">
-                    <div className="h-8 w-48 bg-pro-border rounded" />
-                    <div className="grid grid-cols-7 gap-2">
-                      {[...Array(35)].map((_, i) => (
-                        <div key={i} className="h-24 bg-pro-surface-alt rounded-lg" />
-                      ))}
+              <div className="flex-1 min-h-0">
+                {loading ? (
+                  <Card padding="lg" variant="elevated">
+                    <div className="animate-pulse space-y-4">
+                      <div className="h-8 w-48 bg-pro-border rounded" />
+                      <div className="grid grid-cols-7 gap-2">
+                        {[...Array(35)].map((_, i) => (
+                          <div key={i} className="h-24 bg-pro-surface-alt rounded-lg" />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ) : (
-                <AppointmentCalendar
-                  appointments={appointments as AppointmentSlim[]}
-                  onSelectAppointment={setSelectedApt}
-                  onCreateAppointment={handleCreateAppointment}
-                />
-              )
+                  </Card>
+                ) : (
+                  <AppointmentCalendar
+                    appointments={appointments as AppointmentSlim[]}
+                    onSelectAppointment={setSelectedApt}
+                    onCreateAppointment={handleCreateAppointment}
+                  />
+                )}
+              </div>
             )}
 
             {/* List View */}
