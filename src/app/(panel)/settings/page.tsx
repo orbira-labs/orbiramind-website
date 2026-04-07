@@ -7,7 +7,6 @@ import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Modal } from "@/components/ui/Modal";
 import { createClient as createSupabase } from "@/lib/supabase/client";
@@ -142,15 +141,6 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* Avatar */}
-                <div className="flex items-center gap-4 p-4 bg-pro-surface-alt rounded-xl mb-6">
-                  <Avatar firstName={firstName} lastName={lastName} size="lg" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-pro-text">{firstName} {lastName}</p>
-                    <p className="text-xs text-pro-text-tertiary">{professional?.email}</p>
-                  </div>
-                </div>
-
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <Input
@@ -165,7 +155,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  {/* Telefon ve Uzmanlık yan yana */}
+                  {/* Telefon ve E-posta yan yana */}
                   <div className="grid grid-cols-2 gap-3">
                     <Input
                       label="Telefon"
@@ -174,66 +164,13 @@ export default function SettingsPage() {
                       onChange={(e) => setPhone(e.target.value)}
                       hint="WhatsApp için"
                     />
-
-                    {/* Uzmanlık Alanları dropdown */}
-                    <div className="space-y-1.5" ref={specsRef}>
-                      <label className="block text-sm font-medium text-pro-text">
-                        Uzmanlık Alanı
-                      </label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setSpecsOpen((v) => !v)}
-                          className={clsx(
-                            "w-full flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-sm",
-                            "bg-pro-surface transition-colors duration-150",
-                            "focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary",
-                            specsOpen
-                              ? "border-pro-primary ring-2 ring-pro-primary/30"
-                              : "border-pro-border hover:border-pro-border-strong"
-                          )}
-                        >
-                          <span className={clsx(specs.length === 0 ? "text-pro-text-tertiary" : "text-pro-text")}>
-                            {specsLabel}
-                          </span>
-                          <ChevronDown className={clsx(
-                            "h-4 w-4 text-pro-text-tertiary transition-transform duration-200",
-                            specsOpen && "rotate-180"
-                          )} />
-                        </button>
-
-                        {specsOpen && (
-                          <div className="absolute z-20 mt-1 w-full rounded-xl border border-pro-border bg-pro-surface shadow-[var(--pro-shadow-md)] overflow-hidden">
-                            {SPECIALIZATIONS.map((s) => {
-                              const selected = specs.includes(s.id);
-                              return (
-                                <button
-                                  key={s.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setSpecs((prev) =>
-                                      prev.includes(s.id)
-                                        ? prev.filter((x) => x !== s.id)
-                                        : [...prev, s.id]
-                                    );
-                                  }}
-                                  className={clsx(
-                                    "w-full flex items-center justify-between px-3.5 py-2.5 text-sm",
-                                    "transition-colors duration-150",
-                                    selected
-                                      ? "bg-pro-primary-light text-pro-primary"
-                                      : "text-pro-text hover:bg-pro-surface-alt"
-                                  )}
-                                >
-                                  <span>{s.label}</span>
-                                  {selected && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <Input
+                      label="E-posta"
+                      type="email"
+                      value={professional?.email ?? ""}
+                      disabled
+                      readOnly
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -247,6 +184,66 @@ export default function SettingsPage() {
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                     />
+                  </div>
+
+                  {/* Uzmanlık Alanları dropdown */}
+                  <div className="space-y-1.5" ref={specsRef}>
+                    <label className="block text-sm font-medium text-pro-text">
+                      Uzmanlık Alanı
+                    </label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setSpecsOpen((v) => !v)}
+                        className={clsx(
+                          "w-full flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-sm",
+                          "bg-pro-surface transition-colors duration-150",
+                          "focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary",
+                          specsOpen
+                            ? "border-pro-primary ring-2 ring-pro-primary/30"
+                            : "border-pro-border hover:border-pro-border-strong"
+                        )}
+                      >
+                        <span className={clsx(specs.length === 0 ? "text-pro-text-tertiary" : "text-pro-text")}>
+                          {specsLabel}
+                        </span>
+                        <ChevronDown className={clsx(
+                          "h-4 w-4 text-pro-text-tertiary transition-transform duration-200",
+                          specsOpen && "rotate-180"
+                        )} />
+                      </button>
+
+                      {specsOpen && (
+                        <div className="absolute z-20 mt-1 w-full rounded-xl border border-pro-border bg-pro-surface shadow-[var(--pro-shadow-md)] overflow-hidden">
+                          {SPECIALIZATIONS.map((s) => {
+                            const selected = specs.includes(s.id);
+                            return (
+                              <button
+                                key={s.id}
+                                type="button"
+                                onClick={() => {
+                                  setSpecs((prev) =>
+                                    prev.includes(s.id)
+                                      ? prev.filter((x) => x !== s.id)
+                                      : [...prev, s.id]
+                                  );
+                                }}
+                                className={clsx(
+                                  "w-full flex items-center justify-between px-3.5 py-2.5 text-sm",
+                                  "transition-colors duration-150",
+                                  selected
+                                    ? "bg-pro-primary-light text-pro-primary"
+                                    : "text-pro-text hover:bg-pro-surface-alt"
+                                )}
+                              >
+                                <span>{s.label}</span>
+                                {selected && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <Button onClick={handleSave} loading={saving} className="mt-2">
