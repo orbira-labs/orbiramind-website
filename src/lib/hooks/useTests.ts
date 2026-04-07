@@ -81,7 +81,7 @@ export function useTests(statusFilter: StatusFilter = "all") {
       fetchCounts(),
     ]);
 
-    const newData = (dataRes.data as TestWithClient[]) || [];
+    const newData = (dataRes.data as unknown as TestWithClient[]) || [];
     setTests(newData);
     setHasMore(newData.length === PAGE_SIZE);
     setLoading(false);
@@ -99,7 +99,7 @@ export function useTests(statusFilter: StatusFilter = "all") {
       .order("created_at", { ascending: false })
       .range(from, to);
 
-    const newData = (data as TestWithClient[]) || [];
+    const newData = (data as unknown as TestWithClient[]) || [];
     setTests((prev) => [...prev, ...newData]);
     setPage(nextPage);
     setHasMore(newData.length === PAGE_SIZE);

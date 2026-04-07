@@ -87,7 +87,7 @@ export function useAppointments(filter: AppointmentFilter = "all") {
       fetchCounts(),
     ]);
 
-    const newData = (dataRes.data as AppointmentWithClient[]) || [];
+    const newData = (dataRes.data as unknown as AppointmentWithClient[]) || [];
     setAppointments(newData);
     setHasMore(newData.length === PAGE_SIZE);
     setLoading(false);
@@ -107,7 +107,7 @@ export function useAppointments(filter: AppointmentFilter = "all") {
       .order("starts_at", { ascending: orderAsc })
       .range(from, to);
 
-    const newData = (data as AppointmentWithClient[]) || [];
+    const newData = (data as unknown as AppointmentWithClient[]) || [];
     setAppointments((prev) => [...prev, ...newData]);
     setPage(nextPage);
     setHasMore(newData.length === PAGE_SIZE);

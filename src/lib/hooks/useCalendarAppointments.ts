@@ -42,7 +42,7 @@ export function useCalendarAppointments(currentMonth: Date) {
       .lte("starts_at", calendarEnd.toISOString())
       .order("starts_at", { ascending: true });
 
-    setAppointments((data as AppointmentWithClient[]) || []);
+    setAppointments((data as unknown as AppointmentWithClient[]) || []);
     setLoading(false);
   }, [professional?.id, monthKey]);
 

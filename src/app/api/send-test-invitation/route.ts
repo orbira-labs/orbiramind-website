@@ -4,8 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface SendTestInvitationPayload {
   invitationId: string;
   clientEmail: string;
@@ -32,6 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const body: SendTestInvitationPayload = await request.json();
 
     if (!body.clientEmail || !body.testLink) {
