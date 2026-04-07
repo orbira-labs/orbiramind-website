@@ -1,42 +1,47 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   createSession,
   submitAnswers,
   completeSession,
-  groupProfileFields,
   type SessionData,
   type DeepDiveQuestion,
-  type ProfileGroup,
+  type ProfileField,
 } from "@/lib/engine-api";
 import { getDimensionTheme, getPoolTheme, getDimensionLabel, getPoolLabel } from "@/lib/dimension-colors";
-import { LikertScale } from "@/components/test/LikertScale";
-import { ProfileField } from "@/components/test/ProfileField";
 import { AnalysisLoading } from "@/components/test/AnalysisLoading";
 import { PreparationScreen } from "@/components/test/PreparationScreen";
 import { JourneyMap } from "@/components/test/JourneyMap";
 import { StageIntro } from "@/components/test/StageIntro";
 import { StageCompletion } from "@/components/test/StageCompletion";
 import { MidwayMotivation } from "@/components/test/MidwayMotivation";
+import {
+  ScaleQuestion,
+  SingleChoiceQuestion,
+  MultiSelectQuestion,
+  BooleanQuestion,
+  NumericQuestion,
+  TextQuestion,
+} from "@/components/test/QuestionTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import { clsx } from "clsx";
-import { User, Heart, Shield, Coffee, Apple, Sparkles, Activity, Ruler, Fingerprint } from "lucide-react";
+import { ChevronLeft, Activity, Sparkles } from "lucide-react";
 import { celebrateCompletion } from "@/lib/confetti";
 import { celebrationPop } from "@/lib/animations";
 
-type Phase = 
-  | "loading" 
+type Phase =
+  | "loading"
   | "preparation"
   | "journey_map"
   | "stage_intro"
-  | "profile" 
+  | "profile"
   | "stage_complete"
-  | "core" 
+  | "core"
   | "core_midway"
-  | "deep_dive" 
-  | "analyzing" 
-  | "done" 
+  | "deep_dive"
+  | "analyzing"
+  | "done"
   | "error";
 
 interface TestFlowProps {
@@ -44,19 +49,15 @@ interface TestFlowProps {
   clientName?: string;
 }
 
-const CATEGORY_ICONS: Record<string, typeof User> = {
-  demographic: User,
-  physical: Ruler,
-  lifestyle: Heart,
-  health: Shield,
-  habit: Coffee,
-  nutrition: Apple,
-  identity: Fingerprint,
-};
+// Page types for unified navigation
+type PageItem =
+  | { type: "profile"; field: ProfileField; index: number }
+  | { type: "core"; question: SessionData["core_questions"][0]; index: number }
+  | { type: "deep_dive"; question: DeepDiveQuestion; index: number };
 
-const slideVariants = {
+const pageVariants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? 80 : -80,
+    x: direction > 0 ? "100%" : "-100%",
     opacity: 0,
   }),
   center: {
@@ -64,7 +65,7 @@ const slideVariants = {
     opacity: 1,
   },
   exit: (direction: number) => ({
-    x: direction > 0 ? -80 : 80,
+    x: direction > 0 ? "-100%" : "100%",
     opacity: 0,
   }),
 };
@@ -154,19 +155,46 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   const [coreAnswers, setCoreAnswers] = useState<Record<string, number>>({});
   const [deepDiveAnswers, setDeepDiveAnswers] = useState<Record<string, number>>({});
 
-  const [profileGroupIndex, setProfileGroupIndex] = useState(0);
-  const [currentCoreIndex, setCurrentCoreIndex] = useState(0);
-  const [currentDeepDiveIndex, setCurrentDeepDiveIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
   // Stage tracking
   const [currentStage, setCurrentStage] = useState(0);
   const [midwayShown, setMidwayShown] = useState(false);
 
-  const profileGroups: ProfileGroup[] = useMemo(
-    () => (sessionData ? groupProfileFields(sessionData.profile_fields) : []),
-    [sessionData]
-  );
+  // Build pages based on current phase
+  const pages: PageItem[] = useMemo(() => {
+    if (!sessionData) return [];
+
+    if (phase === "profile") {
+      return sessionData.profile_fields.map((field, index) => ({
+        type: "profile" as const,
+        field,
+        index,
+      }));
+    }
+
+    if (phase === "core") {
+      return sessionData.core_questions.map((question, index) => ({
+        type: "core" as const,
+        question,
+        index,
+      }));
+    }
+
+    if (phase === "deep_dive") {
+      return deepDiveQuestions.map((question, index) => ({
+        type: "deep_dive" as const,
+        question,
+        index,
+      }));
+    }
+
+    return [];
+  }, [sessionData, deepDiveQuestions, phase]);
+
+  const currentPage = pages[currentIndex];
+  const totalPages = pages.length;
 
   useEffect(() => {
     initSession();
@@ -177,13 +205,28 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       const data = await createSession(token);
       setSessionId(data.session_id);
       setSessionData(data);
-      setPhase("preparation"); // Start with preparation screen
+      setPhase("preparation");
     } catch (e) {
       console.error("Session init error:", e);
       setError("Bağlantı hatası oluştu. Lütfen sayfayı yenileyin.");
       setPhase("error");
     }
   }
+
+  // Navigation helpers
+  const goNext = useCallback(() => {
+    if (currentIndex < totalPages - 1) {
+      setDirection(1);
+      setCurrentIndex((i) => i + 1);
+    }
+  }, [currentIndex, totalPages]);
+
+  const goPrev = useCallback(() => {
+    if (currentIndex > 0) {
+      setDirection(-1);
+      setCurrentIndex((i) => i - 1);
+    }
+  }, [currentIndex]);
 
   // Stage transition handlers
   function handlePreparationContinue() {
@@ -196,6 +239,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   function handleStageIntroStart() {
+    setCurrentIndex(0);
     if (currentStage === 1) {
       setPhase("profile");
     } else if (currentStage === 2) {
@@ -207,7 +251,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   function handleStageCompleteContinue() {
     if (currentStage === 1) {
-      // After profile, submit answers and move to core
       handleProfileSubmit();
     } else if (currentStage === 2) {
       setCurrentStage(3);
@@ -241,119 +284,92 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
-  function handleProfileChange(fieldId: string, value: unknown) {
+  // Answer handlers
+  function handleProfileAnswer(fieldId: string, value: unknown) {
     setProfile((prev) => ({ ...prev, [fieldId]: value }));
+  }
+
+  function handleProfileAnswerAndNext(fieldId: string, value: unknown) {
+    handleProfileAnswer(fieldId, value);
+    setTimeout(() => {
+      if (currentIndex < totalPages - 1) {
+        goNext();
+      } else {
+        // Profile complete
+        setPhase("stage_complete");
+      }
+    }, 300);
   }
 
   function handleCoreAnswer(questionId: string, value: number) {
     const newAnswers = { ...coreAnswers, [questionId]: value };
     setCoreAnswers(newAnswers);
-    
-    if (sessionData && currentCoreIndex < sessionData.core_questions.length - 1) {
-      // Check for midway motivation
-      const total = sessionData.core_questions.length;
-      const answered = Object.keys(newAnswers).length;
-      const midpoint = Math.floor(total / 2);
-      
-      if (!midwayShown && answered === midpoint) {
+
+    // Check for midway motivation
+    if (sessionData && !midwayShown) {
+      const midpoint = Math.floor(sessionData.core_questions.length / 2);
+      if (Object.keys(newAnswers).length === midpoint) {
         setMidwayShown(true);
-        setTimeout(() => setPhase("core_midway"), 400);
+        setTimeout(() => setPhase("core_midway"), 300);
         return;
       }
-      
-      setTimeout(() => {
-        setDirection(1);
-        setCurrentCoreIndex((i) => i + 1);
-      }, 400);
     }
+
+    setTimeout(() => {
+      if (currentIndex < totalPages - 1) {
+        goNext();
+      } else {
+        // Core complete
+        setPhase("stage_complete");
+      }
+    }, 400);
   }
 
   function handleDeepDiveAnswer(questionId: string, value: number) {
     setDeepDiveAnswers((prev) => ({ ...prev, [questionId]: value }));
-    if (currentDeepDiveIndex < deepDiveQuestions.length - 1) {
-      setTimeout(() => {
-        setDirection(1);
-        setCurrentDeepDiveIndex((i) => i + 1);
-      }, 400);
-    }
+
+    setTimeout(() => {
+      if (currentIndex < totalPages - 1) {
+        goNext();
+      } else {
+        // Deep dive complete
+        setPhase("stage_complete");
+      }
+    }, 400);
   }
 
-  function handleProfileGroupNext() {
-    const group = profileGroups[profileGroupIndex];
-    const missing = group.fields.filter((f) => {
-      if (f.required === false) return false;
-      const val = profile[f.id];
-      if (val == null) return true;
-      if (f.answer_type === "multi_select" && Array.isArray(val) && val.length === 0) return true;
-      return false;
-    });
-    if (missing.length > 0) {
-      setError("Lütfen tüm zorunlu alanları doldurun.");
-      return;
-    }
-    setError(null);
-    setDirection(1);
+  function handleProfileNext() {
+    const currentField = sessionData?.profile_fields[currentIndex];
+    if (!currentField) return;
 
-    if (profileGroupIndex < profileGroups.length - 1) {
-      setProfileGroupIndex((i) => i + 1);
+    const val = profile[currentField.id];
+    if (currentField.required !== false) {
+      if (val == null) {
+        setError("Lütfen bu alanı doldurun.");
+        return;
+      }
+      if (currentField.answer_type === "multi_select" && Array.isArray(val) && val.length === 0) {
+        setError("Lütfen en az bir seçenek seçin.");
+        return;
+      }
+    }
+
+    setError(null);
+
+    if (currentIndex < totalPages - 1) {
+      goNext();
     } else {
-      // Profile stage complete - show completion card
       setPhase("stage_complete");
-    }
-  }
-
-  function handleProfileGroupPrev() {
-    if (profileGroupIndex > 0) {
-      setDirection(-1);
-      setProfileGroupIndex((i) => i - 1);
-      setError(null);
-    }
-  }
-
-  function handleCoreToDone() {
-    if (!sessionData) return;
-    const answeredCount = Object.keys(coreAnswers).length;
-    if (answeredCount < sessionData.core_questions.length) {
-      setError(`Lütfen tüm soruları yanıtlayın (${answeredCount}/${sessionData.core_questions.length})`);
-      return;
-    }
-    setError(null);
-    setDirection(1);
-    // Core stage complete - show completion card
-    setPhase("stage_complete");
-  }
-
-  // Check for midway motivation (around 50% of core questions)
-  function checkCoreMidway() {
-    if (!sessionData || midwayShown) return;
-    const total = sessionData.core_questions.length;
-    const answered = Object.keys(coreAnswers).length;
-    const midpoint = Math.floor(total / 2);
-    
-    if (answered >= midpoint && answered < midpoint + 2) {
-      setMidwayShown(true);
-      setPhase("core_midway");
     }
   }
 
   async function handleProfileSubmit() {
     if (!sessionId || !sessionData) return;
 
-    // Check if height and weight are filled (if they exist in profile_fields)
-    const requiredPhysical = sessionData.profile_fields.filter(
-      (f) => (f.id === "height" || f.id === "weight") && f.required !== false
-    );
-    const missingPhysical = requiredPhysical.filter((f) => !profile[f.id]);
-    if (missingPhysical.length > 0) {
-      setError("Lütfen boy ve kilo bilgilerinizi girin.");
-      return;
-    }
-
     setError(null);
     setPhase("loading");
 
     try {
-      // Update status via API (server-side, bypasses RLS)
       const statusRes = await fetch("/api/test/update-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -368,11 +384,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         console.error("Test başlangıcı kaydedilemedi");
       }
 
-      // measurements is now empty - height/weight are part of profile
       const data = await submitAnswers(sessionId, profile, coreAnswers, {}, token);
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
-      // Move to core stage
+      setCurrentIndex(0);
       setCurrentStage(2);
       setPhase("stage_intro");
     } catch (e) {
@@ -382,30 +397,14 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
-  async function handleDeepDiveSubmit() {
-    if (!sessionId) return;
-
-    const answeredCount = Object.keys(deepDiveAnswers).length;
-    if (answeredCount < deepDiveQuestions.length) {
-      setError(`Lütfen tüm soruları yanıtlayın (${answeredCount}/${deepDiveQuestions.length})`);
-      return;
-    }
-
-    setError(null);
-    
-    // Show stage 4 completion before analyzing
-    setPhase("stage_complete");
-  }
-
   async function handleFinalAnalysis() {
     if (!sessionId) return;
-    
+
     setPhase("analyzing");
 
     try {
       const data = await completeSession(sessionId, deepDiveAnswers, token);
 
-      // Update status via API (server-side, bypasses RLS)
       const statusRes = await fetch("/api/test/update-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -428,25 +427,40 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
-  // --- Progress calculation ---
-  const totalProfileGroups = profileGroups.length;
-  const totalPhases = totalProfileGroups + 2; // profile groups + core + deep_dive
+  // Progress calculation
+  function getProgress(): { current: number; total: number; label: string; subProgress: number } {
+    const profileCount = sessionData?.profile_fields.length || 0;
+    const coreCount = sessionData?.core_questions.length || 0;
+    const deepDiveCount = deepDiveQuestions.length;
 
-  function getProgress(): { current: number; total: number; label: string } {
     switch (phase) {
       case "profile":
-        return { current: profileGroupIndex + 1, total: totalPhases, label: "Profil" };
+        return {
+          current: 1,
+          total: 3,
+          label: "Profil",
+          subProgress: totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0,
+        };
       case "core":
-        return { current: totalProfileGroups + 1, total: totalPhases, label: "Değerlendirme" };
+        return {
+          current: 2,
+          total: 3,
+          label: "Değerlendirme",
+          subProgress: totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0,
+        };
       case "deep_dive":
-        return { current: totalProfileGroups + 2, total: totalPhases, label: "Derinlemesine" };
+        return {
+          current: 3,
+          total: 3,
+          label: "Derinlemesine",
+          subProgress: totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0,
+        };
       default:
-        return { current: 0, total: totalPhases, label: "" };
+        return { current: 0, total: 3, label: "", subProgress: 0 };
     }
   }
 
-  // --- Full-screen states ---
-
+  // Full-screen states
   if (phase === "loading") {
     return (
       <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4 pb-safe">
@@ -490,7 +504,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   if (phase === "analyzing") return <AnalysisLoading />;
 
-  // New onboarding flow screens
   if (phase === "preparation") {
     return (
       <PreparationScreen
@@ -501,13 +514,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   if (phase === "journey_map" && sessionData) {
-    const profileFieldCount = sessionData.profile_fields.length;
-    const coreCount = sessionData.core_questions.length;
-    
     return (
       <JourneyMap
-        profileGroupCount={profileFieldCount}
-        coreQuestionCount={coreCount}
+        profileGroupCount={sessionData.profile_fields.length}
+        coreQuestionCount={sessionData.core_questions.length}
         onStart={handleJourneyMapStart}
       />
     );
@@ -526,9 +536,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   if (phase === "stage_complete") {
-    // After stage 3 (deep_dive), go to analyzing
     const isDeepDiveComplete = currentStage === 3;
-    
     return (
       <StageCompletion
         stageNumber={currentStage}
@@ -539,12 +547,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   if (phase === "core_midway" && sessionData) {
-    const total = sessionData.core_questions.length;
-    const completed = Object.keys(coreAnswers).length;
     return (
       <MidwayMotivation
-        completedCount={completed}
-        totalCount={total}
+        completedCount={Object.keys(coreAnswers).length}
+        totalCount={sessionData.core_questions.length}
         onContinue={handleMidwayContinue}
       />
     );
@@ -554,307 +560,229 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     return <CompletionScreen />;
   }
 
-  // --- Main flow UI ---
+  // Main question flow
   const progress = getProgress();
-  const progressPercent = (progress.current / progress.total) * 100;
+  const isQuestionPhase = phase === "profile" || phase === "core" || phase === "deep_dive";
 
-  const currentGroup = profileGroups[profileGroupIndex];
-  const CategoryIcon = currentGroup ? (CATEGORY_ICONS[currentGroup.category] ?? Sparkles) : Sparkles;
+  // Get theme for current question
+  let currentTheme = null;
+  let dimensionLabel = "";
+  let poolLabel = "";
 
-  const currentCoreQuestion = sessionData?.core_questions[currentCoreIndex];
-  const coreTheme = currentCoreQuestion ? getDimensionTheme(currentCoreQuestion.dimension) : null;
-
-  const currentDeepDiveQuestion = deepDiveQuestions[currentDeepDiveIndex];
-  const deepDiveTheme = currentDeepDiveQuestion ? getPoolTheme(currentDeepDiveQuestion.pool) : null;
-
-  const isQuestionPhase = phase === "core" || phase === "deep_dive";
-  const activeTheme = phase === "core" ? coreTheme : phase === "deep_dive" ? deepDiveTheme : null;
+  if (phase === "core" && currentPage?.type === "core") {
+    currentTheme = getDimensionTheme(currentPage.question.dimension);
+    dimensionLabel = getDimensionLabel(currentPage.question.dimension);
+  } else if (phase === "deep_dive" && currentPage?.type === "deep_dive") {
+    currentTheme = getPoolTheme(currentPage.question.pool);
+    poolLabel = getPoolLabel(currentPage.question.pool);
+  }
 
   return (
     <div
       className={clsx(
-        "min-h-[100dvh] transition-colors duration-500",
-        isQuestionPhase && activeTheme
-          ? `bg-gradient-to-br ${activeTheme.bgGradient}`
+        "min-h-[100dvh] flex flex-col transition-colors duration-500",
+        isQuestionPhase && currentTheme
+          ? `bg-gradient-to-br ${currentTheme.bgGradient}`
           : "bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC]"
       )}
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-xl border-b border-white/50 pt-safe">
-        <div className="max-w-xl mx-auto px-4 sm:px-5 py-3 sm:py-4">
-          <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight truncate">Karakter Analizi</h1>
-              {clientName && <p className="text-xs text-gray-400 mt-0.5 truncate">{clientName}</p>}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-white/50 pt-safe">
+        <div className="max-w-xl mx-auto px-4 py-3">
+          {/* Back button and progress */}
+          <div className="flex items-center gap-3 mb-3">
+            <button
+              onClick={goPrev}
+              disabled={currentIndex === 0}
+              className={clsx(
+                "p-2 -ml-2 rounded-xl transition-all",
+                currentIndex === 0
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-600 hover:bg-gray-100 active:scale-95"
+              )}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="flex-1 text-center">
+              <h1 className="text-sm font-bold text-gray-900 tracking-tight">
+                {clientName || "Karakter Analizi"}
+              </h1>
             </div>
-            <div className="text-right flex-shrink-0 ml-3">
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-[10px] sm:text-xs font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-                  {progress.label}
-                </span>
-                <span className="text-[10px] sm:text-xs text-gray-500 font-medium">
-                  {progress.current}/{progress.total}
-                </span>
-              </div>
-              <p className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 sm:mt-1">
-                ~{Math.max(1, Math.ceil((progress.total - progress.current) * 2))} dk kaldı
-              </p>
-            </div>
+
+            <div className="w-9" /> {/* Spacer for centering */}
           </div>
 
-          {/* Segmented progress bar */}
-          <div className="flex gap-0.5 sm:gap-1">
-            {Array.from({ length: progress.total }).map((_, i) => (
-              <div
-                key={i}
-                className="flex-1 h-1 sm:h-1.5 rounded-full overflow-hidden bg-gray-200/60"
-              >
-                <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-[#5B7B6A] to-[#7A9A8A]"
-                  initial={false}
-                  animate={{ width: i < progress.current ? "100%" : i === progress.current ? `${getSubProgress()}%` : "0%" }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                />
-              </div>
-            ))}
+          {/* Question counter and stage progress */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-2.5 py-1 rounded-full">
+                {progress.label}
+              </span>
+              {(phase === "core" && dimensionLabel) && (
+                <span className={clsx("text-xs font-medium px-2 py-0.5 rounded-full", currentTheme?.badge, currentTheme?.badgeText)}>
+                  {dimensionLabel}
+                </span>
+              )}
+              {(phase === "deep_dive" && poolLabel) && (
+                <span className={clsx("text-xs font-medium px-2 py-0.5 rounded-full", currentTheme?.badge, currentTheme?.badgeText)}>
+                  {poolLabel}
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-gray-500 font-medium tabular-nums">
+              {currentIndex + 1} / {totalPages}
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1.5 bg-gray-200/60 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-[#5B7B6A] to-[#7A9A8A]"
+              initial={false}
+              animate={{ width: `${progress.subProgress}%` }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            />
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-xl mx-auto px-4 sm:px-5 py-6 sm:py-8 pb-safe min-h-[calc(100dvh-100px)] flex flex-col">
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium"
-          >
-            {error}
-          </motion.div>
-        )}
+      {/* Error message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-4 mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium text-center"
+        >
+          {error}
+        </motion.div>
+      )}
 
-        <div className="flex-1 flex flex-col justify-center">
-          <AnimatePresence mode="wait" custom={direction}>
-
-            {/* PROFILE GROUPS */}
-            {phase === "profile" && currentGroup && (
-              <motion.div
-                key={`profile-${profileGroupIndex}`}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-8"
-              >
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#5B7B6A]/10 mb-4">
-                    <CategoryIcon className="w-7 h-7 text-[#5B7B6A]" />
-                  </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1.5">{currentGroup.label}</h2>
-                  <p className="text-gray-500 text-sm">{currentGroup.description}</p>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-5 sm:p-7 space-y-5 sm:space-y-6">
-                  {currentGroup.fields.map((field) => (
-                    <ProfileField
-                      key={field.id}
-                      field={field}
-                      value={profile[field.id]}
-                      onChange={(value) => handleProfileChange(field.id, value)}
+      {/* Question content */}
+      <div className="flex-1 flex flex-col max-w-xl mx-auto w-full">
+        <AnimatePresence mode="wait" custom={direction}>
+          {currentPage && (
+            <motion.div
+              key={`${phase}-${currentIndex}`}
+              custom={direction}
+              variants={pageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="flex-1 flex flex-col bg-white/60 backdrop-blur-sm"
+            >
+              {/* Profile Questions */}
+              {currentPage.type === "profile" && (
+                <>
+                  {currentPage.field.answer_type === "single_choice" && currentPage.field.options && (
+                    <SingleChoiceQuestion
+                      question={currentPage.field.text}
+                      options={currentPage.field.options}
+                      value={profile[currentPage.field.id] as string | boolean}
+                      onAnswer={(val) => handleProfileAnswerAndNext(currentPage.field.id, val)}
                     />
-                  ))}
-                </div>
-
-                <div className="flex gap-2 sm:gap-3">
-                  {profileGroupIndex > 0 && (
-                    <button
-                      onClick={handleProfileGroupPrev}
-                      className="min-h-[52px] px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl font-semibold text-gray-500 hover:bg-white/80 transition-all active:scale-95 touch-manipulation"
-                    >
-                      Geri
-                    </button>
                   )}
-                  <button
-                    onClick={handleProfileGroupNext}
-                    className="flex-1 min-h-[52px] py-3.5 sm:py-4 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#5B7B6A]/20 hover:shadow-2xl hover:shadow-[#5B7B6A]/30 transition-all active:scale-95 touch-manipulation"
-                  >
-                    {profileGroupIndex < profileGroups.length - 1 ? "Devam Et" : "Sorulara Geç"}
-                  </button>
-                </div>
-              </motion.div>
-            )}
 
-            {/* CORE QUESTIONS */}
-            {phase === "core" && sessionData && currentCoreQuestion && coreTheme && (
-              <motion.div
-                key={`core-${currentCoreIndex}`}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-8"
-              >
-                <div className="text-center">
-                  <div className={clsx("inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3", coreTheme.badge, coreTheme.badgeText)}>
-                    <Activity className="w-3.5 h-3.5" />
-                    {getDimensionLabel(currentCoreQuestion.dimension)}
-                  </div>
-                  <div className="text-sm text-gray-400 font-medium">
-                    {currentCoreIndex + 1} / {sessionData.core_questions.length}
-                  </div>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-5 sm:p-8">
-                  <p className="text-base sm:text-xl text-gray-900 font-semibold leading-relaxed text-center mb-6 sm:mb-8">
-                    {currentCoreQuestion.text}
-                  </p>
-                  <LikertScale
-                    value={coreAnswers[currentCoreQuestion.id]}
-                    onChange={(v) => handleCoreAnswer(currentCoreQuestion.id, v)}
-                    labels={currentCoreQuestion.scale_labels}
-                    accentColor={coreTheme.accent}
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <button
-                    onClick={() => { setDirection(-1); setCurrentCoreIndex((i) => Math.max(0, i - 1)); }}
-                    disabled={currentCoreIndex === 0}
-                    className={clsx(
-                      "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
-                      currentCoreIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-white/80 active:scale-95"
-                    )}
-                  >
-                    Önceki
-                  </button>
-                  <div className="flex-1" />
-                  {currentCoreIndex < sessionData.core_questions.length - 1 ? (
-                    <button
-                      onClick={() => { setDirection(1); setCurrentCoreIndex((i) => i + 1); }}
-                      disabled={!coreAnswers[currentCoreQuestion.id]}
-                      className={clsx(
-                        "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
-                        !coreAnswers[currentCoreQuestion.id] ? "text-gray-300 cursor-not-allowed" : "text-[#5B7B6A] hover:bg-[#5B7B6A]/10 active:scale-95"
-                      )}
-                    >
-                      Sonraki
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleCoreToDone}
-                      disabled={!coreAnswers[currentCoreQuestion.id]}
-                      className={clsx(
-                        "min-h-[48px] px-5 sm:px-6 py-3 rounded-2xl font-semibold text-sm transition-all touch-manipulation",
-                        coreAnswers[currentCoreQuestion.id]
-                          ? "bg-[#5B7B6A] text-white shadow-lg shadow-[#5B7B6A]/20 active:scale-95"
-                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      )}
-                    >
-                      Devam Et
-                    </button>
+                  {currentPage.field.answer_type === "boolean" && (
+                    <BooleanQuestion
+                      question={currentPage.field.text}
+                      value={profile[currentPage.field.id] as boolean}
+                      options={currentPage.field.options as { value: boolean; label: string }[]}
+                      onAnswer={(val) => handleProfileAnswerAndNext(currentPage.field.id, val)}
+                    />
                   )}
-                </div>
-              </motion.div>
-            )}
 
-            {/* DEEP DIVE QUESTIONS */}
-            {phase === "deep_dive" && currentDeepDiveQuestion && deepDiveTheme && (
-              <motion.div
-                key={`deep-${currentDeepDiveIndex}`}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-8"
-              >
-                <div className="text-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-[#5B7B6A]/10 to-[#7A9A8A]/10 text-[#5B7B6A] rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Neredeyse bitti!
-                  </div>
-                  <div className={clsx("inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-2", deepDiveTheme.badge, deepDiveTheme.badgeText)}>
-                    {getPoolLabel(currentDeepDiveQuestion.pool)}
-                  </div>
-                  <div className="text-sm text-gray-400 font-medium">
-                    {currentDeepDiveIndex + 1} / {deepDiveQuestions.length}
-                  </div>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-5 sm:p-8">
-                  <p className="text-base sm:text-xl text-gray-900 font-semibold leading-relaxed text-center mb-6 sm:mb-8">
-                    {currentDeepDiveQuestion.text}
-                  </p>
-                  <LikertScale
-                    value={deepDiveAnswers[currentDeepDiveQuestion.id]}
-                    onChange={(v) => handleDeepDiveAnswer(currentDeepDiveQuestion.id, v)}
-                    labels={currentDeepDiveQuestion.scale_labels}
-                    accentColor={deepDiveTheme.accent}
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <button
-                    onClick={() => { setDirection(-1); setCurrentDeepDiveIndex((i) => Math.max(0, i - 1)); }}
-                    disabled={currentDeepDiveIndex === 0}
-                    className={clsx(
-                      "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
-                      currentDeepDiveIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-white/80 active:scale-95"
-                    )}
-                  >
-                    Önceki
-                  </button>
-                  <div className="flex-1" />
-                  {currentDeepDiveIndex < deepDiveQuestions.length - 1 ? (
-                    <button
-                      onClick={() => { setDirection(1); setCurrentDeepDiveIndex((i) => i + 1); }}
-                      disabled={!deepDiveAnswers[currentDeepDiveQuestion.id]}
-                      className={clsx(
-                        "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
-                        !deepDiveAnswers[currentDeepDiveQuestion.id] ? "text-gray-300 cursor-not-allowed" : "text-[#5B7B6A] hover:bg-[#5B7B6A]/10 active:scale-95"
-                      )}
-                    >
-                      Sonraki
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleDeepDiveSubmit}
-                      disabled={!deepDiveAnswers[currentDeepDiveQuestion.id]}
-                      className={clsx(
-                        "min-h-[48px] px-5 sm:px-6 py-3 rounded-2xl font-semibold text-sm transition-all touch-manipulation",
-                        deepDiveAnswers[currentDeepDiveQuestion.id]
-                          ? "bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white shadow-lg shadow-[#5B7B6A]/20 active:scale-95"
-                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      )}
-                    >
-                      Testi Tamamla
-                    </button>
+                  {currentPage.field.answer_type === "multi_select" && currentPage.field.options && (
+                    <MultiSelectQuestion
+                      question={currentPage.field.text}
+                      options={currentPage.field.options.map((o) => ({
+                        value: String(o.value),
+                        label: o.label,
+                      }))}
+                      value={(profile[currentPage.field.id] as string[]) || []}
+                      onAnswer={(val) => handleProfileAnswer(currentPage.field.id, val)}
+                      onNext={handleProfileNext}
+                    />
                   )}
-                </div>
-              </motion.div>
-            )}
 
-          </AnimatePresence>
-        </div>
+                  {currentPage.field.answer_type === "numeric" && (
+                    <NumericQuestion
+                      question={currentPage.field.text}
+                      value={profile[currentPage.field.id] as number}
+                      min={currentPage.field.numeric_range?.min}
+                      max={currentPage.field.numeric_range?.max}
+                      onAnswer={(val) => handleProfileAnswer(currentPage.field.id, val)}
+                      onNext={handleProfileNext}
+                      suffix={currentPage.field.id === "height" ? "cm" : currentPage.field.id === "weight" ? "kg" : undefined}
+                    />
+                  )}
+
+                  {currentPage.field.answer_type === "text" && (
+                    <TextQuestion
+                      question={currentPage.field.text}
+                      value={profile[currentPage.field.id] as string}
+                      onAnswer={(val) => handleProfileAnswer(currentPage.field.id, val)}
+                      onNext={handleProfileNext}
+                    />
+                  )}
+                </>
+              )}
+
+              {/* Core Questions */}
+              {currentPage.type === "core" && (
+                <ScaleQuestion
+                  question={currentPage.question.text}
+                  value={coreAnswers[currentPage.question.id]}
+                  labels={currentPage.question.scale_labels}
+                  onAnswer={(val) => handleCoreAnswer(currentPage.question.id, val)}
+                  accentColor={currentTheme?.accent}
+                />
+              )}
+
+              {/* Deep Dive Questions */}
+              {currentPage.type === "deep_dive" && (
+                <>
+                  {(currentPage.question.answer_type === "scale" || !currentPage.question.answer_type) && (
+                    <ScaleQuestion
+                      question={currentPage.question.text}
+                      value={deepDiveAnswers[currentPage.question.id]}
+                      labels={currentPage.question.scale_labels}
+                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, val)}
+                      accentColor={currentTheme?.accent}
+                    />
+                  )}
+
+                  {currentPage.question.answer_type === "single_choice" && currentPage.question.options && (
+                    <SingleChoiceQuestion
+                      question={currentPage.question.text}
+                      options={currentPage.question.options}
+                      value={deepDiveAnswers[currentPage.question.id]?.toString()}
+                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, Number(val))}
+                    />
+                  )}
+
+                  {currentPage.question.answer_type === "multi_select" && currentPage.question.options && (
+                    <MultiSelectQuestion
+                      question={currentPage.question.text}
+                      options={currentPage.question.options}
+                      value={[]}
+                      onAnswer={() => {}}
+                      onNext={() => {
+                        if (currentIndex < totalPages - 1) {
+                          goNext();
+                        } else {
+                          setPhase("stage_complete");
+                        }
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
-
-  function getSubProgress(): number {
-    switch (phase) {
-      case "profile":
-        return 0;
-      case "core":
-        return sessionData ? (Object.keys(coreAnswers).length / sessionData.core_questions.length) * 100 : 0;
-      case "deep_dive":
-        return deepDiveQuestions.length > 0 ? (Object.keys(deepDiveAnswers).length / deepDiveQuestions.length) * 100 : 0;
-      default:
-        return 0;
-    }
-  }
 }

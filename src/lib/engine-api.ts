@@ -135,6 +135,7 @@ class EngineAPIError extends Error {
 }
 
 const ENGINE_REQUEST_TIMEOUT_MS = 30_000;
+const ENGINE_COMPLETE_TIMEOUT_MS = 150_000; // 2.5 dakika - AI rapor üretimi uzun sürebilir
 
 async function secureApiFetch<T>(
   endpoint: string,
@@ -148,8 +149,11 @@ async function secureApiFetch<T>(
     headers["x-test-token"] = testToken;
   }
 
+  // Complete endpoint için daha uzun timeout (AI rapor üretimi)
+  const timeoutMs = endpoint === "complete" ? ENGINE_COMPLETE_TIMEOUT_MS : ENGINE_REQUEST_TIMEOUT_MS;
+
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), ENGINE_REQUEST_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   let res: Response;
   try {
