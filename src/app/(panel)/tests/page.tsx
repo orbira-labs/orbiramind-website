@@ -12,27 +12,21 @@ import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SendTestModal } from "@/components/tests/SendTestModal";
-import { FlaskConical, Eye, Link2, Check, Send } from "lucide-react";
+import { FlaskConical, Eye, Link2, Check, Send, Loader2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { TEST_STATUSES } from "@/lib/constants";
 import { clsx } from "clsx";
 import Link from "next/link";
 
-type Filter = "all" | "pending" | "completed";
+type Filter = "waiting_analysis" | "waiting_client" | "completed";
 
 export default function TestsPage() {
   const router = useRouter();
   const { creditBalance } = useProContext();
-  const { tests, loading, refresh, completedCount, pendingCount } = useTests();
+  const [filter, setFilter] = useState<Filter>("waiting_analysis");
+  const { tests, counts, loading, loadingMore, hasMore, refresh, loadMore } = useTests(filter);
   const [showSendModal, setShowSendModal] = useState(false);
-  const [filter, setFilter] = useState<Filter>("all");
   const [copiedTestId, setCopiedTestId] = useState<string | null>(null);
-
-  const filtered = tests.filter((t) => {
-    if (filter === "pending") return t.status === "sent" || t.status === "started";
-    if (filter === "completed") return t.status === "completed";
-    return true;
-  });
 
   async function copyTestLinkById(token: string, testId: string) {
     const link = `${window.location.origin}/t/${token}`;
@@ -58,54 +52,54 @@ export default function TestsPage() {
             <div className="grid grid-cols-3 gap-3">
               {creditBalance > 0 ? (
                 <Card padding="md" variant="elevated">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-[var(--pro-analysis-light)] flex items-center justify-center">
-                      <FlaskConical className="h-5 w-5 text-[var(--pro-analysis)]" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-10 w-10 rounded-xl bg-[var(--pro-analysis-light)] flex items-center justify-center">
+                        <FlaskConical className="h-5 w-5 text-[var(--pro-analysis)]" />
+                      </div>
+                      <p className="text-sm text-pro-text-secondary font-medium">Kalan MindTest Adedi</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-pro-text-secondary font-medium">Test Kredisi</p>
-                      <p className="text-2xl font-bold text-[var(--pro-analysis)]">{creditBalance}</p>
-                    </div>
+                    <p className="text-3xl font-bold text-[var(--pro-analysis)]">{creditBalance}</p>
                   </div>
                 </Card>
               ) : (
                 <Card padding="md" variant="elevated" className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                      <FlaskConical className="h-5 w-5 text-amber-600" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                        <FlaskConical className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <p className="text-sm text-amber-700 font-medium">MindTest Krediniz Bitti</p>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-amber-700 font-medium">Test Krediniz Bitti</p>
-                      <button
-                        onClick={() => router.push("/billing")}
-                        className="text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1 mt-0.5"
-                      >
-                        Hemen Al →
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => router.push("/billing")}
+                      className="text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1"
+                    >
+                      Hemen Al →
+                    </button>
                   </div>
                 </Card>
               )}
               <Card padding="md" variant="elevated">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                    <Send className="h-5 w-5 text-amber-600" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                      <Send className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <p className="text-sm text-pro-text-secondary font-medium">İşlenmemiş Analizler</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-pro-text-secondary font-medium">İşlenmemiş Analizler</p>
-                    <p className="text-2xl font-bold text-amber-600">{pendingCount}</p>
-                  </div>
+                  <p className="text-3xl font-bold text-amber-600">{counts.pending}</p>
                 </div>
               </Card>
               <Card padding="md" variant="elevated">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center">
-                    <Check className="h-5 w-5 text-green-600" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center">
+                      <Check className="h-5 w-5 text-green-600" />
+                    </div>
+                    <p className="text-sm text-pro-text-secondary font-medium">Tamamlanan</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-pro-text-secondary font-medium">Tamamlanan</p>
-                    <p className="text-2xl font-bold text-green-600">{completedCount}</p>
-                  </div>
+                  <p className="text-3xl font-bold text-green-600">{counts.completed}</p>
                 </div>
               </Card>
             </div>
@@ -120,7 +114,7 @@ export default function TestsPage() {
                     Test Geçmişi
                   </h2>
                   <div className="flex gap-1 bg-pro-surface-alt rounded-lg p-1">
-                    {(["all", "pending", "completed"] as Filter[]).map((f) => (
+                    {(["waiting_analysis", "waiting_client", "completed"] as Filter[]).map((f) => (
                       <button
                         key={f}
                         onClick={() => setFilter(f)}
@@ -131,7 +125,7 @@ export default function TestsPage() {
                             : "text-pro-text-secondary hover:text-pro-text"
                         )}
                       >
-                        {f === "all" ? "Tümü" : f === "pending" ? "İşlenmemiş" : "Tamamlanan"}
+                        {f === "waiting_analysis" ? "Analiz Hazır" : f === "waiting_client" ? "Danışan Bekleniyor" : "Tamamlanan"}
                       </button>
                     ))}
                   </div>
@@ -152,20 +146,17 @@ export default function TestsPage() {
                     </div>
                   ))}
                 </div>
-              ) : filtered.length === 0 ? (
+              ) : tests.length === 0 ? (
                 <EmptyState
                   icon={FlaskConical}
-                  title={tests.length === 0 ? "Henüz test gönderilmemiş" : "Sonuç bulunamadı"}
-                  description={tests.length === 0 ? "Danışanlarınıza test göndererek içgörüler elde edin" : "Farklı bir filtre deneyin"}
-                  actionLabel={tests.length === 0 ? "Test Gönder" : undefined}
-                  onAction={tests.length === 0 ? () => setShowSendModal(true) : undefined}
-                  actionVariant={tests.length === 0 ? "blue" : undefined}
+                  title="Bu kategoride sonuç yok"
+                  description="Farklı bir filtre deneyin veya yeni MindTest gönderin"
                 />
               ) : (
                 <div className="space-y-2">
-                  {filtered.map((test) => {
+                  {tests.map((test) => {
                     const s = TEST_STATUSES.find((ts) => ts.id === test.status);
-                    const isCompleted = test.status === "completed";
+                    const canViewResults = test.status === "completed" || test.status === "reviewed";
                     const isPending = test.status === "sent" || test.status === "started";
                     const isCopied = copiedTestId === test.id;
 
@@ -188,7 +179,7 @@ export default function TestsPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={s?.color as "success" | "warning" | "info" | "danger" || "muted"} size="sm" dot>
+                          <Badge variant={s?.color as "success" | "warning" | "info" | "danger" | "accent" || "muted"} size="sm" dot>
                             {s?.label || test.status}
                           </Badge>
                           {isPending && (
@@ -205,7 +196,7 @@ export default function TestsPage() {
                               {isCopied ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
                             </button>
                           )}
-                          {isCompleted && (
+                          {canViewResults && (
                             <Link
                               href={`/tests/${test.id}`}
                               className="p-1.5 rounded-lg text-[var(--pro-analysis)] hover:bg-[var(--pro-analysis-light)] transition-colors"
@@ -218,6 +209,24 @@ export default function TestsPage() {
                       </div>
                     );
                   })}
+                  
+                  {/* Load More Button */}
+                  {hasMore && (
+                    <button
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="w-full py-3 mt-2 text-sm font-medium text-pro-text-secondary hover:text-pro-text hover:bg-pro-surface-alt rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {loadingMore ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Yükleniyor...
+                        </>
+                      ) : (
+                        "Daha Fazla Yükle"
+                      )}
+                    </button>
+                  )}
                 </div>
               )}
             </Card>

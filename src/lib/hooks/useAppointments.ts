@@ -9,60 +9,122 @@ interface AppointmentWithClient extends Appointment {
   client: { first_name: string; last_name: string } | null;
 }
 
-const CACHE_KEY = "pro_appointments_cache";
-const CACHE_TTL = 60_000;
-
-function getCache(): { data: AppointmentWithClient[]; timestamp: number } | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw);
-    if (Date.now() - cached.timestamp > CACHE_TTL) return null;
-    return cached;
-  } catch {
-    return null;
-  }
+interface AppointmentCounts {
+  upcoming: number;
+  past: number;
+  total: number;
 }
 
-function setCache(data: AppointmentWithClient[]) {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch {}
-}
+type AppointmentFilter = "upcoming" | "past" | "all";
 
-export function useAppointments() {
+const PAGE_SIZE = 30;
+
+export function useAppointments(filter: AppointmentFilter = "all") {
   const { professional } = useProContext();
-  const initialCache = useRef(getCache());
+  const supabase = useRef(createClient());
   
-  const [appointments, setAppointments] = useState<AppointmentWithClient[]>(initialCache.current?.data ?? []);
-  const [loading, setLoading] = useState(!initialCache.current);
+  const [appointments, setAppointments] = useState<AppointmentWithClient[]>([]);
+  const [counts, setCounts] = useState<AppointmentCounts>({ upcoming: 0, past: 0, total: 0 });
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
+
+  // useRef ile now'u sabitliyoruz - sadece component mount olduğunda oluşur
+  const nowRef = useRef(new Date().toISOString());
+
+  const buildQuery = useCallback((forCount = false) => {
+    let query = supabase.current
+      .from("appointments")
+      .select(forCount ? "id" : "*, client:clients(first_name, last_name)", forCount ? { count: "exact", head: true } : undefined)
+      .eq("professional_id", professional?.id || "");
+
+    if (filter === "upcoming") {
+      query = query.gte("starts_at", nowRef.current);
+    } else if (filter === "past") {
+      query = query.lt("starts_at", nowRef.current);
+    }
+
+    return query;
+  }, [professional?.id, filter]);
+
+  const fetchCounts = useCallback(async () => {
+    if (!professional?.id) return;
+
+    const { data } = await supabase.current
+      .from("professional_stats")
+      .select("upcoming_appointments_count, total_appointments_count")
+      .eq("professional_id", professional.id)
+      .single();
+
+    const statsData = data as {
+      upcoming_appointments_count: number;
+      total_appointments_count: number;
+    } | null;
+
+    const upcoming = statsData?.upcoming_appointments_count ?? 0;
+    const total = statsData?.total_appointments_count ?? 0;
+
+    setCounts({
+      upcoming,
+      past: total - upcoming,
+      total,
+    });
+  }, [professional?.id]);
 
   const refresh = useCallback(async () => {
     if (!professional?.id) return;
     
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("appointments")
-      .select("*, client:clients(first_name, last_name)")
-      .eq("professional_id", professional.id)
-      .order("starts_at", { ascending: true });
+    setLoading(true);
+    setPage(0);
+
+    const orderAsc = filter === "upcoming" || filter === "all";
+
+    const [dataRes] = await Promise.all([
+      buildQuery()
+        .order("starts_at", { ascending: orderAsc })
+        .range(0, PAGE_SIZE - 1),
+      fetchCounts(),
+    ]);
+
+    const newData = (dataRes.data as AppointmentWithClient[]) || [];
+    setAppointments(newData);
+    setHasMore(newData.length === PAGE_SIZE);
+    setLoading(false);
+  }, [professional?.id, buildQuery, fetchCounts, filter]);
+
+  const loadMore = useCallback(async () => {
+    if (!professional?.id || loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    const from = nextPage * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
+    const orderAsc = filter === "upcoming" || filter === "all";
+
+    const { data } = await buildQuery()
+      .order("starts_at", { ascending: orderAsc })
+      .range(from, to);
 
     const newData = (data as AppointmentWithClient[]) || [];
-    setAppointments(newData);
-    setLoading(false);
-    setCache(newData);
-  }, [professional?.id]);
+    setAppointments((prev) => [...prev, ...newData]);
+    setPage(nextPage);
+    setHasMore(newData.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [professional?.id, loadingMore, hasMore, page, buildQuery, filter]);
 
   useEffect(() => {
-    if (!professional?.id) return;
-    
-    if (initialCache.current) {
-      setLoading(false);
-    }
     refresh();
-  }, [professional?.id, refresh]);
+  }, [refresh]);
 
-  return { appointments, loading, refresh };
+  return { 
+    appointments, 
+    counts,
+    loading, 
+    loadingMore,
+    hasMore,
+    refresh, 
+    loadMore,
+  };
 }

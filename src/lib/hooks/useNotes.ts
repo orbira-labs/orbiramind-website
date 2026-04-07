@@ -36,7 +36,8 @@ export function useNotes() {
         .select("*")
         .eq("professional_id", professional.id)
         .order("pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(50);
 
       if (fetchError) throw fetchError;
       setNotes(data || []);

@@ -5,60 +5,50 @@ import { createClient } from "@/lib/supabase/client";
 import { useProContext } from "@/lib/context";
 import type { Client } from "@/lib/types";
 
-const CACHE_KEY = "pro_clients_cache";
-const CACHE_TTL = 60_000;
+const DROPDOWN_LIMIT = 100;
 
-function getCache(): { data: Client[]; timestamp: number } | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw);
-    if (Date.now() - cached.timestamp > CACHE_TTL) return null;
-    return cached;
-  } catch {
-    return null;
-  }
-}
-
-function setCache(data: Client[]) {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch {}
-}
-
-export function useClients() {
+export function useClients(searchTerm?: string) {
   const { professional } = useProContext();
-  const initialCache = useRef(getCache());
   const supabase = useRef(createClient());
   
-  const [clients, setClients] = useState<Client[]>(initialCache.current?.data ?? []);
-  const [loading, setLoading] = useState(!initialCache.current);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!professional?.id) return;
     
-    const { data } = await supabase.current
+    setLoading(true);
+    
+    let query = supabase.current
       .from("clients")
       .select("*")
       .eq("professional_id", professional.id)
-      .order("created_at", { ascending: false });
+      .eq("status", "active")
+      .order("first_name", { ascending: true })
+      .limit(DROPDOWN_LIMIT + 1);
+
+    if (searchTerm && searchTerm.trim()) {
+      const term = searchTerm.trim();
+      const likePattern = `%${term}%`;
+      query = query.or(
+        `first_name.ilike.${likePattern},last_name.ilike.${likePattern}`
+      );
+    }
+
+    const { data } = await query;
 
     const newData = data || [];
-    setClients(newData);
+    const hasMoreData = newData.length > DROPDOWN_LIMIT;
+    
+    setClients(hasMoreData ? newData.slice(0, DROPDOWN_LIMIT) : newData);
+    setHasMore(hasMoreData);
     setLoading(false);
-    setCache(newData);
-  }, [professional?.id]);
+  }, [professional?.id, searchTerm]);
 
   useEffect(() => {
-    if (!professional?.id) return;
-    
-    if (initialCache.current) {
-      setLoading(false);
-    }
     refresh();
-  }, [professional?.id, refresh]);
+  }, [refresh]);
 
-  return { clients, setClients, loading, refresh };
+  return { clients, setClients, loading, hasMore, refresh };
 }

@@ -5,6 +5,8 @@ export const PRO_CONFIG = {
   testExpiryDays: 7,
 };
 
+export const TIMEZONE = "Europe/Istanbul";
+
 export const SPECIALIZATIONS = [
   { id: "wellness_coaching", label: "Wellness Koçluğu" },
   { id: "clinical_psychology", label: "Klinik Psikoloji" },
@@ -32,9 +34,10 @@ export const CLIENT_STATUSES = [
 ] as const;
 
 export const TEST_STATUSES = [
-  { id: "sent", label: "Bekliyor", color: "warning" },
+  { id: "sent", label: "Danışan Bekleniyor", color: "warning" },
   { id: "started", label: "Devam Ediyor", color: "info" },
-  { id: "completed", label: "Tamamlandı", color: "success" },
+  { id: "completed", label: "Analiz Hazır", color: "accent" },
+  { id: "reviewed", label: "Tamamlandı", color: "success" },
   { id: "expired", label: "Süresi Doldu", color: "danger" },
 ] as const;
 

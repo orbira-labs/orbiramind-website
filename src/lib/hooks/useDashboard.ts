@@ -117,18 +117,7 @@ export function useDashboard(initialData?: DashboardInitialData) {
   const fetchData = useCallback(async () => {
     if (!professional?.id) return;
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const [
-      aptsRes,
-      testsRes,
-      clientsCountRes,
-      pendingAnalysesRes,
-      todayAptsRes,
-    ] = await Promise.all([
+    const [aptsRes, testsRes, statsRes] = await Promise.all([
       supabase.current
         .from("appointments")
         .select(
@@ -148,22 +137,10 @@ export function useDashboard(initialData?: DashboardInitialData) {
         .order("created_at", { ascending: false })
         .limit(5),
       supabase.current
-        .from("clients")
-        .select("id", { count: "exact", head: true })
+        .from("professional_stats")
+        .select("active_clients_count, todays_appointments_count, pending_analyses_count")
         .eq("professional_id", professional.id)
-        .eq("status", "active"),
-      supabase.current
-        .from("test_invitations")
-        .select("id", { count: "exact", head: true })
-        .eq("professional_id", professional.id)
-        .in("status", ["sent", "started"]),
-      supabase.current
-        .from("appointments")
-        .select("id", { count: "exact", head: true })
-        .eq("professional_id", professional.id)
-        .eq("status", "scheduled")
-        .gte("starts_at", todayStart.toISOString())
-        .lte("starts_at", todayEnd.toISOString()),
+        .single(),
     ]);
 
     const newApts = (aptsRes.data || []).map((a: Record<string, unknown>) => ({
@@ -178,10 +155,16 @@ export function useDashboard(initialData?: DashboardInitialData) {
       })
     ) as DashboardTest[];
 
+    const statsData = statsRes.data as { 
+      active_clients_count: number; 
+      todays_appointments_count: number; 
+      pending_analyses_count: number 
+    } | null;
+
     const newStats: DashboardStats = {
-      active_clients: clientsCountRes.count ?? 0,
-      todays_appointments: todayAptsRes.count ?? 0,
-      pending_analyses: pendingAnalysesRes.count ?? 0,
+      active_clients: statsData?.active_clients_count ?? 0,
+      todays_appointments: statsData?.todays_appointments_count ?? 0,
+      pending_analyses: statsData?.pending_analyses_count ?? 0,
     };
 
     setUpcomingAppointments(newApts);

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { isToday, isFuture, isPast } from "date-fns";
 import { useAppointments } from "@/lib/hooks/useAppointments";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
@@ -13,7 +12,7 @@ import { CreateAppointmentModal } from "@/components/appointments";
 import { AppointmentDetailModal, type AppointmentSlim } from "@/components/appointments/AppointmentDetailModal";
 import { EditAppointmentModal } from "@/components/appointments/EditAppointmentModal";
 import { AppointmentCalendar } from "@/components/appointments/AppointmentCalendar";
-import { Calendar, Plus, Clock, CalendarDays, List } from "lucide-react";
+import { Calendar, Plus, Clock, CalendarDays, List, Loader2 } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import { clsx } from "clsx";
 
@@ -21,20 +20,13 @@ type ViewMode = "calendar" | "list";
 type Filter = "upcoming" | "past" | "all";
 
 export default function AppointmentsPage() {
-  const { appointments, loading, refresh } = useAppointments();
-  const [showModal, setShowModal] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");
   const [filter, setFilter] = useState<Filter>("upcoming");
+  const { appointments, counts, loading, loadingMore, hasMore, refresh, loadMore } = useAppointments(filter);
+  const [showModal, setShowModal] = useState(false);
   const [selectedApt, setSelectedApt] = useState<AppointmentSlim | null>(null);
   const [editApt, setEditApt] = useState<AppointmentSlim | null>(null);
   const [preselectedDate, setPreselectedDate] = useState<Date | undefined>(undefined);
-
-  const filtered = appointments.filter((a) => {
-    const d = new Date(a.starts_at);
-    if (filter === "upcoming") return isFuture(d) || isToday(d);
-    if (filter === "past") return isPast(d) && !isToday(d);
-    return true;
-  });
 
   const handleCreateAppointment = (date?: Date) => {
     setPreselectedDate(date);
@@ -113,24 +105,11 @@ export default function AppointmentsPage() {
             {/* Calendar View */}
             {viewMode === "calendar" && (
               <div className="flex-1 min-h-0">
-                {loading ? (
-                  <Card padding="lg" variant="elevated">
-                    <div className="animate-pulse space-y-4">
-                      <div className="h-8 w-48 bg-pro-border rounded" />
-                      <div className="grid grid-cols-7 gap-2">
-                        {[...Array(35)].map((_, i) => (
-                          <div key={i} className="h-24 bg-pro-surface-alt rounded-lg" />
-                        ))}
-                      </div>
-                    </div>
-                  </Card>
-                ) : (
-                  <AppointmentCalendar
-                    appointments={appointments as AppointmentSlim[]}
-                    onSelectAppointment={setSelectedApt}
-                    onCreateAppointment={handleCreateAppointment}
-                  />
-                )}
+                <AppointmentCalendar
+                  onSelectAppointment={setSelectedApt}
+                  onCreateAppointment={handleCreateAppointment}
+                  onRefreshNeeded={refresh}
+                />
               </div>
             )}
 
@@ -151,13 +130,10 @@ export default function AppointmentsPage() {
                             : "text-pro-text-secondary hover:text-pro-text"
                         )}
                       >
-                        {f === "upcoming" ? "Yaklaşan" : f === "past" ? "Geçmiş" : "Tümü"}
+                        {f === "upcoming" ? `Yaklaşan (${counts.upcoming})` : f === "past" ? `Geçmiş (${counts.past})` : `Tümü (${counts.total})`}
                       </button>
                     ))}
                   </div>
-                  <span className="text-xs text-pro-text-tertiary">
-                    {filtered.length} randevu
-                  </span>
                 </div>
 
                 {/* List Content */}
@@ -174,7 +150,7 @@ export default function AppointmentsPage() {
                       </div>
                     ))}
                   </div>
-                ) : filtered.length === 0 ? (
+                ) : appointments.length === 0 ? (
                   <EmptyState
                     icon={Calendar}
                     title="Randevu yok"
@@ -188,7 +164,7 @@ export default function AppointmentsPage() {
                   />
                 ) : (
                   <div className="space-y-2">
-                    {filtered.map((apt) => (
+                    {appointments.map((apt) => (
                       <button
                         key={apt.id}
                         type="button"
@@ -232,6 +208,24 @@ export default function AppointmentsPage() {
                         </div>
                       </button>
                     ))}
+                    
+                    {/* Load More Button */}
+                    {hasMore && (
+                      <button
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                        className="w-full py-3 mt-2 text-sm font-medium text-pro-text-secondary hover:text-pro-text hover:bg-pro-surface-alt rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {loadingMore ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Yükleniyor...
+                          </>
+                        ) : (
+                          "Daha Fazla Yükle"
+                        )}
+                      </button>
+                    )}
                   </div>
                 )}
               </Card>

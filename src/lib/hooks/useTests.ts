@@ -9,63 +9,114 @@ interface TestWithClient extends TestInvitation {
   client: { first_name: string; last_name: string } | null;
 }
 
-const CACHE_KEY = "pro_tests_cache";
-const CACHE_TTL = 60_000;
-
-function getCache(): { data: TestWithClient[]; timestamp: number } | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw);
-    if (Date.now() - cached.timestamp > CACHE_TTL) return null;
-    return cached;
-  } catch {
-    return null;
-  }
+interface TestCounts {
+  total: number;
+  pending: number;
+  completed: number;
 }
 
-function setCache(data: TestWithClient[]) {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch {}
-}
+type StatusFilter = "all" | "waiting_client" | "waiting_analysis" | "completed";
 
-export function useTests() {
+const PAGE_SIZE = 20;
+
+export function useTests(statusFilter: StatusFilter = "all") {
   const { professional } = useProContext();
-  const initialCache = useRef(getCache());
   const supabase = useRef(createClient());
   
-  const [tests, setTests] = useState<TestWithClient[]>(initialCache.current?.data ?? []);
-  const [loading, setLoading] = useState(!initialCache.current);
+  const [tests, setTests] = useState<TestWithClient[]>([]);
+  const [counts, setCounts] = useState<TestCounts>({ total: 0, pending: 0, completed: 0 });
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
+
+  const buildQuery = useCallback((forCount = false) => {
+    let query = supabase.current
+      .from("test_invitations")
+      .select(forCount ? "id" : "*, client:clients(first_name, last_name)", forCount ? { count: "exact", head: true } : undefined)
+      .eq("professional_id", professional?.id || "");
+
+    if (statusFilter === "waiting_client") {
+      query = query.eq("status", "sent");
+    } else if (statusFilter === "waiting_analysis") {
+      query = query.in("status", ["started", "completed"]);
+    } else if (statusFilter === "completed") {
+      query = query.eq("status", "reviewed");
+    }
+
+    return query;
+  }, [professional?.id, statusFilter]);
+
+  const fetchCounts = useCallback(async () => {
+    if (!professional?.id) return;
+
+    const { data } = await supabase.current
+      .from("professional_stats")
+      .select("pending_analyses_count, completed_analyses_count")
+      .eq("professional_id", professional.id)
+      .single();
+
+    const statsData = data as {
+      pending_analyses_count: number;
+      completed_analyses_count: number;
+    } | null;
+
+    setCounts({
+      total: (statsData?.pending_analyses_count ?? 0) + (statsData?.completed_analyses_count ?? 0),
+      pending: statsData?.pending_analyses_count ?? 0,
+      completed: statsData?.completed_analyses_count ?? 0,
+    });
+  }, [professional?.id]);
 
   const refresh = useCallback(async () => {
     if (!professional?.id) return;
     
-    const { data } = await supabase.current
-      .from("test_invitations")
-      .select("*, client:clients(first_name, last_name)")
-      .eq("professional_id", professional.id)
-      .order("created_at", { ascending: false });
+    setLoading(true);
+    setPage(0);
+
+    const [dataRes] = await Promise.all([
+      buildQuery()
+        .order("created_at", { ascending: false })
+        .range(0, PAGE_SIZE - 1),
+      fetchCounts(),
+    ]);
+
+    const newData = (dataRes.data as TestWithClient[]) || [];
+    setTests(newData);
+    setHasMore(newData.length === PAGE_SIZE);
+    setLoading(false);
+  }, [professional?.id, buildQuery, fetchCounts]);
+
+  const loadMore = useCallback(async () => {
+    if (!professional?.id || loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    const from = nextPage * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
+    const { data } = await buildQuery()
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     const newData = (data as TestWithClient[]) || [];
-    setTests(newData);
-    setLoading(false);
-    setCache(newData);
-  }, [professional?.id]);
+    setTests((prev) => [...prev, ...newData]);
+    setPage(nextPage);
+    setHasMore(newData.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [professional?.id, loadingMore, hasMore, page, buildQuery]);
 
   useEffect(() => {
-    if (!professional?.id) return;
-    
-    if (initialCache.current) {
-      setLoading(false);
-    }
     refresh();
-  }, [professional?.id, refresh]);
+  }, [refresh]);
 
-  const completedCount = tests.filter((t) => t.status === "completed").length;
-  const pendingCount = tests.filter((t) => t.status === "sent" || t.status === "started").length;
-
-  return { tests, loading, refresh, completedCount, pendingCount };
+  return { 
+    tests, 
+    counts,
+    loading, 
+    loadingMore,
+    hasMore,
+    refresh, 
+    loadMore,
+  };
 }

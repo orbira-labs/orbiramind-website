@@ -9,30 +9,31 @@ import {
   eachDayOfInterval, 
   format, 
   isSameMonth, 
-  isSameDay, 
   isToday,
   addMonths,
   subMonths
 } from "date-fns";
 import { tr } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
+import { useCalendarAppointments } from "@/lib/hooks/useCalendarAppointments";
 import type { AppointmentSlim } from "./AppointmentDetailModal";
 
 interface AppointmentCalendarProps {
-  appointments: AppointmentSlim[];
   onSelectAppointment: (apt: AppointmentSlim) => void;
   onCreateAppointment: (date?: Date) => void;
+  onRefreshNeeded?: () => void;
 }
 
 const WEEKDAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
 export function AppointmentCalendar({ 
-  appointments, 
   onSelectAppointment, 
-  onCreateAppointment 
+  onCreateAppointment,
+  onRefreshNeeded,
 }: AppointmentCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { appointments, loading, refresh } = useCalendarAppointments(currentMonth);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -50,13 +51,18 @@ export function AppointmentCalendar({
       if (!map.has(dateKey)) {
         map.set(dateKey, []);
       }
-      map.get(dateKey)!.push(apt);
+      map.get(dateKey)!.push(apt as AppointmentSlim);
     });
     map.forEach((apts) => {
       apts.sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
     });
     return map;
   }, [appointments]);
+  
+  const handleRefresh = () => {
+    refresh();
+    onRefreshNeeded?.();
+  };
 
   const numWeeks = calendarDays.length / 7;
 

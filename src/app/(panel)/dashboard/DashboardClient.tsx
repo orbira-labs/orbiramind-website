@@ -84,11 +84,12 @@ const STAT_CARDS = [
 
 const STATUS_MAP: Record<
   string,
-  { label: string; variant: "success" | "warning" | "info" | "danger" }
+  { label: string; variant: "success" | "warning" | "info" | "danger" | "accent" }
 > = {
-  sent: { label: "Bekliyor", variant: "warning" },
+  sent: { label: "Danışan Bekleniyor", variant: "warning" },
   started: { label: "Devam Ediyor", variant: "info" },
-  completed: { label: "Tamamlandı", variant: "success" },
+  completed: { label: "Analiz Hazır", variant: "accent" },
+  reviewed: { label: "Tamamlandı", variant: "success" },
   expired: { label: "Süresi Doldu", variant: "danger" },
 };
 
@@ -352,9 +353,10 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                   <div className="space-y-2">
                     {recentTests.slice(0, 4).map((test) => {
                       const s = STATUS_MAP[test.status] || STATUS_MAP.sent;
-                      const isCompleted = test.status === "completed";
+                      const canViewResults = test.status === "completed" || test.status === "reviewed";
                       const isPending =
                         test.status !== "completed" &&
+                        test.status !== "reviewed" &&
                         test.status !== "expired";
                       const profName = professional
                         ? `${professional.first_name} ${professional.last_name}`
@@ -394,7 +396,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                             <Badge variant={s.variant} size="sm" dot>
                               {s.label}
                             </Badge>
-                            {isCompleted && (
+                            {canViewResults && (
                               <span
                                 className="p-1 rounded-lg text-pro-primary"
                                 title="Sonuçları Gör"

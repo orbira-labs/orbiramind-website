@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 
-type BadgeVariant = "success" | "warning" | "danger" | "info" | "muted";
+type BadgeVariant = "success" | "warning" | "danger" | "info" | "accent" | "muted";
 type BadgeSize = "sm" | "md";
 
 interface BadgeProps {
@@ -16,6 +16,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   warning: "bg-pro-warning-light text-pro-warning border border-pro-warning/15",
   danger: "bg-pro-danger-light text-pro-danger border border-pro-danger/15",
   info: "bg-pro-primary-light text-pro-primary border border-pro-primary/15",
+  accent: "bg-blue-50 text-blue-600 border border-blue-200/50",
   muted: "bg-pro-surface-alt text-pro-text-secondary border border-pro-border",
 };
 
@@ -29,6 +30,7 @@ const dotColors: Record<BadgeVariant, string> = {
   warning: "bg-pro-warning",
   danger: "bg-pro-danger",
   info: "bg-pro-primary",
+  accent: "bg-blue-600",
   muted: "bg-pro-text-tertiary",
 };
 

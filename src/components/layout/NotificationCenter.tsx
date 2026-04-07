@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, FileText, Calendar, AlertCircle, Clock } from "lucide-react";
+import { Bell, FileText, Calendar, AlertCircle, Clock, Pin } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
 import { clsx } from "clsx";
 
@@ -14,6 +14,7 @@ export interface ProPanelNotification {
   createdAt: string;
   isRead: boolean;
   href?: string;
+  isPersistent?: boolean;
 }
 
 interface NotificationCenterProps {
@@ -63,11 +64,18 @@ export function NotificationCenter({
   }, []);
 
   const handleNotificationClick = (notification: ProPanelNotification) => {
-    if (!notification.isRead) {
+    // For persistent notifications (like appointment reminders), 
+    // only mark as read when explicitly clicked, don't auto-dismiss
+    if (!notification.isRead && !notification.isPersistent) {
       onMarkAsRead?.(notification.id);
     }
     onNotificationClick?.(notification);
     setIsOpen(false);
+  };
+
+  const handleMarkAsReadClick = (e: React.MouseEvent, notificationId: string) => {
+    e.stopPropagation();
+    onMarkAsRead?.(notificationId);
   };
 
   return (
@@ -132,10 +140,17 @@ export function NotificationCenter({
                         key={notification.id}
                         onClick={() => handleNotificationClick(notification)}
                         className={clsx(
-                          "w-full flex items-start gap-3 p-4 text-left transition-colors hover:bg-pro-surface-alt",
-                          !notification.isRead && "bg-pro-primary-light/20"
+                          "w-full flex items-start gap-3 p-4 text-left transition-colors hover:bg-pro-surface-alt relative",
+                          !notification.isRead && "bg-pro-primary-light/20",
+                          notification.isPersistent && !notification.isRead && "border-l-4 border-[var(--pro-appointment)]"
                         )}
                       >
+                        {/* Persistent indicator */}
+                        {notification.isPersistent && !notification.isRead && (
+                          <div className="absolute top-2 right-2">
+                            <Pin className="h-3 w-3 text-[var(--pro-appointment)]" />
+                          </div>
+                        )}
                         <div
                           className={clsx(
                             "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
@@ -159,10 +174,20 @@ export function NotificationCenter({
                             )}
                           </div>
                           <p className="text-xs text-pro-text-tertiary mt-0.5 line-clamp-2">{notification.body}</p>
-                          <p className="text-[10px] text-pro-text-tertiary mt-1 flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatRelative(notification.createdAt)}
-                          </p>
+                          <div className="flex items-center justify-between mt-1">
+                            <p className="text-[10px] text-pro-text-tertiary flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {formatRelative(notification.createdAt)}
+                            </p>
+                            {notification.isPersistent && !notification.isRead && (
+                              <button
+                                onClick={(e) => handleMarkAsReadClick(e, notification.id)}
+                                className="text-[10px] text-pro-primary hover:underline"
+                              >
+                                Okundu
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </button>
                     );

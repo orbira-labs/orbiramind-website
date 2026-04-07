@@ -6,18 +6,7 @@ import type { DashboardInitialData } from "@/lib/hooks/useDashboard";
 async function getDashboardData(userId: string): Promise<DashboardInitialData> {
   const supabase = await createClient();
 
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
-
-  const [
-    aptsRes,
-    testsRes,
-    clientsCountRes,
-    pendingAnalysesRes,
-    todayAptsRes,
-  ] = await Promise.all([
+  const [aptsRes, testsRes, statsRes] = await Promise.all([
     supabase
       .from("appointments")
       .select(
@@ -37,22 +26,10 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
       .order("created_at", { ascending: false })
       .limit(5),
     supabase
-      .from("clients")
-      .select("id", { count: "exact", head: true })
+      .from("professional_stats")
+      .select("active_clients_count, todays_appointments_count, pending_analyses_count")
       .eq("professional_id", userId)
-      .eq("status", "active"),
-    supabase
-      .from("test_invitations")
-      .select("id", { count: "exact", head: true })
-      .eq("professional_id", userId)
-      .in("status", ["sent", "started"]),
-    supabase
-      .from("appointments")
-      .select("id", { count: "exact", head: true })
-      .eq("professional_id", userId)
-      .eq("status", "scheduled")
-      .gte("starts_at", todayStart.toISOString())
-      .lte("starts_at", todayEnd.toISOString()),
+      .single(),
   ]);
 
   interface ClientInfo {
@@ -98,13 +75,19 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     })
   );
 
+  const statsData = statsRes.data as {
+    active_clients_count: number;
+    todays_appointments_count: number;
+    pending_analyses_count: number;
+  } | null;
+
   return {
     upcomingAppointments,
     recentTests,
     stats: {
-      active_clients: clientsCountRes.count ?? 0,
-      todays_appointments: todayAptsRes.count ?? 0,
-      pending_analyses: pendingAnalysesRes.count ?? 0,
+      active_clients: statsData?.active_clients_count ?? 0,
+      todays_appointments: statsData?.todays_appointments_count ?? 0,
+      pending_analyses: statsData?.pending_analyses_count ?? 0,
     },
   };
 }

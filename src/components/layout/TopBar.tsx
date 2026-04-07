@@ -6,8 +6,10 @@ import { Send, Clock } from "lucide-react";
 import { Avatar } from "../ui/Avatar";
 import { NotificationCenter, type ProPanelNotification } from "./NotificationCenter";
 import { useProContext } from "@/lib/context";
-import { useCompletedAnalysisNotifications } from "@/lib/hooks/useCompletedAnalysisNotifications";
+import { useCombinedNotifications } from "@/lib/hooks/useCombinedNotifications";
 import { SendTestModal } from "@/components/tests/SendTestModal";
+import { AppointmentReminderPopup } from "@/components/appointments/AppointmentReminderPopup";
+import { AnalysisReadyPopup } from "@/components/tests/AnalysisReadyPopup";
 
 interface TopBarProps {
   title?: string;
@@ -37,7 +39,16 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
   const [showSendModal, setShowSendModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(formatTime());
 
-  const { notifications, markAsRead, markAllAsRead, triggerLoad } = useCompletedAnalysisNotifications();
+  const { 
+    notifications, 
+    markAsRead, 
+    markAllAsRead, 
+    triggerLoad, 
+    appointmentPopup, 
+    dismissAppointmentPopup,
+    analysisPopup,
+    dismissAnalysisPopup,
+  } = useCombinedNotifications();
 
   useEffect(() => {
     if (!showGreeting) return;
@@ -63,6 +74,8 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
   return (
     <>
       <SendTestModal open={showSendModal} onClose={() => setShowSendModal(false)} onSent={handleTestSent} />
+      <AppointmentReminderPopup notification={appointmentPopup} onDismiss={dismissAppointmentPopup} />
+      <AnalysisReadyPopup notification={analysisPopup} onDismiss={dismissAnalysisPopup} />
       <header className="h-auto min-h-[64px] border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-30">
         {showGreeting ? (
           <div className="flex items-center gap-2.5 bg-white/35 border border-white/60 rounded-2xl px-3.5 py-2 shadow-sm">
@@ -92,13 +105,13 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
         )}
 
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Test Gönder Butonu */}
+          {/* MindTest Gönder Butonu */}
           <button
             onClick={() => setShowSendModal(true)}
             className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-white/50 hover:bg-white/80 border border-white/70 hover:border-white text-[#3D5A4C] text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
           >
             <Send className="h-4 w-4" />
-            <span className="hidden sm:inline">Test Gönder</span>
+            <span className="hidden sm:inline">MindTest Gönder</span>
           </button>
 
           {/* Bildirimler */}

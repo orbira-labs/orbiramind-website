@@ -1,21 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
-import { Modal } from "@/components/ui/Modal";
-import { Button } from "@/components/ui/Button";
 import { useNotes, type Note, type NoteColor } from "@/lib/hooks/useNotes";
-import { StickyNote, Plus, Pin, Trash2, X, Check } from "lucide-react";
+import { StickyNote, Plus, Pin, Trash2, X, Check, Pencil, Sparkles } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 
-const NOTE_COLORS: { value: NoteColor; bg: string; border: string; text: string }[] = [
-  { value: "yellow", bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-900" },
-  { value: "green", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-900" },
-  { value: "blue", bg: "bg-sky-50", border: "border-sky-200", text: "text-sky-900" },
-  { value: "pink", bg: "bg-pink-50", border: "border-pink-200", text: "text-pink-900" },
-  { value: "purple", bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-900" },
+const NOTE_COLORS: { value: NoteColor; bg: string; bgSoft: string; border: string; text: string; accent: string; shadow: string }[] = [
+  { value: "yellow", bg: "bg-amber-50", bgSoft: "bg-amber-50/80", border: "border-amber-200/60", text: "text-amber-800", accent: "bg-amber-400", shadow: "shadow-amber-200/50" },
+  { value: "green", bg: "bg-emerald-50", bgSoft: "bg-emerald-50/80", border: "border-emerald-200/60", text: "text-emerald-800", accent: "bg-emerald-400", shadow: "shadow-emerald-200/50" },
+  { value: "blue", bg: "bg-sky-50", bgSoft: "bg-sky-50/80", border: "border-sky-200/60", text: "text-sky-800", accent: "bg-sky-400", shadow: "shadow-sky-200/50" },
+  { value: "pink", bg: "bg-pink-50", bgSoft: "bg-pink-50/80", border: "border-pink-200/60", text: "text-pink-800", accent: "bg-pink-400", shadow: "shadow-pink-200/50" },
+  { value: "purple", bg: "bg-violet-50", bgSoft: "bg-violet-50/80", border: "border-violet-200/60", text: "text-violet-800", accent: "bg-violet-400", shadow: "shadow-violet-200/50" },
 ];
 
 function getColorStyles(color: string) {
@@ -36,6 +34,14 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
   const [color, setColor] = useState<NoteColor>((note?.color as NoteColor) || "yellow");
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    if (open) {
+      setTitle(note?.title || "");
+      setContent(note?.content || "");
+      setColor((note?.color as NoteColor) || "yellow");
+    }
+  }, [open, note]);
+
   const colorStyles = getColorStyles(color);
 
   const handleSave = async () => {
@@ -50,71 +56,185 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={note ? "Notu Düzenle" : "Yeni Not"} size="md">
-      <div className="space-y-4">
-        <div className={clsx("rounded-xl p-4 border-2 transition-colors", colorStyles.bg, colorStyles.border)}>
-          <input
-            type="text"
-            placeholder="Not başlığı..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className={clsx(
-              "w-full bg-transparent font-semibold text-lg outline-none placeholder:opacity-50",
-              colorStyles.text
-            )}
-            autoFocus
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={onClose}
+        >
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/25 backdrop-blur-[2px]" 
           />
-          <textarea
-            placeholder="Detaylar (opsiyonel)..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={4}
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ 
+              type: "spring", 
+              damping: 28, 
+              stiffness: 350,
+              mass: 0.8
+            }}
+            onClick={(e) => e.stopPropagation()}
             className={clsx(
-              "w-full bg-transparent mt-2 text-sm outline-none resize-none placeholder:opacity-50",
-              colorStyles.text
+              "relative w-full max-w-md rounded-3xl overflow-hidden",
+              "bg-white shadow-2xl",
+              colorStyles.shadow
             )}
-          />
-        </div>
+            style={{
+              boxShadow: `0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px ${color === 'yellow' ? 'rgba(251, 191, 36, 0.1)' : color === 'green' ? 'rgba(52, 211, 153, 0.1)' : color === 'blue' ? 'rgba(56, 189, 248, 0.1)' : color === 'pink' ? 'rgba(244, 114, 182, 0.1)' : 'rgba(167, 139, 250, 0.1)'}`,
+            }}
+          >
+            <div className={clsx("h-1.5 w-full", colorStyles.accent)} />
+            
+            <div className="px-6 pt-5 pb-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    initial={{ rotate: -10 }}
+                    animate={{ rotate: 0 }}
+                    transition={{ type: "spring", damping: 10 }}
+                  >
+                    <Sparkles className={clsx("h-5 w-5", colorStyles.text, "opacity-60")} />
+                  </motion.div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {note ? "Notu Düzenle" : "Yeni Not"}
+                  </h2>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all duration-200"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-pro-text-secondary">Renk:</span>
-          <div className="flex gap-1.5">
-            {NOTE_COLORS.map((c) => (
-              <button
-                key={c.value}
-                onClick={() => setColor(c.value)}
+            <div className="px-6 pb-6">
+              <motion.div 
+                layout
                 className={clsx(
-                  "h-6 w-6 rounded-full border-2 transition-all",
-                  c.bg,
-                  c.border,
-                  color === c.value && "ring-2 ring-offset-1 ring-pro-primary scale-110"
+                  "rounded-2xl p-5 transition-all duration-300",
+                  colorStyles.bg,
+                  "border border-transparent"
                 )}
-              />
-            ))}
-          </div>
-        </div>
+                style={{
+                  boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)"
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Not başlığı..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={clsx(
+                    "w-full bg-transparent font-medium text-base outline-none",
+                    "placeholder:text-gray-400/70 transition-colors",
+                    "focus:placeholder:text-gray-400/50",
+                    colorStyles.text
+                  )}
+                  autoFocus
+                  style={{ caretColor: color === 'yellow' ? '#f59e0b' : color === 'green' ? '#10b981' : color === 'blue' ? '#0ea5e9' : color === 'pink' ? '#ec4899' : '#8b5cf6' }}
+                />
+                <div className={clsx("h-px my-3 opacity-20", colorStyles.accent)} />
+                <textarea
+                  placeholder="Düşüncelerinizi yazın..."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  rows={5}
+                  className={clsx(
+                    "w-full bg-transparent text-sm outline-none resize-none leading-relaxed",
+                    "placeholder:text-gray-400/60 transition-colors",
+                    colorStyles.text,
+                    "opacity-90"
+                  )}
+                  style={{ caretColor: color === 'yellow' ? '#f59e0b' : color === 'green' ? '#10b981' : color === 'blue' ? '#0ea5e9' : color === 'pink' ? '#ec4899' : '#8b5cf6' }}
+                />
+              </motion.div>
 
-        <div className="flex items-center justify-between pt-2">
-          {note && onDelete ? (
-            <Button variant="danger" size="sm" onClick={onDelete}>
-              <Trash2 className="h-4 w-4 mr-1" />
-              Sil
-            </Button>
-          ) : (
-            <div />
-          )}
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={onClose}>
-              İptal
-            </Button>
-            <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
-              <Check className="h-4 w-4 mr-1" />
-              {saving ? "Kaydediliyor..." : "Kaydet"}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Modal>
+              <div className="flex items-center gap-3 mt-5">
+                <span className="text-sm text-gray-500 font-medium">Renk</span>
+                <div className="flex gap-2">
+                  {NOTE_COLORS.map((c) => (
+                    <motion.button
+                      key={c.value}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setColor(c.value)}
+                      className={clsx(
+                        "h-7 w-7 rounded-full transition-all duration-200 relative",
+                        c.bg,
+                        color === c.value 
+                          ? "ring-2 ring-offset-2 ring-gray-400/50" 
+                          : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-200"
+                      )}
+                    >
+                      {color === c.value && (
+                        <motion.div
+                          layoutId="colorCheck"
+                          className={clsx("absolute inset-0 flex items-center justify-center rounded-full", c.accent)}
+                          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                        >
+                          <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                        </motion.div>
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                {note && onDelete ? (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onDelete}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Sil
+                  </motion.button>
+                ) : (
+                  <div />
+                )}
+                <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    İptal
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleSave}
+                    disabled={saving}
+                    className={clsx(
+                      "flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white rounded-xl transition-all",
+                      "bg-pro-primary hover:bg-pro-primary-hover disabled:opacity-50 disabled:cursor-not-allowed",
+                      "shadow-sm hover:shadow-md"
+                    )}
+                  >
+                    <Check className="h-4 w-4" />
+                    {saving ? "Kaydediliyor..." : "Kaydet"}
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

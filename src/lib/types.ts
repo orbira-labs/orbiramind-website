@@ -55,7 +55,7 @@ export interface TestInvitation {
   client_id: string;
   token: string;
   test_type: string;
-  status: "sent" | "started" | "completed" | "expired";
+  status: "sent" | "started" | "completed" | "reviewed" | "expired";
   sent_via: "whatsapp" | "email" | "manual";
   message_text: string | null;
   expires_at: string;
@@ -64,6 +64,7 @@ export interface TestInvitation {
   created_at: string;
   started_at: string | null;
   completed_at: string | null;
+  reviewed_at: string | null;
 }
 
 export interface CreditPackage {
@@ -105,6 +106,19 @@ export interface DashboardStats {
   active_clients: number;
   todays_appointments: number;
   pending_analyses: number;
+}
+
+export interface ProfessionalStats {
+  professional_id: string;
+  active_clients_count: number;
+  total_clients_count: number;
+  pending_analyses_count: number;
+  completed_analyses_count: number;
+  todays_appointments_count: number;
+  upcoming_appointments_count: number;
+  total_appointments_count: number;
+  total_notes_count: number;
+  updated_at: string;
 }
 
 export interface Trait {

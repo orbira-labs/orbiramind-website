@@ -59,7 +59,23 @@ export default function TestResultPage() {
         .eq("professional_id", user.id)
         .single();
 
-      setTest(data as (TestInvitation & { client: Client }) | null);
+      const testData = data as (TestInvitation & { client: Client }) | null;
+      
+      // Eğer test completed durumundaysa ve henüz reviewed değilse, reviewed yap
+      if (testData && testData.status === "completed" && testData.results_snapshot) {
+        await supabase
+          .from("test_invitations")
+          .update({ 
+            status: "reviewed",
+            reviewed_at: new Date().toISOString()
+          })
+          .eq("id", id);
+        
+        testData.status = "reviewed";
+        testData.reviewed_at = new Date().toISOString();
+      }
+
+      setTest(testData);
       setLoading(false);
     }
 
@@ -112,7 +128,7 @@ export default function TestResultPage() {
     );
   }
 
-  if (test.status !== "completed" || !test.results_snapshot) {
+  if ((test.status !== "completed" && test.status !== "reviewed") || !test.results_snapshot) {
     return (
       <>
         <TopBar title="Analiz Sonucu" />
