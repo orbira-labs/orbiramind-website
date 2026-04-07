@@ -1,12 +1,13 @@
 "use client";
 
-import { Sparkles, Layers, BarChart3, Lock } from "lucide-react";
+import { Users, CalendarCheck, FileText, Brain, Sparkles, Lock } from "lucide-react";
 
 const FEATURES = [
-  { icon: Sparkles, text: "AQE ile her danışana uyarlanan akıllı soru akışı" },
-  { icon: Layers, text: "HAE ile çok katmanlı karakter ve davranış analizi" },
-  { icon: BarChart3, text: "350+ psikolojik özellik, 10 boyutlu profil çıktısı" },
-  { icon: Lock, text: "Uçtan uca güvenli, KVKK uyumlu profesyonel altyapı" },
+  { icon: Users, text: "Danışan ve randevu yönetimi tek ekranda" },
+  { icon: FileText, text: "Seans notları ve ilerleme takibi" },
+  { icon: Brain, text: "HAE motoru ile duygusal ve davranışsal haritalama" },
+  { icon: Sparkles, text: "AQE motoru ile kişilik ve uyum analizi" },
+  { icon: Lock, text: "Uçtan uca güvenli, KVKK uyumlu altyapı" },
 ];
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -35,18 +36,18 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div>
                 <span className="text-white/90 text-lg font-semibold">Orbira</span>
-                <span className="text-white/60 text-lg font-light ml-1.5">Karakter Analiz</span>
+                <span className="text-white/60 text-lg font-light ml-1.5">Mind</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-5">
             <h2 className="text-white text-[26px] xl:text-[30px] font-semibold leading-snug">
-              Danışanınızı yüzeyde değil,<br />
-              derin yapısında anlayın.
+              Danışan yönetiminde<br />
+              profesyonel asistanınız.
             </h2>
             <p className="text-white/55 text-sm leading-relaxed max-w-[380px]">
-              Orbira, AQE ve HAE motorlarıyla danışan verisini adaptif olarak toplar, çok boyutlu karakter analiziyle anlamlı içgörülere dönüştürür.
+              Danışan takibi, randevu yönetimi, seans notları ve AI destekli derinlemesine karakter analizleri — hepsi tek platformda.
             </p>
             <div className="space-y-4 pt-4">
               {FEATURES.map((f, i) => (
@@ -78,7 +79,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             <div className="mx-auto h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center mb-3 shadow-[var(--pro-shadow-md)]">
               <span className="text-white text-2xl font-bold">O</span>
             </div>
-            <p className="text-sm font-semibold text-pro-text">Orbira <span className="font-light text-pro-text-secondary">Karakter Analiz</span></p>
+            <p className="text-sm font-semibold text-pro-text">Orbira <span className="font-light text-pro-text-secondary">Mind</span></p>
           </div>
 
           {children}
