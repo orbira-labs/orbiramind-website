@@ -22,12 +22,12 @@ export async function GET(request: Request) {
           .single();
 
         if (!profile || !profile.onboarding_completed) {
-          return NextResponse.redirect(`${origin}/pro/onboarding`);
+          return NextResponse.redirect(`${origin}/onboarding`);
         }
-        return NextResponse.redirect(`${origin}/pro/dashboard`);
+        return NextResponse.redirect(`${origin}/dashboard`);
       }
     }
   }
 
-  return NextResponse.redirect(`${origin}/pro/auth/login`);
+  return NextResponse.redirect(`${origin}/auth/login`);
 }

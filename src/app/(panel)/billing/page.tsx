@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   Layers,
   ScanSearch,
+  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -62,6 +63,28 @@ export default function BillingPage() {
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
         <div className="mx-auto max-w-4xl">
           <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4">
+
+            {/* Credit Balance Card */}
+            <Card padding="lg" variant="elevated">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-pro-text-tertiary mb-1">Mevcut Bakiyeniz</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-pro-text">{creditBalance}</span>
+                    <span className="text-base text-pro-text-secondary">Analiz Kredisi</span>
+                  </div>
+                  {creditBalance <= 2 && creditBalance > 0 && (
+                    <p className="text-xs text-amber-600 mt-2">Krediniz azalıyor, yeni paket almayı düşünün.</p>
+                  )}
+                  {creditBalance === 0 && (
+                    <p className="text-xs text-red-500 mt-2">Krediniz tükendi. Analiz başlatmak için paket satın alın.</p>
+                  )}
+                </div>
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center shadow-lg shadow-[#5B7B6A]/20">
+                  <Wallet className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </Card>
 
             {/* Top Info Card — clean feature list */}
             <Card padding="lg" variant="elevated">

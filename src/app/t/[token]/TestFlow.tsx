@@ -605,9 +605,17 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
               {clientName && <p className="text-xs text-gray-400 mt-0.5">{clientName}</p>}
             </div>
             <div className="text-right">
-              <span className="text-xs font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-3 py-1 rounded-full">
-                {progress.label}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-3 py-1 rounded-full">
+                  {progress.label}
+                </span>
+                <span className="text-xs text-gray-500 font-medium">
+                  {progress.current}/{progress.total}
+                </span>
+              </div>
+              <p className="text-[10px] text-gray-400 mt-1">
+                ~{Math.max(1, Math.ceil((progress.total - progress.current) * 2))} dk kaldı
+              </p>
             </div>
           </div>
 

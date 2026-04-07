@@ -11,6 +11,22 @@ export interface ClientCounts {
   passive: number;
 }
 
+export interface ClientAnalysisInfo {
+  status: "pending" | "completed" | "none";
+  lastCompletedAt?: string;
+  pendingCount?: number;
+}
+
+export interface ClientAppointmentInfo {
+  hasUpcoming: boolean;
+  nextDate?: string;
+}
+
+export interface ClientWithExtras extends Client {
+  analysisInfo?: ClientAnalysisInfo;
+  appointmentInfo?: ClientAppointmentInfo;
+}
+
 interface UseClientsListOptions {
   page: number;
   pageSize: number;
@@ -26,7 +42,7 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
   const { professional } = useProContext();
   const supabase = useRef(createClient());
 
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientWithExtras[]>([]);
   const [counts, setCounts] = useState<ClientCounts>({ total: 0, active: 0, passive: 0 });
   const [totalMatching, setTotalMatching] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -121,7 +137,80 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
         return;
       }
 
-      setClients((data as Client[]) || []);
+      const clientList = (data as Client[]) || [];
+      
+      if (clientList.length > 0) {
+        const clientIds = clientList.map(c => c.id);
+        
+        const [testsRes, appointmentsRes] = await Promise.all([
+          supabase.current
+            .from("test_invitations")
+            .select("client_id, status, completed_at")
+            .in("client_id", clientIds)
+            .order("completed_at", { ascending: false }),
+          supabase.current
+            .from("appointments")
+            .select("client_id, starts_at")
+            .in("client_id", clientIds)
+            .eq("status", "scheduled")
+            .gte("starts_at", new Date().toISOString())
+            .order("starts_at", { ascending: true })
+        ]);
+
+        const testsByClient = new Map<string, { completed: string | null; pending: number }>();
+        const appointmentsByClient = new Map<string, string>();
+
+        (testsRes.data || []).forEach((t: { client_id: string; status: string; completed_at: string | null }) => {
+          const existing = testsByClient.get(t.client_id) || { completed: null, pending: 0 };
+          if (t.status === "completed" && t.completed_at && !existing.completed) {
+            existing.completed = t.completed_at;
+          }
+          if (t.status === "sent" || t.status === "started") {
+            existing.pending += 1;
+          }
+          testsByClient.set(t.client_id, existing);
+        });
+
+        (appointmentsRes.data || []).forEach((a: { client_id: string; starts_at: string }) => {
+          if (!appointmentsByClient.has(a.client_id)) {
+            appointmentsByClient.set(a.client_id, a.starts_at);
+          }
+        });
+
+        const enrichedClients: ClientWithExtras[] = clientList.map(client => {
+          const testInfo = testsByClient.get(client.id);
+          const nextAppointment = appointmentsByClient.get(client.id);
+
+          let analysisInfo: ClientAnalysisInfo | undefined;
+          if (testInfo) {
+            if (testInfo.pending > 0) {
+              analysisInfo = { status: "pending", pendingCount: testInfo.pending };
+            } else if (testInfo.completed) {
+              analysisInfo = { status: "completed", lastCompletedAt: testInfo.completed };
+            }
+          }
+
+          let appointmentInfo: ClientAppointmentInfo | undefined;
+          if (nextAppointment) {
+            appointmentInfo = {
+              hasUpcoming: true,
+              nextDate: new Date(nextAppointment).toLocaleDateString("tr-TR", {
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit"
+              })
+            };
+          }
+
+          return { ...client, analysisInfo, appointmentInfo };
+        });
+
+        setClients(enrichedClients);
+      } else {
+        setClients([]);
+      }
+      
       setTotalMatching(count ?? 0);
     } catch (err) {
       console.error("fetchList beklenmedik hata:", err);

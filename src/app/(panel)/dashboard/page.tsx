@@ -61,21 +61,42 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
       .maybeSingle(),
   ]);
 
+  interface ClientInfo {
+    first_name: string;
+    last_name: string;
+  }
+
+  interface AppointmentRow {
+    id: string;
+    client_id: string;
+    starts_at: string;
+    duration_minutes: number;
+    note: string | null;
+    status: string;
+    client: ClientInfo | ClientInfo[] | null;
+  }
+
+  interface TestRow {
+    id: string;
+    token: string;
+    status: string;
+    created_at: string;
+    client: ClientInfo | ClientInfo[] | null;
+  }
+
   const upcomingAppointments = (aptsRes.data || []).map(
-    (a: Record<string, unknown>) => ({
+    (a: AppointmentRow) => ({
       ...a,
       client: Array.isArray(a.client) ? a.client[0] || null : a.client,
     })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as any[];
+  );
 
   const recentTests = (testsRes.data || []).map(
-    (t: Record<string, unknown>) => ({
+    (t: TestRow) => ({
       ...t,
       client: Array.isArray(t.client) ? t.client[0] || null : t.client,
     })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as any[];
+  );
 
   return {
     upcomingAppointments,

@@ -235,6 +235,8 @@ export default function ClientsPage() {
                       client={client}
                       viewMode="row"
                       lastContactAt={client.updated_at}
+                      analysisInfo={client.analysisInfo}
+                      appointmentInfo={client.appointmentInfo}
                       rowActions={{
                         onSetStatus: (status) => handleSetStatus(client, status),
                         onDelete: () => setDeleteTarget(client),

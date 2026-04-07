@@ -100,31 +100,31 @@ export default function LoginPage() {
 
             <div className="space-y-3">
               <button
-                onClick={() => setMode("test_code")}
-                className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-pro-primary/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
+                onClick={() => setMode("login")}
+                className="w-full flex items-center gap-4 p-5 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] rounded-2xl shadow-lg shadow-[#5B7B6A]/20 hover:shadow-xl hover:shadow-[#5B7B6A]/30 transition-all text-left group"
               >
-                <div className="h-12 w-12 rounded-xl bg-pro-primary-light flex items-center justify-center shrink-0 group-hover:bg-pro-primary/15 transition-colors">
-                  <ClipboardList className="h-6 w-6 text-pro-primary" />
+                <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition-colors">
+                  <LogIn className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-[15px] font-semibold text-pro-text">Test Kodumu Gir</p>
-                  <p className="text-sm text-pro-text-tertiary mt-0.5">
-                    Uzmanınızdan aldığınız kodu girin
+                  <p className="text-[15px] font-semibold text-white">Uzman Girişi</p>
+                  <p className="text-sm text-white/70 mt-0.5">
+                    Profesyonel hesabınızla giriş yapın
                   </p>
                 </div>
               </button>
 
               <button
-                onClick={() => setMode("login")}
+                onClick={() => setMode("test_code")}
                 className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-pro-primary/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
               >
                 <div className="h-12 w-12 rounded-xl bg-pro-surface-alt flex items-center justify-center shrink-0 group-hover:bg-pro-surface-alt/80 transition-colors">
-                  <LogIn className="h-6 w-6 text-pro-text-secondary" />
+                  <ClipboardList className="h-6 w-6 text-pro-text-secondary" />
                 </div>
                 <div>
-                  <p className="text-[15px] font-semibold text-pro-text">Uzman Girişi</p>
+                  <p className="text-[15px] font-semibold text-pro-text">Test Kodumu Gir</p>
                   <p className="text-sm text-pro-text-tertiary mt-0.5">
-                    Profesyonel hesabınızla giriş yapın
+                    Uzmanınızdan aldığınız kodu girin
                   </p>
                 </div>
               </button>
