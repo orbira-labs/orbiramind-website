@@ -13,12 +13,14 @@ function ErrorCard({
   iconColor,
   title,
   description,
+  errorCode,
 }: {
   icon: React.ReactNode;
   iconBg: string;
   iconColor: string;
   title: string;
   description: string;
+  errorCode?: string;
 }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4">
@@ -37,6 +39,9 @@ function ErrorCard({
         </div>
         <h1 className="text-xl font-semibold text-gray-900 mb-2">{title}</h1>
         <p className="text-gray-600">{description}</p>
+        {errorCode && (
+          <p className="mt-4 text-xs text-gray-400 font-mono">Hata kodu: {errorCode}</p>
+        )}
       </div>
     </div>
   );
@@ -55,6 +60,27 @@ export default async function TestPage({ params }: TestPageProps) {
 
   if (error) {
     console.error("Test daveti sorgulanamadı:", error);
+    
+    // DB bağlantı hatası veya RLS hatası
+    if (error.code === "PGRST301" || error.message?.includes("permission") || error.message?.includes("policy")) {
+      return (
+        <ErrorCard
+          iconBg="bg-red-100"
+          iconColor="text-red-500"
+          icon={
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          }
+          title="Bağlantı Hatası"
+          description="Sunucuya bağlanırken bir sorun oluştu. Lütfen birkaç dakika sonra tekrar deneyin."
+          errorCode={error.code}
+        />
+      );
+    }
   }
 
   if (!invitation) {
@@ -72,6 +98,7 @@ export default async function TestPage({ params }: TestPageProps) {
         }
         title="Test Bulunamadı"
         description="Girdiğiniz kod geçersiz veya bu test artık mevcut değil. Lütfen uzmanınızdan yeni bir link isteyin."
+        errorCode={error?.code}
       />
     );
   }
