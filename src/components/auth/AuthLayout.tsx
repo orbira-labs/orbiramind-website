@@ -1,12 +1,12 @@
 "use client";
 
-import { Brain, Users, BarChart3, Lock } from "lucide-react";
+import { Sparkles, Layers, BarChart3, Lock } from "lucide-react";
 
 const FEATURES = [
-  { icon: Brain, text: "Yapay zeka destekli karakter ve davranış analizi" },
-  { icon: Users, text: "Danışanlarınızı tek panelden takip edin" },
-  { icon: BarChart3, text: "350+ psikolojik özellik, 10 boyutlu karakter analizi" },
-  { icon: Lock, text: "Uçtan uca güvenli, KVKK uyumlu altyapı" },
+  { icon: Sparkles, text: "AQE ile her danışana uyarlanan akıllı soru akışı" },
+  { icon: Layers, text: "HAE ile çok katmanlı karakter ve davranış analizi" },
+  { icon: BarChart3, text: "350+ psikolojik özellik, 10 boyutlu profil çıktısı" },
+  { icon: Lock, text: "Uçtan uca güvenli, KVKK uyumlu profesyonel altyapı" },
 ];
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -42,11 +42,11 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
           <div className="space-y-5">
             <h2 className="text-white text-[26px] xl:text-[30px] font-semibold leading-snug">
-              Danışanlarınızın<br />
-              iç dünyasını keşfedin.
+              Danışanınızı yüzeyde değil,<br />
+              derin yapısında anlayın.
             </h2>
-            <p className="text-white/55 text-sm leading-relaxed max-w-[340px]">
-              Bilimsel karakter analizi ile her danışanınızı daha iyi anlayın, daha doğru yönlendirin.
+            <p className="text-white/55 text-sm leading-relaxed max-w-[380px]">
+              Orbira, AQE ve HAE motorlarıyla danışan verisini adaptif olarak toplar, çok boyutlu karakter analiziyle anlamlı içgörülere dönüştürür.
             </p>
             <div className="space-y-4 pt-4">
               {FEATURES.map((f, i) => (
@@ -60,9 +60,15 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <p className="text-white/25 text-xs">
-            &copy; {new Date().getFullYear()} Orbira Labs
-          </p>
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-white/40 tracking-wide uppercase">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+              Powered by Orbira Engines
+            </span>
+            <p className="text-white/25 text-xs">
+              &copy; {new Date().getFullYear()} Orbira Labs
+            </p>
+          </div>
         </div>
       </div>
 
