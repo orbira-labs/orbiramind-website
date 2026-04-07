@@ -16,6 +16,10 @@ import {
 } from "@/components/appointments/AppointmentDetailModal";
 import { EditAppointmentModal } from "@/components/appointments/EditAppointmentModal";
 import {
+  AnalysisDetailModal,
+  type AnalysisSlim,
+} from "@/components/tests/AnalysisDetailModal";
+import {
   Users,
   Calendar,
   FlaskConical,
@@ -192,6 +196,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [selectedApt, setSelectedApt] = useState<AppointmentSlim | null>(null);
   const [editApt, setEditApt] = useState<AppointmentSlim | null>(null);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisSlim | null>(null);
 
   const statCards = STAT_CARDS.map((card) => ({
     ...card,
@@ -223,6 +228,14 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         onClose={() => setEditApt(null)}
         onUpdated={() => {
           setEditApt(null);
+          refresh();
+        }}
+      />
+      <AnalysisDetailModal
+        analysis={selectedAnalysis}
+        onClose={() => setSelectedAnalysis(null)}
+        onDeleted={() => {
+          setSelectedAnalysis(null);
           refresh();
         }}
       />
@@ -360,9 +373,21 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                         : "";
 
                       return (
-                        <div
+                        <button
                           key={test.id}
-                          className="flex items-center gap-2 p-2.5 rounded-lg bg-pro-surface-alt"
+                          onClick={() =>
+                            setSelectedAnalysis({
+                              id: test.id,
+                              token: test.token,
+                              status: test.status,
+                              created_at: test.created_at,
+                              sent_via: test.sent_via,
+                              started_at: test.started_at,
+                              completed_at: test.completed_at,
+                              client: test.client,
+                            })
+                          }
+                          className="flex items-center gap-2 p-2.5 rounded-lg bg-pro-surface-alt w-full text-left hover:bg-pro-primary-light transition-colors"
                         >
                           <Avatar
                             firstName={test.client?.first_name || "?"}
@@ -382,27 +407,27 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                               {s.label}
                             </Badge>
                             {isCompleted && (
-                              <Link
-                                href={`/tests/${test.id}`}
-                                className="p-1 rounded-lg text-pro-primary hover:bg-pro-primary-light transition-colors"
+                              <span
+                                className="p-1 rounded-lg text-pro-primary"
                                 title="Sonuçları Gör"
                               >
                                 <Eye className="h-3.5 w-3.5" />
-                              </Link>
+                              </span>
                             )}
                             {isPending && (
                               <div className="relative">
-                                <button
-                                  onClick={() =>
+                                <span
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setShareOpenId(
                                       shareOpenId === test.id ? null : test.id
-                                    )
-                                  }
-                                  className="p-1 rounded-lg text-pro-text-tertiary hover:text-pro-primary hover:bg-pro-primary-light transition-colors"
+                                    );
+                                  }}
+                                  className="p-1 rounded-lg text-pro-text-tertiary hover:text-pro-primary hover:bg-pro-primary-light transition-colors cursor-pointer"
                                   title="Analizi Paylaş"
                                 >
                                   <Share2 className="h-3.5 w-3.5" />
-                                </button>
+                                </span>
                                 {shareOpenId === test.id && (
                                   <SharePopover
                                     testToken={test.token}
@@ -414,7 +439,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                               </div>
                             )}
                           </div>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
