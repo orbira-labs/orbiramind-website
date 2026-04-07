@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validStatuses = ["started", "completed"];
+    const validStatuses = ["started", "processing", "completed", "error"];
     if (!validStatuses.includes(status)) {
       return NextResponse.json(
         { error: "Invalid status" },
@@ -34,11 +34,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (status === "processing") {
+      // Analiz başladı, kullanıcı sayfayı kapattı bile işlem devam ediyor
+      if (session_id) {
+        updateData.session_id = session_id;
+      }
+    }
+
     if (status === "completed") {
       updateData.completed_at = new Date().toISOString();
       if (results_snapshot) {
         updateData.results_snapshot = results_snapshot;
       }
+    }
+
+    if (status === "error") {
+      // Analiz sırasında hata oluştu
+      updateData.completed_at = new Date().toISOString();
     }
 
     const { error } = await supabase

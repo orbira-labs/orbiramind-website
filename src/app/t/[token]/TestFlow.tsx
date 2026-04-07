@@ -403,31 +403,54 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   async function handleFinalAnalysis() {
     if (!sessionId) return;
 
-    setPhase("analyzing");
-
+    // Önce "processing" statüsünü kaydet - kullanıcı sayfayı kapatsa bile
+    // sunucu tarafında işlemin başladığını bilelim
     try {
-      const data = await completeSession(sessionId, deepDiveAnswers, token);
-
-      const statusRes = await fetch("/api/test/update-status", {
+      await fetch("/api/test/update-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token,
-          status: "completed",
-          results_snapshot: data.results,
+          status: "processing",
+          session_id: sessionId,
         }),
       });
-
-      if (!statusRes.ok) {
-        console.error("Test sonuçları kaydedilemedi");
-      }
-
-      setPhase("done");
     } catch (e) {
-      console.error("Complete session error:", e);
-      setError("Analiz tamamlanamadı. Lütfen tekrar deneyin.");
-      setPhase("deep_dive");
+      console.error("Processing status kaydedilemedi:", e);
     }
+
+    // Hemen tamamlandı ekranını göster - kullanıcının beklemesine gerek yok
+    // Analiz arka planda devam edecek, sonuçlar uzman paneline gidecek
+    setPhase("done");
+
+    // Arka planda analizi tamamla (fire-and-forget)
+    // Kullanıcı sayfayı kapatsa bile bu istek sunucuya ulaşacak
+    completeSession(sessionId, deepDiveAnswers, token)
+      .then(async (data) => {
+        // Sonuçları kaydet
+        await fetch("/api/test/update-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token,
+            status: "completed",
+            results_snapshot: data.results,
+          }),
+        });
+        console.log("Analiz başarıyla tamamlandı");
+      })
+      .catch((e) => {
+        console.error("Arka plan analiz hatası:", e);
+        // Hata durumunda status'u güncelle
+        fetch("/api/test/update-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token,
+            status: "error",
+          }),
+        }).catch(() => {});
+      });
   }
 
   // Progress calculation
