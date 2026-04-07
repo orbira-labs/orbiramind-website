@@ -63,7 +63,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
           <div className="space-y-2">
             <span className="inline-flex items-center gap-1.5 text-[10px] text-white/40 tracking-wide uppercase">
               <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-              Powered by Orbira Engines
+              Powered by Orbira Labs
             </span>
             <p className="text-white/25 text-xs">
               &copy; {new Date().getFullYear()} Orbira Labs
