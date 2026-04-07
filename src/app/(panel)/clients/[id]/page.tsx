@@ -217,11 +217,14 @@ export default function ClientDetailPage() {
             Danışanlara Dön
           </Link>
 
-          <div className="rounded-2xl border border-pro-border-strong bg-pro-surface-alt p-6">
+          <div 
+            className="rounded-2xl border border-pro-border-strong p-6"
+            style={{ background: "linear-gradient(135deg, #EFEAE4 0%, #E5E0DB 50%, #DDD8D2 100%)" }}
+          >
             <div className="flex flex-col sm:flex-row justify-between gap-6">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
+              <div className="flex flex-col justify-between flex-1">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold text-pro-text tracking-tight">
                       {client.first_name} {client.last_name}
                     </h2>
@@ -232,33 +235,34 @@ export default function ClientDetailPage() {
                       {statusInfo?.label}
                     </span>
                   </div>
-                  <button
-                    onClick={() => setEditModalOpen(true)}
-                    className="flex items-center gap-1 text-pro-primary hover:text-pro-primary-hover text-xs font-medium transition-colors"
-                  >
-                    <Pencil className="h-3 w-3" />
-                    Bilgileri düzenle
-                  </button>
+
+                  <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                      <span className="text-pro-text">{client.gender ? GENDERS[client.gender] : "—"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Cake className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                      <span className="text-pro-text">{client.birth_date ? formatDate(client.birth_date) : "—"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                      <span className="text-pro-text">{client.phone || "—"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-pro-text-tertiary shrink-0" />
+                      <span className="text-pro-text truncate">{client.email || "—"}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-pro-text-tertiary shrink-0" />
-                    <span className="text-pro-text">{client.gender ? GENDERS[client.gender] : "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Cake className="h-4 w-4 text-pro-text-tertiary shrink-0" />
-                    <span className="text-pro-text">{client.birth_date ? formatDate(client.birth_date) : "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-pro-text-tertiary shrink-0" />
-                    <span className="text-pro-text">{client.phone || "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-pro-text-tertiary shrink-0" />
-                    <span className="text-pro-text truncate">{client.email || "—"}</span>
-                  </div>
-                </div>
+                <button
+                  onClick={() => setEditModalOpen(true)}
+                  className="flex items-center gap-1.5 text-pro-text-secondary hover:text-pro-text text-xs font-medium transition-colors mt-4 w-fit"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Bilgileri düzenle
+                </button>
               </div>
 
               <div className="flex flex-col gap-2 shrink-0">

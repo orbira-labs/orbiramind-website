@@ -16,13 +16,31 @@ import { LikertScale } from "@/components/test/LikertScale";
 import { ProfileField } from "@/components/test/ProfileField";
 import { MeasurementInput } from "@/components/test/MeasurementInput";
 import { AnalysisLoading } from "@/components/test/AnalysisLoading";
+import { PreparationScreen } from "@/components/test/PreparationScreen";
+import { JourneyMap } from "@/components/test/JourneyMap";
+import { StageIntro } from "@/components/test/StageIntro";
+import { StageCompletion } from "@/components/test/StageCompletion";
+import { MidwayMotivation } from "@/components/test/MidwayMotivation";
 import { AnimatePresence, motion } from "framer-motion";
 import { clsx } from "clsx";
 import { User, Heart, Shield, Coffee, Apple, Sparkles, Activity, Ruler, Fingerprint } from "lucide-react";
 import { celebrateCompletion } from "@/lib/confetti";
 import { celebrationPop } from "@/lib/animations";
 
-type Phase = "loading" | "profile" | "core" | "measurements" | "deep_dive" | "analyzing" | "done" | "error";
+type Phase = 
+  | "loading" 
+  | "preparation"
+  | "journey_map"
+  | "stage_intro"
+  | "profile" 
+  | "stage_complete"
+  | "core" 
+  | "core_midway"
+  | "measurements" 
+  | "deep_dive" 
+  | "analyzing" 
+  | "done" 
+  | "error";
 
 interface TestFlowProps {
   token: string;
@@ -144,6 +162,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   const [currentDeepDiveIndex, setCurrentDeepDiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
+  // Stage tracking
+  const [currentStage, setCurrentStage] = useState(0);
+  const [midwayShown, setMidwayShown] = useState(false);
+
   const profileGroups: ProfileGroup[] = useMemo(
     () => (sessionData ? groupProfileFields(sessionData.profile_fields) : []),
     [sessionData]
@@ -158,11 +180,77 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       const data = await createSession(token);
       setSessionId(data.session_id);
       setSessionData(data);
-      setPhase("profile");
+      setPhase("preparation"); // Start with preparation screen
     } catch (e) {
       console.error("Session init error:", e);
       setError("Bağlantı hatası oluştu. Lütfen sayfayı yenileyin.");
       setPhase("error");
+    }
+  }
+
+  // Stage transition handlers
+  function handlePreparationContinue() {
+    setPhase("journey_map");
+  }
+
+  function handleJourneyMapStart() {
+    setCurrentStage(1);
+    setPhase("stage_intro");
+  }
+
+  function handleStageIntroStart() {
+    if (currentStage === 1) {
+      setPhase("profile");
+    } else if (currentStage === 2) {
+      setPhase("core");
+    } else if (currentStage === 3) {
+      setPhase("measurements");
+    } else if (currentStage === 4) {
+      setPhase("deep_dive");
+    }
+  }
+
+  function handleStageCompleteContinue() {
+    if (currentStage === 1) {
+      setCurrentStage(2);
+      setPhase("stage_intro");
+    } else if (currentStage === 2) {
+      setCurrentStage(3);
+      setPhase("stage_intro");
+    } else if (currentStage === 3) {
+      setCurrentStage(4);
+      setPhase("stage_intro");
+    }
+  }
+
+  function handleMidwayContinue() {
+    setPhase("core");
+  }
+
+  function getStageIntroContent(): { title: string; subtitle: string } {
+    switch (currentStage) {
+      case 1:
+        return {
+          title: "Temel Bilgiler",
+          subtitle: "Seni tanımak için demografik ve yaşam tarzı bilgileriyle başlıyoruz.",
+        };
+      case 2:
+        return {
+          title: "Çekirdek Analiz",
+          subtitle: "Kişilik özelliklerini ve davranış kalıplarını anlamamıza yardımcı ol.",
+        };
+      case 3:
+        return {
+          title: "Fiziksel Ölçümler",
+          subtitle: "Boy, kilo gibi fiziksel verilerle devam ediyoruz.",
+        };
+      case 4:
+        return {
+          title: "Derinlemesine Keşif",
+          subtitle: "Son aşama! Sana özel detaylı sorularla bitiriyoruz.",
+        };
+      default:
+        return { title: "Devam", subtitle: "Bir sonraki adıma geçiyoruz." };
     }
   }
 
@@ -175,8 +263,21 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   function handleCoreAnswer(questionId: string, value: number) {
-    setCoreAnswers((prev) => ({ ...prev, [questionId]: value }));
+    const newAnswers = { ...coreAnswers, [questionId]: value };
+    setCoreAnswers(newAnswers);
+    
     if (sessionData && currentCoreIndex < sessionData.core_questions.length - 1) {
+      // Check for midway motivation
+      const total = sessionData.core_questions.length;
+      const answered = Object.keys(newAnswers).length;
+      const midpoint = Math.floor(total / 2);
+      
+      if (!midwayShown && answered === midpoint) {
+        setMidwayShown(true);
+        setTimeout(() => setPhase("core_midway"), 400);
+        return;
+      }
+      
       setTimeout(() => {
         setDirection(1);
         setCurrentCoreIndex((i) => i + 1);
@@ -213,7 +314,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     if (profileGroupIndex < profileGroups.length - 1) {
       setProfileGroupIndex((i) => i + 1);
     } else {
-      setPhase("core");
+      // Profile stage complete - show completion card
+      setPhase("stage_complete");
     }
   }
 
@@ -234,7 +336,21 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
     setError(null);
     setDirection(1);
-    setPhase("measurements");
+    // Core stage complete - show completion card
+    setPhase("stage_complete");
+  }
+
+  // Check for midway motivation (around 50% of core questions)
+  function checkCoreMidway() {
+    if (!sessionData || midwayShown) return;
+    const total = sessionData.core_questions.length;
+    const answered = Object.keys(coreAnswers).length;
+    const midpoint = Math.floor(total / 2);
+    
+    if (answered >= midpoint && answered < midpoint + 2) {
+      setMidwayShown(true);
+      setPhase("core_midway");
+    }
   }
 
   async function handleMeasurementsSubmit() {
@@ -270,7 +386,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       const data = await submitAnswers(sessionId, profile, coreAnswers, measurements, token);
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
-      setPhase("deep_dive");
+      // Measurements stage complete - show completion card before deep_dive
+      setPhase("stage_complete");
     } catch (e) {
       console.error("Submit answers error:", e);
       setError("Cevaplar gönderilemedi. Lütfen tekrar deneyin.");
@@ -288,6 +405,14 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
 
     setError(null);
+    
+    // Show stage 4 completion before analyzing
+    setPhase("stage_complete");
+  }
+
+  async function handleFinalAnalysis() {
+    if (!sessionId) return;
+    
     setPhase("analyzing");
 
     try {
@@ -378,6 +503,69 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   if (phase === "analyzing") return <AnalysisLoading />;
+
+  // New onboarding flow screens
+  if (phase === "preparation") {
+    return (
+      <PreparationScreen
+        clientName={clientName}
+        onContinue={handlePreparationContinue}
+      />
+    );
+  }
+
+  if (phase === "journey_map" && sessionData) {
+    const profileFieldCount = sessionData.profile_fields.length;
+    const coreCount = sessionData.core_questions.length;
+    const measurementCount = sessionData.measurement_context.length;
+    
+    return (
+      <JourneyMap
+        profileGroupCount={profileFieldCount}
+        coreQuestionCount={coreCount}
+        measurementCount={measurementCount}
+        onStart={handleJourneyMapStart}
+      />
+    );
+  }
+
+  if (phase === "stage_intro") {
+    const { title, subtitle } = getStageIntroContent();
+    return (
+      <StageIntro
+        stageNumber={currentStage}
+        title={title}
+        subtitle={subtitle}
+        onStart={handleStageIntroStart}
+      />
+    );
+  }
+
+  if (phase === "stage_complete") {
+    // After stage 3 (measurements), go to stage 4 intro (deep_dive)
+    // After stage 4 (deep_dive), go to analyzing
+    const isDeepDiveComplete = currentStage === 4;
+    
+    return (
+      <StageCompletion
+        stageNumber={currentStage}
+        isLastStage={isDeepDiveComplete}
+        onContinue={isDeepDiveComplete ? handleFinalAnalysis : handleStageCompleteContinue}
+      />
+    );
+  }
+
+  if (phase === "core_midway" && sessionData) {
+    const total = sessionData.core_questions.length;
+    const completed = Object.keys(coreAnswers).length;
+    return (
+      <MidwayMotivation
+        completedCount={completed}
+        totalCount={total}
+        onContinue={handleMidwayContinue}
+      />
+    );
+  }
 
   if (phase === "done") {
     return <CompletionScreen />;
