@@ -43,7 +43,8 @@ function ErrorCard({
 }
 
 export default async function TestPage({ params }: TestPageProps) {
-  const { token } = await params;
+  const { token: rawToken } = await params;
+  const token = rawToken.toUpperCase();
   const supabase = await createClient();
 
   const { data: invitation, error } = await supabase

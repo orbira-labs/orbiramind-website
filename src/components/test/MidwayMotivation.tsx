@@ -13,7 +13,7 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 50;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4 pt-safe pb-safe">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -25,10 +25,10 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-          className="relative w-28 h-28 mx-auto mb-8"
+          className="relative w-24 sm:w-28 h-24 sm:h-28 mx-auto mb-6 sm:mb-8"
         >
           {/* Background Circle */}
-          <svg className="w-28 h-28 transform -rotate-90">
+          <svg className="w-24 sm:w-28 h-24 sm:h-28 transform -rotate-90" viewBox="0 0 112 112">
             <circle
               cx="56"
               cy="56"
@@ -54,8 +54,8 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
           
           {/* Inner Icon */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 bg-[#7C3AED]/10 rounded-full flex items-center justify-center">
-              <Flame className="w-8 h-8 text-[#7C3AED]" />
+            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-[#7C3AED]/10 rounded-full flex items-center justify-center">
+              <Flame className="w-6 sm:w-8 h-6 sm:h-8 text-[#7C3AED]" />
             </div>
           </div>
         </motion.div>
@@ -65,7 +65,7 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-xl font-bold text-gray-900 mb-4"
+          className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4"
         >
           Harika Gidiyorsun!
         </motion.h1>
@@ -75,9 +75,9 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="inline-flex items-center px-4 py-2 bg-[#7C3AED]/10 rounded-xl mb-5"
+          className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-[#7C3AED]/10 rounded-xl mb-4 sm:mb-5"
         >
-          <span className="text-sm font-bold text-[#7C3AED]">
+          <span className="text-xs sm:text-sm font-bold text-[#7C3AED]">
             {completedCount}/{totalCount} soru tamamlandı
           </span>
         </motion.div>
@@ -87,7 +87,7 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="text-gray-500 text-sm mb-10 px-4"
+          className="text-gray-500 text-sm mb-8 sm:mb-10 px-4"
         >
           Yorulduğunu biliyoruz, biraz daha sabret. Bu aşamayı yarıladın, az kaldı!
         </motion.p>
@@ -98,7 +98,7 @@ export function MidwayMotivation({ completedCount, totalCount, onContinue }: Mid
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
           onClick={onContinue}
-          className="w-full py-4 bg-[#7C3AED] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#7C3AED]/25 hover:shadow-2xl transition-all active:scale-[0.98]"
+          className="w-full min-h-[52px] py-3.5 sm:py-4 bg-[#7C3AED] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#7C3AED]/25 hover:shadow-2xl transition-all active:scale-95 touch-manipulation"
         >
           Devam Et
         </motion.button>

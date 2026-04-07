@@ -22,12 +22,12 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
 
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-gray-800">
+        <label className="block text-sm sm:text-base font-semibold text-gray-800">
           {field.text}
           {field.required !== false && <span className="text-red-400 ml-1">*</span>}
         </label>
-        <p className="text-xs text-gray-400">Birden fazla seçenek seçebilirsiniz</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="text-xs sm:text-sm text-gray-400">Birden fazla seçenek seçebilirsiniz</p>
+        <div className="flex flex-wrap gap-2 sm:gap-2.5">
           {field.options.map((option) => {
             const isSelected = selectedValues.includes(String(option.value));
             return (
@@ -36,10 +36,11 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
                 type="button"
                 onClick={() => toggleOption(String(option.value))}
                 className={clsx(
-                  "px-4 py-2.5 rounded-full border-2 text-sm font-medium transition-all duration-200",
+                  "min-h-[44px] px-4 py-2.5 rounded-full border-2 text-sm font-medium transition-all duration-200",
+                  "touch-manipulation select-none active:scale-95",
                   isSelected
                     ? "bg-[#5B7B6A] border-[#5B7B6A] text-white shadow-md shadow-[#5B7B6A]/20"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-[#5B7B6A]/40 hover:bg-[#5B7B6A]/5 active:scale-[0.98]"
+                    : "bg-white border-gray-200 text-gray-700 hover:border-[#5B7B6A]/40 hover:bg-[#5B7B6A]/5"
                 )}
               >
                 {option.label}
@@ -54,21 +55,22 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
   if (field.answer_type === "single_choice" && field.options) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-gray-800">
+        <label className="block text-sm sm:text-base font-semibold text-gray-800">
           {field.text}
           {field.required !== false && <span className="text-red-400 ml-1">*</span>}
         </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
           {field.options.map((option) => (
             <button
               key={String(option.value)}
               type="button"
               onClick={() => onChange(option.value)}
               className={clsx(
-                "relative px-4 py-3 rounded-2xl border-2 text-sm font-medium transition-all duration-200",
+                "relative min-h-[48px] px-3 sm:px-4 py-3 rounded-2xl border-2 text-sm font-medium transition-all duration-200",
+                "touch-manipulation select-none active:scale-95",
                 value === option.value
                   ? "bg-[#5B7B6A] border-[#5B7B6A] text-white shadow-lg shadow-[#5B7B6A]/25 scale-[1.02]"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-[#5B7B6A]/40 hover:bg-[#5B7B6A]/5 hover:shadow-sm active:scale-[0.98]"
+                  : "bg-white border-gray-200 text-gray-700 hover:border-[#5B7B6A]/40 hover:bg-[#5B7B6A]/5 hover:shadow-sm"
               )}
             >
               {option.label}
@@ -82,7 +84,7 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
   if (field.answer_type === "boolean" && field.options) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-gray-800">
+        <label className="block text-sm sm:text-base font-semibold text-gray-800">
           {field.text}
           {field.required !== false && <span className="text-red-400 ml-1">*</span>}
         </label>
@@ -93,10 +95,11 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
               type="button"
               onClick={() => onChange(option.value)}
               className={clsx(
-                "flex-1 px-4 py-3.5 rounded-2xl border-2 text-sm font-medium transition-all duration-200",
+                "flex-1 min-h-[52px] px-4 py-3.5 rounded-2xl border-2 text-sm sm:text-base font-medium transition-all duration-200",
+                "touch-manipulation select-none active:scale-95",
                 value === option.value
                   ? "bg-[#5B7B6A] border-[#5B7B6A] text-white shadow-lg shadow-[#5B7B6A]/25 scale-[1.02]"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-[#5B7B6A]/40 hover:shadow-sm active:scale-[0.98]"
+                  : "bg-white border-gray-200 text-gray-700 hover:border-[#5B7B6A]/40 hover:shadow-sm"
               )}
             >
               {option.label}
@@ -110,7 +113,7 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
   if (field.answer_type === "text") {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-gray-800">
+        <label className="block text-sm sm:text-base font-semibold text-gray-800">
           {field.text}
           {field.required !== false && <span className="text-red-400 ml-1">*</span>}
         </label>
@@ -118,7 +121,8 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
           type="text"
           value={(value as string) || ""}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-4 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-[#5B7B6A] focus:outline-none focus:ring-2 focus:ring-[#5B7B6A]/20 transition-all"
+          autoComplete="off"
+          className="w-full min-h-[52px] px-4 py-3.5 rounded-2xl border-2 border-gray-200 text-base text-gray-900 placeholder:text-gray-400 focus:border-[#5B7B6A] focus:outline-none focus:ring-2 focus:ring-[#5B7B6A]/20 transition-all"
           placeholder={`${field.text}...`}
         />
       </div>
@@ -131,13 +135,15 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
     
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-gray-800">
+        <label className="block text-sm sm:text-base font-semibold text-gray-800">
           {field.text}
           {field.required !== false && <span className="text-red-400 ml-1">*</span>}
         </label>
         <div className="flex items-center gap-3">
           <input
             type="number"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={(value as number) ?? ""}
             onChange={(e) => {
               const num = parseInt(e.target.value, 10);
@@ -149,7 +155,8 @@ export function ProfileField({ field, value, onChange }: ProfileFieldProps) {
             }}
             min={minVal}
             max={maxVal}
-            className="w-32 px-4 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-900 text-center text-lg font-semibold placeholder:text-gray-400 focus:border-[#5B7B6A] focus:outline-none focus:ring-2 focus:ring-[#5B7B6A]/20 transition-all"
+            autoComplete="off"
+            className="w-28 sm:w-32 min-h-[52px] px-4 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-900 text-center text-lg font-semibold placeholder:text-gray-400 focus:border-[#5B7B6A] focus:outline-none focus:ring-2 focus:ring-[#5B7B6A]/20 transition-all"
             placeholder={minVal ? String(minVal) : "0"}
           />
           {minVal != null && maxVal != null && (

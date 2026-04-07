@@ -24,7 +24,7 @@ export function AnalysisLoading() {
   }, [stepIndex]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4 pt-safe pb-safe relative overflow-hidden">
       {/* Animated background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -37,7 +37,7 @@ export function AnalysisLoading() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#5B7B6A]/20 to-[#7A9A8A]/10 blur-3xl"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] rounded-full bg-gradient-to-br from-[#5B7B6A]/20 to-[#7A9A8A]/10 blur-3xl"
         />
       </div>
 
@@ -45,9 +45,9 @@ export function AnalysisLoading() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 sm:p-12 max-w-md w-full text-center relative z-10"
+        className="bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-8 md:p-12 max-w-md w-full text-center relative z-10"
       >
-        <div className="relative w-28 h-28 mx-auto mb-8">
+        <div className="relative w-20 sm:w-28 h-20 sm:h-28 mx-auto mb-5 sm:mb-8">
           {/* Outer pulsing ring */}
           <motion.div
             animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.2, 0.5] }}
@@ -55,7 +55,7 @@ export function AnalysisLoading() {
             className="absolute inset-0 rounded-full bg-[#5B7B6A]/20"
           />
           
-          <svg className="w-28 h-28 relative z-10" viewBox="0 0 100 100">
+          <svg className="w-20 sm:w-28 h-20 sm:h-28 relative z-10" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
@@ -92,7 +92,7 @@ export function AnalysisLoading() {
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              <svg className="w-10 h-10 text-[#5B7B6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-7 sm:w-10 h-7 sm:h-10 text-[#5B7B6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </motion.div>
@@ -104,15 +104,15 @@ export function AnalysisLoading() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-xl font-semibold text-gray-900 mb-2"
+          className="text-base sm:text-xl font-semibold text-gray-900 mb-1.5 sm:mb-2"
         >
           {LOADING_STEPS[stepIndex].label}
         </motion.h2>
-        <p className="text-gray-500 text-sm mb-8">
+        <p className="text-gray-500 text-xs sm:text-sm mb-5 sm:mb-8">
           Bu işlem 20-30 saniye sürebilir
         </p>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2 sm:space-y-2.5">
           {LOADING_STEPS.map((step, idx) => (
             <motion.div
               key={idx}
@@ -126,7 +126,7 @@ export function AnalysisLoading() {
                     : "rgb(249 250 251)",
               }}
               transition={{ duration: 0.3 }}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-xl"
+              className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl"
             >
               <motion.div
                 initial={false}
@@ -143,13 +143,13 @@ export function AnalysisLoading() {
                   backgroundColor: { duration: 0.3 },
                   scale: { duration: 1, repeat: idx === stepIndex ? Infinity : 0 },
                 }}
-                className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                className="w-5 sm:w-6 h-5 sm:h-6 rounded-full flex items-center justify-center flex-shrink-0"
               >
                 {idx < stepIndex ? (
                   <motion.svg
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-3.5 h-3.5 text-white"
+                    className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-white"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -159,14 +159,14 @@ export function AnalysisLoading() {
                   <motion.div
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
-                    className="w-2 h-2 bg-white rounded-full"
+                    className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full"
                   />
                 ) : (
-                  <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                  <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-gray-400 rounded-full" />
                 )}
               </motion.div>
               <span
-                className={`text-sm font-medium transition-colors duration-300 ${
+                className={`text-xs sm:text-sm font-medium transition-colors duration-300 text-left ${
                   idx < stepIndex
                     ? "text-green-700"
                     : idx === stepIndex
@@ -184,9 +184,9 @@ export function AnalysisLoading() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-8 pt-6 border-t border-gray-100"
+          className="mt-5 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100"
         >
-          <p className="text-xs text-gray-400 flex items-center justify-center gap-1.5">
+          <p className="text-[10px] sm:text-xs text-gray-400 flex items-center justify-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
             Lütfen sayfayı kapatmayın
           </p>

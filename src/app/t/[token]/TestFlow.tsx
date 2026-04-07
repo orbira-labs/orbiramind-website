@@ -76,12 +76,12 @@ function CompletionScreen() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4 pb-safe">
       <motion.div
         variants={celebrationPop}
         initial="initial"
         animate="animate"
-        className="bg-white rounded-3xl shadow-2xl p-10 max-w-md text-center"
+        className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 max-w-md w-full text-center"
       >
         <motion.div
           initial={{ scale: 0 }}
@@ -448,7 +448,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   if (phase === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4">
+      <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4 pb-safe">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -463,11 +463,11 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   if (phase === "error") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4">
+      <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4 pb-safe">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl shadow-2xl p-10 max-w-md text-center"
+          className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 max-w-md w-full text-center"
         >
           <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -478,7 +478,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
           <p className="text-gray-500 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-8 py-3 bg-[#5B7B6A] text-white rounded-2xl font-semibold hover:bg-[#4A6A59] transition-all active:scale-[0.98] shadow-lg shadow-[#5B7B6A]/20"
+            className="w-full min-h-[52px] px-8 py-3 bg-[#5B7B6A] text-white rounded-2xl font-semibold hover:bg-[#4A6A59] transition-all active:scale-[0.98] shadow-lg shadow-[#5B7B6A]/20 touch-manipulation"
           >
             Sayfayı Yenile
           </button>
@@ -572,41 +572,41 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   return (
     <div
       className={clsx(
-        "min-h-screen transition-colors duration-500",
+        "min-h-[100dvh] transition-colors duration-500",
         isQuestionPhase && activeTheme
           ? `bg-gradient-to-br ${activeTheme.bgGradient}`
           : "bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC]"
       )}
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-xl border-b border-white/50">
-        <div className="max-w-xl mx-auto px-5 py-4">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h1 className="text-base font-bold text-gray-900 tracking-tight">Karakter Analizi</h1>
-              {clientName && <p className="text-xs text-gray-400 mt-0.5">{clientName}</p>}
+      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-xl border-b border-white/50 pt-safe">
+        <div className="max-w-xl mx-auto px-4 sm:px-5 py-3 sm:py-4">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight truncate">Karakter Analizi</h1>
+              {clientName && <p className="text-xs text-gray-400 mt-0.5 truncate">{clientName}</p>}
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-3 py-1 rounded-full">
+            <div className="text-right flex-shrink-0 ml-3">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-[10px] sm:text-xs font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
                   {progress.label}
                 </span>
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-[10px] sm:text-xs text-gray-500 font-medium">
                   {progress.current}/{progress.total}
                 </span>
               </div>
-              <p className="text-[10px] text-gray-400 mt-1">
+              <p className="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 sm:mt-1">
                 ~{Math.max(1, Math.ceil((progress.total - progress.current) * 2))} dk kaldı
               </p>
             </div>
           </div>
 
           {/* Segmented progress bar */}
-          <div className="flex gap-1">
+          <div className="flex gap-0.5 sm:gap-1">
             {Array.from({ length: progress.total }).map((_, i) => (
               <div
                 key={i}
-                className="flex-1 h-1.5 rounded-full overflow-hidden bg-gray-200/60"
+                className="flex-1 h-1 sm:h-1.5 rounded-full overflow-hidden bg-gray-200/60"
               >
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-[#5B7B6A] to-[#7A9A8A]"
@@ -621,7 +621,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       </div>
 
       {/* Content */}
-      <div className="max-w-xl mx-auto px-5 py-8 min-h-[calc(100vh-80px)] flex flex-col">
+      <div className="max-w-xl mx-auto px-4 sm:px-5 py-6 sm:py-8 pb-safe min-h-[calc(100dvh-100px)] flex flex-col">
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -655,7 +655,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   <p className="text-gray-500 text-sm">{currentGroup.description}</p>
                 </div>
 
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-7 space-y-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-5 sm:p-7 space-y-5 sm:space-y-6">
                   {currentGroup.fields.map((field) => (
                     <ProfileField
                       key={field.id}
@@ -666,18 +666,18 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   ))}
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3">
                   {profileGroupIndex > 0 && (
                     <button
                       onClick={handleProfileGroupPrev}
-                      className="px-6 py-4 rounded-2xl font-semibold text-gray-500 hover:bg-white/80 transition-all active:scale-[0.98]"
+                      className="min-h-[52px] px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl font-semibold text-gray-500 hover:bg-white/80 transition-all active:scale-95 touch-manipulation"
                     >
                       Geri
                     </button>
                   )}
                   <button
                     onClick={handleProfileGroupNext}
-                    className="flex-1 py-4 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#5B7B6A]/20 hover:shadow-2xl hover:shadow-[#5B7B6A]/30 transition-all active:scale-[0.98]"
+                    className="flex-1 min-h-[52px] py-3.5 sm:py-4 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#5B7B6A]/20 hover:shadow-2xl hover:shadow-[#5B7B6A]/30 transition-all active:scale-95 touch-manipulation"
                   >
                     {profileGroupIndex < profileGroups.length - 1 ? "Devam Et" : "Sorulara Geç"}
                   </button>
@@ -707,8 +707,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   </div>
                 </div>
 
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-8">
-                  <p className="text-lg sm:text-xl text-gray-900 font-semibold leading-relaxed text-center mb-8">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-5 sm:p-8">
+                  <p className="text-base sm:text-xl text-gray-900 font-semibold leading-relaxed text-center mb-6 sm:mb-8">
                     {currentCoreQuestion.text}
                   </p>
                   <LikertScale
@@ -719,13 +719,13 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   />
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <button
                     onClick={() => { setDirection(-1); setCurrentCoreIndex((i) => Math.max(0, i - 1)); }}
                     disabled={currentCoreIndex === 0}
                     className={clsx(
-                      "px-5 py-3 rounded-2xl text-sm font-semibold transition-all",
-                      currentCoreIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-white/80 active:scale-[0.98]"
+                      "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
+                      currentCoreIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-white/80 active:scale-95"
                     )}
                   >
                     Önceki
@@ -736,8 +736,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                       onClick={() => { setDirection(1); setCurrentCoreIndex((i) => i + 1); }}
                       disabled={!coreAnswers[currentCoreQuestion.id]}
                       className={clsx(
-                        "px-5 py-3 rounded-2xl text-sm font-semibold transition-all",
-                        !coreAnswers[currentCoreQuestion.id] ? "text-gray-300 cursor-not-allowed" : "text-[#5B7B6A] hover:bg-[#5B7B6A]/10 active:scale-[0.98]"
+                        "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
+                        !coreAnswers[currentCoreQuestion.id] ? "text-gray-300 cursor-not-allowed" : "text-[#5B7B6A] hover:bg-[#5B7B6A]/10 active:scale-95"
                       )}
                     >
                       Sonraki
@@ -747,9 +747,9 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                       onClick={handleCoreToDone}
                       disabled={!coreAnswers[currentCoreQuestion.id]}
                       className={clsx(
-                        "px-6 py-3 rounded-2xl font-semibold text-sm transition-all",
+                        "min-h-[48px] px-5 sm:px-6 py-3 rounded-2xl font-semibold text-sm transition-all touch-manipulation",
                         coreAnswers[currentCoreQuestion.id]
-                          ? "bg-[#5B7B6A] text-white shadow-lg shadow-[#5B7B6A]/20 active:scale-[0.98]"
+                          ? "bg-[#5B7B6A] text-white shadow-lg shadow-[#5B7B6A]/20 active:scale-95"
                           : "bg-gray-200 text-gray-400 cursor-not-allowed"
                       )}
                     >
@@ -785,8 +785,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   </div>
                 </div>
 
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-8">
-                  <p className="text-lg sm:text-xl text-gray-900 font-semibold leading-relaxed text-center mb-8">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg shadow-black/[0.04] border border-white/60 p-5 sm:p-8">
+                  <p className="text-base sm:text-xl text-gray-900 font-semibold leading-relaxed text-center mb-6 sm:mb-8">
                     {currentDeepDiveQuestion.text}
                   </p>
                   <LikertScale
@@ -797,13 +797,13 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   />
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <button
                     onClick={() => { setDirection(-1); setCurrentDeepDiveIndex((i) => Math.max(0, i - 1)); }}
                     disabled={currentDeepDiveIndex === 0}
                     className={clsx(
-                      "px-5 py-3 rounded-2xl text-sm font-semibold transition-all",
-                      currentDeepDiveIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-white/80 active:scale-[0.98]"
+                      "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
+                      currentDeepDiveIndex === 0 ? "text-gray-300 cursor-not-allowed" : "text-gray-500 hover:bg-white/80 active:scale-95"
                     )}
                   >
                     Önceki
@@ -814,8 +814,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                       onClick={() => { setDirection(1); setCurrentDeepDiveIndex((i) => i + 1); }}
                       disabled={!deepDiveAnswers[currentDeepDiveQuestion.id]}
                       className={clsx(
-                        "px-5 py-3 rounded-2xl text-sm font-semibold transition-all",
-                        !deepDiveAnswers[currentDeepDiveQuestion.id] ? "text-gray-300 cursor-not-allowed" : "text-[#5B7B6A] hover:bg-[#5B7B6A]/10 active:scale-[0.98]"
+                        "min-h-[48px] px-4 sm:px-5 py-3 rounded-2xl text-sm font-semibold transition-all touch-manipulation",
+                        !deepDiveAnswers[currentDeepDiveQuestion.id] ? "text-gray-300 cursor-not-allowed" : "text-[#5B7B6A] hover:bg-[#5B7B6A]/10 active:scale-95"
                       )}
                     >
                       Sonraki
@@ -825,9 +825,9 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                       onClick={handleDeepDiveSubmit}
                       disabled={!deepDiveAnswers[currentDeepDiveQuestion.id]}
                       className={clsx(
-                        "px-6 py-3 rounded-2xl font-semibold text-sm transition-all",
+                        "min-h-[48px] px-5 sm:px-6 py-3 rounded-2xl font-semibold text-sm transition-all touch-manipulation",
                         deepDiveAnswers[currentDeepDiveQuestion.id]
-                          ? "bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white shadow-lg shadow-[#5B7B6A]/20 active:scale-[0.98]"
+                          ? "bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white shadow-lg shadow-[#5B7B6A]/20 active:scale-95"
                           : "bg-gray-200 text-gray-400 cursor-not-allowed"
                       )}
                     >

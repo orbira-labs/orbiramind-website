@@ -21,8 +21,8 @@ const SCALE_COLORS = [
 
 export function LikertScale({ value, onChange, labels = DEFAULT_LABELS, accentColor }: LikertScaleProps) {
   return (
-    <div className="space-y-3">
-      <div className="flex gap-1.5 sm:gap-2">
+    <div className="space-y-4">
+      <div className="flex gap-2 sm:gap-3">
         {[1, 2, 3, 4, 5].map((num) => {
           const isSelected = value === num;
           const colors = SCALE_COLORS[num - 1];
@@ -33,18 +33,20 @@ export function LikertScale({ value, onChange, labels = DEFAULT_LABELS, accentCo
               key={num}
               onClick={() => onChange(num)}
               className={clsx(
-                "flex-1 py-3 sm:py-4 rounded-2xl font-bold text-xs sm:text-sm transition-all duration-200",
-                "border-2 focus:outline-none focus:ring-2 focus:ring-offset-2",
-                "flex flex-col items-center justify-center gap-0.5 leading-tight",
+                "flex-1 min-h-[56px] sm:min-h-[64px] py-3 sm:py-4 rounded-2xl font-bold transition-all duration-200",
+                "border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-2",
+                "flex flex-col items-center justify-center gap-1 leading-tight",
+                "touch-manipulation select-none",
+                "active:scale-95 sm:active:scale-100",
                 isSelected
-                  ? `${colors.active} text-white border-transparent shadow-xl scale-105 ${colors.ring}`
-                  : `${colors.bg} ${colors.border} ${colors.text} hover:scale-102 hover:shadow-md active:scale-100`
+                  ? `${colors.active} text-white border-transparent shadow-xl scale-[1.02] ${colors.ring}`
+                  : `${colors.bg} ${colors.border} ${colors.text} hover:scale-[1.02] hover:shadow-md`
               )}
               style={isSelected && accentColor ? { boxShadow: `0 8px 25px ${accentColor}30` } : undefined}
             >
-              <span className="text-[10px] sm:text-xs font-black opacity-60">{num}</span>
+              <span className="text-xs sm:text-sm font-black opacity-70">{num}</span>
               {label && (
-                <span className="text-[9px] sm:text-[11px] font-semibold text-center px-0.5 leading-tight">
+                <span className="text-[10px] sm:text-xs font-semibold text-center px-1 leading-tight line-clamp-2">
                   {label}
                 </span>
               )}

@@ -175,6 +175,38 @@ body {
   overflow-x: hidden;
 }
 
+/* ============================================================
+   Safe Area Utilities for iOS notch/home indicator
+   ============================================================ */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.p-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Minimum touch target size for accessibility */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 [data-theme="marketing"] {
   background: var(--background);
   color: var(--foreground);
@@ -264,6 +296,33 @@ body {
     transform: scale(0.98);
     opacity: 0.9;
   }
+}
+
+/* Touch manipulation for faster mobile response */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text selection on interactive elements */
+.select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 /* Ensure smooth animations on mobile */

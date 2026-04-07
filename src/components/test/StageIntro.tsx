@@ -21,7 +21,7 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
   const Icon = config.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex items-center justify-center p-4 pt-safe pb-safe">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -33,7 +33,7 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6"
+          className="inline-flex items-center px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-5 sm:mb-6"
           style={{
             backgroundColor: `${config.color}15`,
             color: config.color,
@@ -48,13 +48,13 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
-          className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+          className="w-16 sm:w-20 h-16 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-5 sm:mb-6"
           style={{
             backgroundColor: `${config.color}10`,
             border: `2px solid ${config.color}25`,
           }}
         >
-          <Icon className="w-9 h-9" style={{ color: config.color }} />
+          <Icon className="w-7 sm:w-9 h-7 sm:h-9" style={{ color: config.color }} />
         </motion.div>
 
         {/* Title */}
@@ -62,7 +62,7 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-xl font-bold text-gray-900 mb-3"
+          className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3"
         >
           {title}
         </motion.h1>
@@ -72,7 +72,7 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-gray-500 text-sm mb-10 px-4"
+          className="text-gray-500 text-sm mb-8 sm:mb-10 px-4"
         >
           {subtitle}
         </motion.p>
@@ -83,7 +83,7 @@ export function StageIntro({ stageNumber, title, subtitle, onStart }: StageIntro
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
           onClick={onStart}
-          className="w-full py-4 rounded-2xl font-semibold text-base shadow-xl transition-all active:scale-[0.98]"
+          className="w-full min-h-[52px] py-3.5 sm:py-4 rounded-2xl font-semibold text-base shadow-xl transition-all active:scale-95 touch-manipulation"
           style={{
             backgroundColor: config.color,
             color: "white",
