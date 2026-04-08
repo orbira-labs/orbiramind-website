@@ -1,123 +1,238 @@
 import Link from "next/link";
-import { Brain, Users, BarChart3, Shield, Zap, CheckCircle, ArrowRight } from "lucide-react";
+import { 
+  Brain, 
+  Users, 
+  BarChart3, 
+  Shield, 
+  Sparkles, 
+  Heart,
+  ArrowRight,
+  Leaf,
+  Star,
+  CheckCircle2,
+  Play,
+  Quote
+} from "lucide-react";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-[#FAFAF8]">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-xl border-b border-pro-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center">
-              <span className="text-white text-lg font-bold">O</span>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-lg shadow-[#5B7B6A]/20">
+              <span className="text-white text-xl font-semibold">O</span>
             </div>
-            <span className="text-lg font-semibold text-pro-text">OrbiraMind</span>
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold text-[#1a1a1a] tracking-tight">OrbiraMind</span>
+              <span className="text-[10px] text-[#5B7B6A] font-medium -mt-0.5 tracking-wider uppercase">Wellness Platform</span>
+            </div>
           </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</a>
+            <a href="#for-who" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</a>
+            <a href="#testimonials" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">Referanslar</a>
+          </div>
           <div className="flex items-center gap-3">
             <Link
               href="/auth/login"
-              className="text-sm text-pro-text-secondary hover:text-pro-text transition-colors"
+              className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors px-4 py-2"
             >
               Giriş Yap
             </Link>
             <Link
               href="/auth/register"
-              className="text-sm px-4 py-2 bg-pro-primary text-white rounded-lg hover:bg-pro-primary/90 transition-colors"
+              className="text-sm px-5 py-2.5 bg-[#1a1a1a] text-white rounded-full hover:bg-[#333] transition-all shadow-lg shadow-black/10"
             >
-              Ücretsiz Dene
+              Ücretsiz Başla
             </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-pro-primary/10 rounded-full text-sm text-pro-primary mb-6">
-            <Brain className="h-4 w-4" />
-            <span>Psikologlar için tasarlandı</span>
+      <section className="pt-32 sm:pt-40 pb-20 sm:pb-32 px-6 sm:px-8 lg:px-12 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#5B7B6A]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#E8D5B7]/30 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-[#5B7B6A]/5 to-transparent rounded-full" />
+        
+        <div className="max-w-6xl mx-auto relative">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-full shadow-sm border border-[#eee] mb-8">
+              <div className="flex items-center gap-1">
+                <Leaf className="h-4 w-4 text-[#5B7B6A]" />
+                <Heart className="h-4 w-4 text-[#C4A484]" />
+              </div>
+              <span className="text-sm text-[#666]">Psikolojik Sağlık & Wellness Profesyonelleri İçin</span>
+            </div>
+            
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-[#1a1a1a] leading-[1.1] tracking-tight mb-8">
+              Danışanlarınızın
+              <br />
+              <span className="bg-gradient-to-r from-[#5B7B6A] via-[#6B8B7A] to-[#5B7B6A] bg-clip-text text-transparent">
+                İç Dünyasını Anlayın
+              </span>
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-xl sm:text-2xl text-[#666] max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+              Bilimsel kişilik analizi, bütünsel danışan yönetimi ve içgörü raporları 
+              — <span className="text-[#5B7B6A] font-medium">hepsi tek platformda.</span>
+            </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+              <Link
+                href="/auth/register"
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#1a1a1a] text-white rounded-full font-medium hover:bg-[#333] transition-all shadow-xl shadow-black/20"
+              >
+                <span>14 Gün Ücretsiz Dene</span>
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="#demo"
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1a1a1a] rounded-full font-medium border border-[#e5e5e5] hover:border-[#ccc] hover:shadow-lg transition-all"
+              >
+                <Play className="h-5 w-5 text-[#5B7B6A]" />
+                <span>Demo İzle</span>
+              </Link>
+            </div>
+            
+            {/* Trust Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-[#999]">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span>KVKK Uyumlu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                <span>256-bit SSL</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                <span>500+ Profesyonel</span>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-pro-text leading-tight mb-6">
-            Danışanlarınızı{" "}
-            <span className="text-pro-primary">Daha İyi Anlayın</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-pro-text-secondary max-w-2xl mx-auto mb-10">
-            Kişilik analizi, danışan yönetimi ve randevu takibi için tek platform. 
-            HAE ve AQE motorlarıyla bilimsel, güvenilir sonuçlar.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/auth/register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-pro-primary text-white rounded-xl font-medium hover:bg-pro-primary/90 transition-colors"
-            >
-              Ücretsiz Başla
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link
-              href="/auth/login"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-pro-surface border border-pro-border text-pro-text rounded-xl font-medium hover:bg-pro-surface-alt transition-colors"
-            >
-              Giriş Yap
-            </Link>
+        </div>
+      </section>
+
+      {/* Logos/Social Proof */}
+      <section className="py-12 px-6 sm:px-8 border-y border-[#eee] bg-white/50">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-center text-sm text-[#999] mb-8">Türkiye'nin önde gelen profesyonelleri tarafından tercih ediliyor</p>
+          <div className="flex flex-wrap items-center justify-center gap-12 opacity-50">
+            <span className="text-xl font-semibold text-[#666]">TPD</span>
+            <span className="text-xl font-semibold text-[#666]">ICF Türkiye</span>
+            <span className="text-xl font-semibold text-[#666]">PERYÖN</span>
+            <span className="text-xl font-semibold text-[#666]">TKD</span>
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-20 px-4 sm:px-6 bg-pro-surface/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-pro-text mb-4">
-              Neden OrbiraMind?
+      <section id="features" className="py-24 sm:py-32 px-6 sm:px-8 lg:px-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <span className="inline-block px-4 py-2 bg-[#5B7B6A]/10 rounded-full text-sm text-[#5B7B6A] font-medium mb-6">
+              Platform Özellikleri
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a] mb-6 tracking-tight">
+              Pratiğinizi Dönüştürün
             </h2>
-            <p className="text-lg text-pro-text-secondary">
-              Profesyoneller için tasarlanmış güçlü özellikler
+            <p className="text-xl text-[#666] max-w-2xl mx-auto">
+              Danışan ilişkilerinizi güçlendiren, içgörü odaklı araçlar
             </p>
           </div>
+          
+          {/* Main Feature */}
+          <div className="mb-16 p-8 sm:p-12 bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] rounded-[32px] text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="relative grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm mb-6">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Yapay Zeka Destekli</span>
+                </div>
+                <h3 className="text-3xl sm:text-4xl font-semibold mb-6 leading-tight">
+                  HAE & AQE Analiz Motorları
+                </h3>
+                <p className="text-lg text-white/80 mb-8 leading-relaxed">
+                  Orbira Labs'ın özel geliştirdiği <strong>Human Analysis Engine</strong> ve <strong>Adaptive Question Engine</strong> ile 
+                  danışanlarınızın kişilik profilini, duygusal haritasını ve davranış kalıplarını keşfedin.
+                </p>
+                <ul className="space-y-3">
+                  {["Bilimsel temelli 16 kişilik tipi analizi", "Duygusal zeka ve stres tepki haritası", "Kişiye özel soru adaptasyonu"].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-white/80 shrink-0" />
+                      <span className="text-white/90">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative">
+                <div className="aspect-square bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                  <Brain className="h-32 w-32 text-white/30" />
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Feature Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: Brain,
-                title: "Kişilik Analizi",
-                description: "HAE ve AQE motorları ile bilimsel temelli, derinlemesine kişilik analizleri oluşturun."
-              },
-              {
                 icon: Users,
-                title: "Danışan Yönetimi",
-                description: "Tüm danışanlarınızı tek platformda yönetin, notlar alın, ilerlemeyi takip edin."
+                title: "Danışan Portföyü",
+                description: "Tüm danışanlarınızı organize edin. Profiller, geçmiş, notlar ve ilerleme — tek ekranda.",
+                color: "from-[#E8D5B7] to-[#D4C4A8]"
               },
               {
                 icon: BarChart3,
-                title: "Detaylı Raporlar",
-                description: "Görsel raporlar ve analizlerle danışanlarınızın profilini daha iyi anlayın."
+                title: "İçgörü Raporları",
+                description: "Görsel ve anlaşılır raporlarla danışanlarınızın profilini paylaşın ve seansları zenginleştirin.",
+                color: "from-[#C9E4DE] to-[#B5D6CE]"
               },
               {
-                icon: Zap,
-                title: "Hızlı Test Akışı",
-                description: "Danışanlara link gönderin, test sonuçları otomatik olarak sisteme aktarılsın."
+                icon: Heart,
+                title: "Wellness Takibi",
+                description: "Danışanlarınızın iyilik halini izleyin. Mood tracking, ilerleme grafikleri ve hatırlatıcılar.",
+                color: "from-[#F5E6E0] to-[#E8D5CF]"
               },
               {
                 icon: Shield,
-                title: "KVKK Uyumlu",
-                description: "Verileriniz Türkiye'de, güvenli altyapıda. KVKK ve GDPR uyumlu işleme."
+                title: "Gizlilik & Güvenlik",
+                description: "KVKK ve GDPR uyumlu. Verileriniz Türkiye'de, şifreli ve güvende. Rol tabanlı erişim kontrolü.",
+                color: "from-[#E0E7EE] to-[#D0D7DE]"
               },
               {
-                icon: CheckCircle,
-                title: "Kolay Kullanım",
-                description: "Dakikalar içinde öğrenin, hemen kullanmaya başlayın. Teknik bilgi gerektirmez."
+                icon: Sparkles,
+                title: "Akıllı Öneriler",
+                description: "Analiz sonuçlarına göre seans stratejileri ve okuma önerileri. Yapay zeka destekli içgörüler.",
+                color: "from-[#F0E6F5] to-[#E0D6E5]"
+              },
+              {
+                icon: Leaf,
+                title: "Minimal & Huzurlu",
+                description: "Dikkat dağıtmayan, sakin tasarım. Siz ve danışanlarınız için huzurlu bir deneyim.",
+                color: "from-[#E6F0E8] to-[#D6E0D8]"
               },
             ].map((feature, i) => (
               <div
                 key={i}
-                className="p-6 bg-pro-surface border border-pro-border rounded-2xl hover:border-pro-primary/30 transition-colors"
+                className="group p-8 bg-white rounded-3xl border border-[#eee] hover:border-[#ddd] hover:shadow-xl hover:shadow-black/5 transition-all duration-300"
               >
-                <div className="h-12 w-12 rounded-xl bg-pro-primary/10 flex items-center justify-center mb-4">
-                  <feature.icon className="h-6 w-6 text-pro-primary" />
+                <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className="h-7 w-7 text-[#1a1a1a]/70" />
                 </div>
-                <h3 className="text-lg font-semibold text-pro-text mb-2">
+                <h3 className="text-xl font-semibold text-[#1a1a1a] mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-pro-text-secondary leading-relaxed">
+                <p className="text-[#666] leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -126,24 +241,119 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Who is it for */}
-      <section className="py-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-pro-text mb-4">
-            Kimler İçin?
-          </h2>
-          <p className="text-lg text-pro-text-secondary mb-12">
-            OrbiraMind, danışanlarıyla çalışan tüm profesyoneller için
-          </p>
-          <div className="grid sm:grid-cols-3 gap-6">
+      {/* For Who */}
+      <section id="for-who" className="py-24 sm:py-32 px-6 sm:px-8 lg:px-12 bg-[#F5F5F3]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <span className="inline-block px-4 py-2 bg-[#C4A484]/20 rounded-full text-sm text-[#8B6914] font-medium mb-6">
+              Kimler İçin
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a] mb-6 tracking-tight">
+              Sizin İçin Tasarlandı
+            </h2>
+            <p className="text-xl text-[#666] max-w-2xl mx-auto">
+              İnsan psikolojisi ve wellness alanında çalışan tüm profesyoneller için
+            </p>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: "Psikologlar", desc: "Klinik ve danışmanlık psikologları" },
-              { title: "Yaşam Koçları", desc: "ICF sertifikalı koçlar" },
-              { title: "Terapistler", desc: "Aile ve çift terapistleri" },
+              { 
+                title: "Psikologlar", 
+                desc: "Klinik & Danışmanlık",
+                icon: "🧠",
+                items: ["Kişilik değerlendirmesi", "Terapi planlama", "İlerleme takibi"]
+              },
+              { 
+                title: "Yaşam Koçları", 
+                desc: "ICF & Bireysel",
+                icon: "🌱",
+                items: ["Hedef belirleme", "Davranış analizi", "Koçluk seansları"]
+              },
+              { 
+                title: "Terapistler", 
+                desc: "Aile & Çift",
+                icon: "💚",
+                items: ["İlişki dinamikleri", "Uyum analizi", "Ortak seanslar"]
+              },
+              { 
+                title: "Wellness Uzmanları", 
+                desc: "Bütünsel Sağlık",
+                icon: "✨",
+                items: ["Stres yönetimi", "Mindfulness", "İyilik hali"]
+              },
             ].map((item, i) => (
-              <div key={i} className="p-6 bg-pro-surface border border-pro-border rounded-2xl">
-                <h3 className="text-lg font-semibold text-pro-text mb-1">{item.title}</h3>
-                <p className="text-sm text-pro-text-secondary">{item.desc}</p>
+              <div 
+                key={i} 
+                className="p-8 bg-white rounded-3xl border border-[#eee] hover:shadow-xl hover:shadow-black/5 transition-all"
+              >
+                <span className="text-4xl mb-4 block">{item.icon}</span>
+                <h3 className="text-xl font-semibold text-[#1a1a1a] mb-1">{item.title}</h3>
+                <p className="text-sm text-[#5B7B6A] font-medium mb-4">{item.desc}</p>
+                <ul className="space-y-2">
+                  {item.items.map((li, j) => (
+                    <li key={j} className="text-sm text-[#666] flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#5B7B6A]" />
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="py-24 sm:py-32 px-6 sm:px-8 lg:px-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <span className="inline-block px-4 py-2 bg-[#5B7B6A]/10 rounded-full text-sm text-[#5B7B6A] font-medium mb-6">
+              Kullanıcı Yorumları
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a] mb-6 tracking-tight">
+              Profesyoneller Ne Diyor?
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "HAE motoru danışanlarımı anlama şeklimi tamamen değiştirdi. Seanslar çok daha derinlikli ve verimli geçiyor.",
+                author: "Dr. Elif Yıldız",
+                title: "Klinik Psikolog, İstanbul",
+                rating: 5
+              },
+              {
+                quote: "Koçluk seanslarımda artık somut verilerle çalışabiliyorum. Danışanlarım da görsel raporları çok seviyor.",
+                author: "Mehmet Karaca",
+                title: "ICF Sertifikalı Yaşam Koçu",
+                rating: 5
+              },
+              {
+                quote: "Minimal tasarımı ve kullanım kolaylığı harika. Teknolojiyle aram iyi değil ama OrbiraMind'ı hemen öğrendim.",
+                author: "Zeynep Aksoy",
+                title: "Aile Terapisti, Ankara",
+                rating: 5
+              },
+            ].map((item, i) => (
+              <div 
+                key={i} 
+                className="p-8 bg-white rounded-3xl border border-[#eee] hover:shadow-xl hover:shadow-black/5 transition-all"
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(item.rating)].map((_, j) => (
+                    <Star key={j} className="h-5 w-5 fill-[#C4A484] text-[#C4A484]" />
+                  ))}
+                </div>
+                <Quote className="h-8 w-8 text-[#eee] mb-4" />
+                <p className="text-[#666] leading-relaxed mb-6">
+                  "{item.quote}"
+                </p>
+                <div>
+                  <p className="font-semibold text-[#1a1a1a]">{item.author}</p>
+                  <p className="text-sm text-[#999]">{item.title}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -151,51 +361,92 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4 sm:px-6 bg-gradient-to-br from-pro-primary/10 to-pro-primary/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-pro-text mb-4">
-            Hemen Başlayın
-          </h2>
-          <p className="text-lg text-pro-text-secondary mb-8">
-            Ücretsiz hesap oluşturun, platformu keşfedin.
-          </p>
-          <Link
-            href="/auth/register"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-pro-primary text-white rounded-xl font-medium hover:bg-pro-primary/90 transition-colors"
-          >
-            Ücretsiz Hesap Oluştur
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+      <section className="py-24 sm:py-32 px-6 sm:px-8 lg:px-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative p-12 sm:p-16 bg-[#1a1a1a] rounded-[40px] text-center overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#5B7B6A]/20 to-transparent" />
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#5B7B6A]/30 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#C4A484]/20 rounded-full blur-3xl" />
+            
+            <div className="relative">
+              <h2 className="text-4xl sm:text-5xl font-semibold text-white mb-6 tracking-tight">
+                Pratiğinizi Yükseltin
+              </h2>
+              <p className="text-xl text-white/70 mb-10 max-w-xl mx-auto">
+                14 gün ücretsiz deneyin. Kredi kartı gerekmez. 
+                İstediğiniz zaman iptal edin.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href="/auth/register"
+                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1a1a1a] rounded-full font-medium hover:bg-[#f5f5f5] transition-all"
+                >
+                  <span>Ücretsiz Hesap Oluştur</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-white/80 hover:text-white rounded-full font-medium transition-all"
+                >
+                  Zaten hesabım var
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 border-t border-pro-border">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center">
-                <span className="text-white text-sm font-bold">O</span>
+      <footer className="py-16 px-6 sm:px-8 lg:px-12 border-t border-[#eee]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center">
+                  <span className="text-white text-xl font-semibold">O</span>
+                </div>
+                <div>
+                  <span className="text-lg font-semibold text-[#1a1a1a]">OrbiraMind</span>
+                </div>
               </div>
-              <span className="text-sm text-pro-text-secondary">
-                OrbiraMind · Orbira Labs
-              </span>
+              <p className="text-sm text-[#666] leading-relaxed">
+                Psikolojik sağlık ve wellness profesyonelleri için tasarlanmış premium danışan yönetim platformu.
+              </p>
             </div>
-            <div className="flex items-center gap-6 text-sm text-pro-text-secondary">
-              <Link href="/privacy" className="hover:text-pro-text transition-colors">
-                Gizlilik Politikası
-              </Link>
-              <Link href="/terms" className="hover:text-pro-text transition-colors">
-                Kullanım Koşulları
-              </Link>
-              <a href="mailto:info@orbiralabs.com" className="hover:text-pro-text transition-colors">
-                İletişim
-              </a>
+            <div>
+              <h4 className="font-semibold text-[#1a1a1a] mb-4">Platform</h4>
+              <ul className="space-y-3 text-sm text-[#666]">
+                <li><a href="#features" className="hover:text-[#1a1a1a] transition-colors">Özellikler</a></li>
+                <li><a href="#for-who" className="hover:text-[#1a1a1a] transition-colors">Kimler İçin</a></li>
+                <li><Link href="/auth/register" className="hover:text-[#1a1a1a] transition-colors">Ücretsiz Dene</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-[#1a1a1a] mb-4">Yasal</h4>
+              <ul className="space-y-3 text-sm text-[#666]">
+                <li><Link href="/privacy" className="hover:text-[#1a1a1a] transition-colors">Gizlilik Politikası</Link></li>
+                <li><Link href="/terms" className="hover:text-[#1a1a1a] transition-colors">Kullanım Koşulları</Link></li>
+                <li><a href="#" className="hover:text-[#1a1a1a] transition-colors">KVKK Aydınlatma</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-[#1a1a1a] mb-4">İletişim</h4>
+              <ul className="space-y-3 text-sm text-[#666]">
+                <li><a href="mailto:info@orbiralabs.com" className="hover:text-[#1a1a1a] transition-colors">info@orbiralabs.com</a></li>
+                <li><a href="mailto:destek@orbiramind.com" className="hover:text-[#1a1a1a] transition-colors">destek@orbiramind.com</a></li>
+              </ul>
             </div>
           </div>
-          <p className="text-center text-xs text-pro-text-tertiary mt-8">
-            © 2026 Orbira Labs. Tüm hakları saklıdır.
-          </p>
+          
+          <div className="pt-8 border-t border-[#eee] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-[#999]">
+              © 2026 Orbira Labs. Tüm hakları saklıdır.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-[#999]">
+              <span>Powered by</span>
+              <span className="font-semibold text-[#666]">Orbira Labs</span>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
