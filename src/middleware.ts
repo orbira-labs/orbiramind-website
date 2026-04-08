@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = [
+  "/",
   "/auth/login",
   "/auth/register",
   "/auth/verify",
@@ -26,7 +27,7 @@ export function middleware(request: NextRequest) {
     (c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token")
   );
 
-  // Root path (/) özel handling - login varsa dashboard'a yönlendir
+  // Root path (/) - login varsa dashboard'a yönlendir
   if (pathname === "/") {
     if (hasAuthCookie) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -34,19 +35,28 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
-
-  // Auth yoksa ve public path değilse login'e yönlendir
-  if (!hasAuthCookie && !isPublicPath) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+  // Auth sayfaları - login varsa dashboard'a yönlendir
+  const AUTH_PAGES = ["/auth/login", "/auth/register", "/auth/verify"];
+  const isAuthPage = AUTH_PAGES.some((p) => pathname.startsWith(p));
+  
+  if (isAuthPage) {
+    if (hasAuthCookie) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return NextResponse.next();
   }
 
-  const AUTH_ONLY_PUBLIC = ["/auth/login", "/auth/register", "/auth/verify"];
-  const isAuthOnlyPublic = AUTH_ONLY_PUBLIC.some((p) => pathname.startsWith(p));
+  // Public paths - her zaman izin ver
+  const isPublicPath = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  if (isPublicPath) {
+    return NextResponse.next();
+  }
 
-  // Auth varsa ve login/register/verify sayfasındaysa dashboard'a yönlendir
-  if (hasAuthCookie && isAuthOnlyPublic) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // Protected paths - auth yoksa login'e yönlendir
+  if (!hasAuthCookie) {
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();

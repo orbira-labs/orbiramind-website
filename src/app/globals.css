@@ -405,3 +405,60 @@ body {
   letter-spacing: -0.01em;
   color: rgba(255, 255, 255, 0.7);
 }
+
+/* ============================================================
+   Landing Page Animations
+   ============================================================ */
+@keyframes draw {
+  from {
+    stroke-dasharray: 0 300;
+  }
+  to {
+    stroke-dasharray: 300 0;
+  }
+}
+
+.animate-draw {
+  animation: draw 1.5s ease-out forwards;
+  stroke-dasharray: 0 300;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+.delay-700 {
+  animation-delay: 700ms;
+}
+
+.delay-1000 {
+  animation-delay: 1000ms;
+}
