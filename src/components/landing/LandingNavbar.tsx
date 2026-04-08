@@ -1,38 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { User } from "@supabase/supabase-js";
-import { LogOut, LayoutDashboard, Loader2 } from "lucide-react";
 
 export function LandingNavbar() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    
     supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setLoading(false);
+      if (data.user) {
+        router.replace("/dashboard");
+      }
     });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setUser(null);
-    router.refresh();
-  };
+  }, [router]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-xl">
@@ -54,43 +37,18 @@ export function LandingNavbar() {
         </div>
         
         <div className="flex items-center gap-3">
-          {loading ? (
-            <div className="px-4 py-2">
-              <Loader2 className="h-5 w-5 animate-spin text-[#666]" />
-            </div>
-          ) : user ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 text-sm text-[#666] hover:text-[#1a1a1a] transition-colors px-4 py-2"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">Dashboard</span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center gap-2 text-sm px-5 py-2.5 bg-[#1a1a1a] text-white rounded-full hover:bg-[#333] transition-all shadow-lg shadow-black/10"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Çıkış</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/auth/login"
-                className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors px-4 py-2"
-              >
-                Giriş Yap
-              </Link>
-              <Link
-                href="/auth/register"
-                className="text-sm px-5 py-2.5 bg-[#1a1a1a] text-white rounded-full hover:bg-[#333] transition-all shadow-lg shadow-black/10"
-              >
-                Ücretsiz Başla
-              </Link>
-            </>
-          )}
+          <Link
+            href="/auth/login"
+            className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors px-4 py-2"
+          >
+            Giriş Yap
+          </Link>
+          <Link
+            href="/auth/register"
+            className="text-sm px-5 py-2.5 bg-[#1a1a1a] text-white rounded-full hover:bg-[#333] transition-all shadow-lg shadow-black/10"
+          >
+            Ücretsiz Başla
+          </Link>
         </div>
       </div>
     </nav>

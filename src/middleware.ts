@@ -22,11 +22,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
-
   const hasAuthCookie = request.cookies.getAll().some(
     (c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token")
   );
+
+  // Root path (/) özel handling - login varsa dashboard'a yönlendir
+  if (pathname === "/") {
+    if (hasAuthCookie) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
   // Auth yoksa ve public path değilse login'e yönlendir
   if (!hasAuthCookie && !isPublicPath) {
@@ -46,6 +54,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|xml|txt)$).*)",
   ],
 };
