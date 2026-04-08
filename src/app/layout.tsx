@@ -16,13 +16,46 @@ const nunito = Nunito({
   display: "swap",
 });
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbiramind.com'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: {
-    default: "OrbiraMind",
+    default: "OrbiraMind | Psikologlar İçin Danışan Analiz Platformu",
     template: "%s | OrbiraMind",
   },
-  description: "Danışanlarınızın iç dünyasını anlamanın en bilimsel yolu",
-  robots: { index: false, follow: false },
+  description: "Psikologlar, koçlar ve danışmanlar için kişilik analizi ve danışan yönetim platformu. HAE ve AQE motorları ile bilimsel analiz.",
+  keywords: ["psikolog yazılımı", "danışan yönetimi", "kişilik analizi", "psikoloji platformu", "koç yazılımı", "danışman araçları", "OrbiraMind"],
+  authors: [{ name: "Orbira Labs" }],
+  creator: "Orbira Labs",
+  publisher: "Orbira Labs",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: "OrbiraMind | Psikologlar İçin Danışan Analiz Platformu",
+    description: "Kişilik analizi ve danışan yönetimi için profesyonel platform.",
+    type: "website",
+    locale: "tr_TR",
+    url: baseUrl,
+    siteName: "OrbiraMind",
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "OrbiraMind | Psikologlar İçin Danışan Analiz Platformu",
+    description: "Kişilik analizi ve danışan yönetimi için profesyonel platform.",
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
 };
 
 export default function RootLayout({
