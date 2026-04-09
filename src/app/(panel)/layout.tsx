@@ -27,7 +27,7 @@ export default async function PanelLayout({
   const professional = await getProfessional(user.id);
 
   if (!professional) {
-    redirect("/auth/login");
+    redirect("/onboarding");
   }
 
   if (!professional.onboarding_completed) {
