@@ -19,6 +19,7 @@ import {
   AnalysisDetailModal,
   type AnalysisSlim,
 } from "@/components/tests/AnalysisDetailModal";
+import { SendTestModal } from "@/components/tests/SendTestModal";
 import {
   Users,
   Calendar,
@@ -43,7 +44,6 @@ import {
   buildTestMessage,
 } from "@/lib/utils";
 import { toast } from "sonner";
-import Link from "next/link";
 
 const STAT_CARDS = [
   {
@@ -169,6 +169,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   const [selectedApt, setSelectedApt] = useState<AppointmentSlim | null>(null);
   const [editApt, setEditApt] = useState<AppointmentSlim | null>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisSlim | null>(null);
+  const [showSendTestModal, setShowSendTestModal] = useState(false);
 
   const statCards = STAT_CARDS.map((card) => ({
     ...card,
@@ -211,6 +212,11 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
           refresh();
         }}
       />
+      <SendTestModal
+        open={showSendTestModal}
+        onClose={() => setShowSendTestModal(false)}
+        onSent={refresh}
+      />
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
         <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="space-y-4">
@@ -224,7 +230,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                   </h3>
                   <button
                     onClick={() => setShowAppointmentModal(true)}
-                    className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-medium"
+                    className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-semibold"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     Oluştur
@@ -297,13 +303,13 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                   <h3 className="font-semibold text-pro-text">
                     Son Analizler
                   </h3>
-                  <Link
-                    href="/tests"
-                    className="flex items-center gap-1 text-sm text-[#D4856A] hover:text-[#C97B5D] font-medium"
+                  <button
+                    onClick={() => setShowSendTestModal(true)}
+                    className="flex items-center gap-1 text-sm text-[#D4856A] hover:text-[#C97B5D] font-semibold"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     MindTest Gönder
-                  </Link>
+                  </button>
                 </div>
                 {loading ? (
                   <div className="space-y-3">

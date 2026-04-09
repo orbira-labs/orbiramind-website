@@ -15,7 +15,7 @@ export interface Note {
   updated_at: string;
 }
 
-export type NoteColor = "yellow" | "green" | "blue" | "pink" | "purple";
+export type NoteColor = "green" | "yellow" | "red";
 
 export function useNotes() {
   const { professional } = useProContext();
@@ -52,7 +52,7 @@ export function useNotes() {
     fetchNotes();
   }, [fetchNotes]);
 
-  const createNote = async (title: string, content?: string, color: NoteColor = "yellow") => {
+  const createNote = async (title: string, content?: string, color: NoteColor = "green") => {
     if (!professional?.id) return null;
 
     try {
@@ -72,6 +72,7 @@ export function useNotes() {
       setNotes((prev) => [data, ...prev]);
       return data;
     } catch (err) {
+      console.error("Note creation error:", err);
       setError(err instanceof Error ? err.message : "Not oluşturulamadı");
       return null;
     }

@@ -1,24 +1,48 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { useNotes, type Note, type NoteColor } from "@/lib/hooks/useNotes";
-import { Button } from "@/components/ui/Button";
-import { StickyNote, Plus, Pin, Trash2, X, Check, Pencil, Sparkles } from "lucide-react";
+import { StickyNote, Plus, Pin, Trash2, X, Pencil, AlertCircle } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 
-const NOTE_COLORS: { value: NoteColor; bg: string; bgSoft: string; border: string; text: string; accent: string; shadow: string }[] = [
-  { value: "yellow", bg: "bg-amber-50", bgSoft: "bg-amber-50/80", border: "border-amber-200/60", text: "text-amber-800", accent: "bg-amber-400", shadow: "shadow-amber-200/50" },
-  { value: "green", bg: "bg-emerald-50", bgSoft: "bg-emerald-50/80", border: "border-emerald-200/60", text: "text-emerald-800", accent: "bg-emerald-400", shadow: "shadow-emerald-200/50" },
-  { value: "blue", bg: "bg-sky-50", bgSoft: "bg-sky-50/80", border: "border-sky-200/60", text: "text-sky-800", accent: "bg-sky-400", shadow: "shadow-sky-200/50" },
-  { value: "pink", bg: "bg-pink-50", bgSoft: "bg-pink-50/80", border: "border-pink-200/60", text: "text-pink-800", accent: "bg-pink-400", shadow: "shadow-pink-200/50" },
-  { value: "purple", bg: "bg-violet-50", bgSoft: "bg-violet-50/80", border: "border-violet-200/60", text: "text-violet-800", accent: "bg-violet-400", shadow: "shadow-violet-200/50" },
+const PRIORITY_OPTIONS: {
+  value: NoteColor;
+  label: string;
+  color: string;
+  bg: string;
+  bgLight: string;
+  border: string;
+}[] = [
+  {
+    value: "green",
+    label: "Düşük",
+    color: "#86EFAC",
+    bg: "bg-emerald-300",
+    bgLight: "bg-emerald-50",
+    border: "border-emerald-200",
+  },
+  {
+    value: "yellow",
+    label: "Orta",
+    color: "#FCD34D",
+    bg: "bg-amber-300",
+    bgLight: "bg-amber-50",
+    border: "border-amber-200",
+  },
+  {
+    value: "red",
+    label: "Yüksek",
+    color: "#FCA5A5",
+    bg: "bg-red-300",
+    bgLight: "bg-red-50",
+    border: "border-red-200",
+  },
 ];
 
-function getColorStyles(color: string) {
-  return NOTE_COLORS.find((c) => c.value === color) || NOTE_COLORS[0];
+function getPriority(color: NoteColor) {
+  return PRIORITY_OPTIONS.find((p) => p.value === color) || PRIORITY_OPTIONS[0];
 }
 
 interface NoteModalProps {
@@ -30,20 +54,27 @@ interface NoteModalProps {
 }
 
 function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
-  const [title, setTitle] = useState(note?.title || "");
-  const [content, setContent] = useState(note?.content || "");
-  const [color, setColor] = useState<NoteColor>((note?.color as NoteColor) || "yellow");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [priority, setPriority] = useState<NoteColor>("green");
   const [saving, setSaving] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (open) {
       setTitle(note?.title || "");
       setContent(note?.content || "");
-      setColor((note?.color as NoteColor) || "yellow");
+      setPriority((note?.color as NoteColor) || "green");
+      setTimeout(() => setIsVisible(true), 10);
+    } else {
+      setIsVisible(false);
     }
   }, [open, note]);
 
-  const colorStyles = getColorStyles(color);
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(onClose, 200);
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -51,191 +82,129 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
       return;
     }
     setSaving(true);
-    await onSave(title.trim(), content.trim(), color);
+    await onSave(title.trim(), content.trim(), priority);
     setSaving(false);
-    onClose();
+    handleClose();
   };
 
+  if (!open) return null;
+
+  const selectedPriority = getPriority(priority);
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={onClose}
-        >
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/25 backdrop-blur-[2px]" 
-          />
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ 
-              type: "spring", 
-              damping: 28, 
-              stiffness: 350,
-              mass: 0.8
-            }}
-            onClick={(e) => e.stopPropagation()}
-            className={clsx(
-              "relative w-full max-w-md rounded-3xl overflow-hidden",
-              "bg-white shadow-2xl",
-              colorStyles.shadow
-            )}
-            style={{
-              boxShadow: `0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px ${color === 'yellow' ? 'rgba(251, 191, 36, 0.1)' : color === 'green' ? 'rgba(52, 211, 153, 0.1)' : color === 'blue' ? 'rgba(56, 189, 248, 0.1)' : color === 'pink' ? 'rgba(244, 114, 182, 0.1)' : 'rgba(167, 139, 250, 0.1)'}`,
-            }}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={handleClose}>
+      <div
+        className={clsx(
+          "fixed inset-0 bg-black/40 backdrop-blur-sm transition-all duration-200",
+          isVisible ? "opacity-100" : "opacity-0"
+        )}
+      />
+
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={clsx(
+          "relative w-full max-w-xl bg-white rounded-2xl shadow-xl transition-all duration-200",
+          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-pro-primary/10 flex items-center justify-center">
+              <StickyNote className="h-5 w-5 text-pro-primary" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">
+                {note ? "Notu Düzenle" : "Yeni Not"}
+              </h2>
+              <p className="text-xs text-gray-500">Düşüncelerinizi kaydedin</p>
+            </div>
+          </div>
+          <button
+            onClick={handleClose}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            <div className={clsx("h-1.5 w-full", colorStyles.accent)} />
-            
-            <div className="px-6 pt-5 pb-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    initial={{ rotate: -10 }}
-                    animate={{ rotate: 0 }}
-                    transition={{ type: "spring", damping: 10 }}
-                  >
-                    <Sparkles className={clsx("h-5 w-5", colorStyles.text, "opacity-60")} />
-                  </motion.div>
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {note ? "Notu Düzenle" : "Yeni Not"}
-                  </h2>
-                </div>
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <div className="p-5 space-y-4">
+          {/* Title Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Başlık</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Not başlığını yazın..."
+              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200/70 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-gray-400/60 transition-colors"
+              autoFocus
+            />
+          </div>
+
+          {/* Content Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">İçerik</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Detayları yazın..."
+              rows={5}
+              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200/70 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-gray-400/60 transition-colors resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between p-5 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
+          <div className="flex items-center gap-2">
+            {/* Priority Dots */}
+            <div className="flex items-center gap-1">
+              {PRIORITY_OPTIONS.map((option) => (
                 <button
-                  onClick={onClose}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all duration-200"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+                  key={option.value}
+                  type="button"
+                  onClick={() => setPriority(option.value)}
+                  className={clsx(
+                    "w-5 h-5 rounded-full transition-all duration-200 flex items-center justify-center",
+                    priority === option.value
+                      ? "ring-2 ring-offset-1 ring-gray-300"
+                      : "hover:scale-110"
+                  )}
+                  style={{ backgroundColor: option.color }}
+                  title={option.label}
+                />
+              ))}
             </div>
-
-            <div className="px-6 pb-6">
-              <motion.div 
-                layout
-                className={clsx(
-                  "rounded-2xl p-5 transition-all duration-300",
-                  colorStyles.bg,
-                  "border border-transparent"
-                )}
-                style={{
-                  boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)"
-                }}
+            {note && onDelete && (
+              <button
+                onClick={onDelete}
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-2"
               >
-                <input
-                  type="text"
-                  placeholder="Not başlığı..."
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className={clsx(
-                    "w-full bg-transparent font-medium text-base outline-none",
-                    "placeholder:text-gray-400/70 transition-colors",
-                    "focus:placeholder:text-gray-400/50",
-                    colorStyles.text
-                  )}
-                  autoFocus
-                  style={{ caretColor: color === 'yellow' ? '#f59e0b' : color === 'green' ? '#10b981' : color === 'blue' ? '#0ea5e9' : color === 'pink' ? '#ec4899' : '#8b5cf6' }}
-                />
-                <div className={clsx("h-px my-3 opacity-20", colorStyles.accent)} />
-                <textarea
-                  placeholder="Düşüncelerinizi yazın..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  rows={5}
-                  className={clsx(
-                    "w-full bg-transparent text-sm outline-none resize-none leading-relaxed",
-                    "placeholder:text-gray-400/60 transition-colors",
-                    colorStyles.text,
-                    "opacity-90"
-                  )}
-                  style={{ caretColor: color === 'yellow' ? '#f59e0b' : color === 'green' ? '#10b981' : color === 'blue' ? '#0ea5e9' : color === 'pink' ? '#ec4899' : '#8b5cf6' }}
-                />
-              </motion.div>
-
-              <div className="flex items-center gap-3 mt-5">
-                <span className="text-sm text-gray-500 font-medium">Renk</span>
-                <div className="flex gap-2">
-                  {NOTE_COLORS.map((c) => (
-                    <motion.button
-                      key={c.value}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setColor(c.value)}
-                      className={clsx(
-                        "h-7 w-7 rounded-full transition-all duration-200 relative",
-                        c.bg,
-                        color === c.value 
-                          ? "ring-2 ring-offset-2 ring-gray-400/50" 
-                          : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-200"
-                      )}
-                    >
-                      {color === c.value && (
-                        <motion.div
-                          layoutId="colorCheck"
-                          className={clsx("absolute inset-0 flex items-center justify-center rounded-full", c.accent)}
-                          transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                        >
-                          <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
-                        </motion.div>
-                      )}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-                {note && onDelete ? (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={onDelete}
-                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Sil
-                  </motion.button>
-                ) : (
-                  <div />
-                )}
-                <div className="flex gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
-                  >
-                    İptal
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleSave}
-                    disabled={saving}
-                    className={clsx(
-                      "flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white rounded-xl transition-all",
-                      "bg-pro-primary hover:bg-pro-primary-hover disabled:opacity-50 disabled:cursor-not-allowed",
-                      "shadow-sm hover:shadow-md"
-                    )}
-                  >
-                    <Check className="h-4 w-4" />
-                    {saving ? "Kaydediliyor..." : "Kaydet"}
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+                <Trash2 className="h-4 w-4" />
+                Sil
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              İptal
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving || !title.trim()}
+              className="px-5 py-2 text-sm font-semibold text-white bg-pro-primary hover:bg-pro-primary-hover rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? "Kaydediliyor..." : "Kaydet"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -248,9 +217,30 @@ interface NoteDetailModalProps {
   onDelete: () => void;
 }
 
-function NoteDetailModal({ note, open, onClose, onEdit, onTogglePin, onDelete }: NoteDetailModalProps) {
-  const colorStyles = getColorStyles(note.color);
+function NoteDetailModal({
+  note,
+  open,
+  onClose,
+  onEdit,
+  onTogglePin,
+  onDelete,
+}: NoteDetailModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setShowDeleteConfirm(false);
+      setTimeout(() => setIsVisible(true), 10);
+    } else {
+      setIsVisible(false);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(onClose, 200);
+  };
 
   const handleDelete = () => {
     if (showDeleteConfirm) {
@@ -261,203 +251,135 @@ function NoteDetailModal({ note, open, onClose, onEdit, onTogglePin, onDelete }:
     }
   };
 
+  if (!open) return null;
+
+  const priority = getPriority(note.color as NoteColor);
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={onClose}
-        >
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" 
-          />
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 40, rotate: -3 }}
-            animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 2 }}
-            transition={{ 
-              type: "spring", 
-              damping: 22, 
-              stiffness: 280,
-              mass: 0.9
-            }}
-            onClick={(e) => e.stopPropagation()}
-            className={clsx(
-              "relative w-full max-w-md rounded-3xl overflow-hidden",
-              "bg-white"
-            )}
-            style={{
-              boxShadow: "0 30px 60px -15px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.03)"
-            }}
-          >
-            <div className={clsx("h-1.5 w-full", colorStyles.accent)} />
-            
-            <div className={clsx("p-6", colorStyles.bg)}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    {note.pinned && (
-                      <motion.div
-                        initial={{ scale: 0, rotate: -45 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", damping: 12 }}
-                      >
-                        <Pin className="h-4 w-4 text-pro-primary" />
-                      </motion.div>
-                    )}
-                    <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                      Not
-                    </span>
-                  </div>
-                  <motion.h3 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className={clsx("font-semibold text-xl leading-tight", colorStyles.text)}
-                  >
-                    {note.title}
-                  </motion.h3>
-                </div>
-                
-                <motion.button
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={onClose}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-white/60 transition-all"
-                >
-                  <X className="h-5 w-5" />
-                </motion.button>
-              </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={handleClose}>
+      <div
+        className={clsx(
+          "fixed inset-0 bg-black/40 backdrop-blur-sm transition-all duration-200",
+          isVisible ? "opacity-100" : "opacity-0"
+        )}
+      />
 
-              {note.content && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="mt-4"
-                >
-                  <p className={clsx(
-                    "text-sm whitespace-pre-wrap leading-relaxed",
-                    colorStyles.text,
-                    "opacity-80"
-                  )}>
-                    {note.content}
-                  </p>
-                </motion.div>
-              )}
-
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="mt-4 pt-3 border-t border-black/5"
-              >
-                <span className="text-xs text-gray-400">
-                  {new Date(note.updated_at).toLocaleDateString("tr-TR", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </motion.div>
-            </div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between"
-            >
-              <div className="flex gap-1">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onTogglePin}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={clsx(
+          "relative w-full max-w-lg bg-white rounded-2xl shadow-xl transition-all duration-200",
+          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        )}
+      >
+        {/* Header */}
+        <div className="p-5 border-b border-gray-100">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span
                   className={clsx(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all",
-                    note.pinned 
-                      ? "bg-pro-primary/10 text-pro-primary" 
-                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                    priority.bgLight,
+                    priority.border,
+                    "border"
                   )}
                 >
-                  <Pin className="h-4 w-4" />
-                  {note.pinned ? "Sabitli" : "Sabitle"}
-                </motion.button>
+                  <span className={clsx("w-2 h-2 rounded-full", priority.bg)} />
+                  {priority.label} Önem
+                </span>
+                {note.pinned && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pro-primary/10 text-pro-primary">
+                    <Pin className="h-3 w-3" />
+                    Sabitli
+                  </span>
+                )}
               </div>
+              <h3 className="text-lg font-semibold text-gray-900">{note.title}</h3>
+              <p className="text-xs text-gray-400 mt-1">
+                {new Date(note.updated_at).toLocaleDateString("tr-TR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+            <button
+              onClick={handleClose}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
 
-              <div className="flex gap-2">
-                <AnimatePresence mode="wait">
-                  {showDeleteConfirm ? (
-                    <motion.div
-                      key="confirm"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="flex items-center gap-2"
-                    >
-                      <span className="text-xs text-red-500">Silmek istediğinize emin misiniz?</span>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setShowDeleteConfirm(false)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        İptal
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleDelete}
-                        className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                      >
-                        Evet, Sil
-                      </motion.button>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="actions"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex gap-2"
-                    >
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleDelete}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Sil
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={onEdit}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-white bg-pro-primary hover:bg-pro-primary-hover transition-all shadow-sm"
-                      >
-                        <Pencil className="h-4 w-4" />
-                        Düzenle
-                      </motion.button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+        {/* Content */}
+        {note.content && (
+          <div className="p-5">
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {note.content}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-between p-5 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
+          <button
+            onClick={onTogglePin}
+            className={clsx(
+              "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              note.pinned
+                ? "text-pro-primary bg-pro-primary/10 hover:bg-pro-primary/15"
+                : "text-gray-600 hover:bg-gray-100"
+            )}
+          >
+            <Pin className="h-4 w-4" />
+            {note.pinned ? "Sabiti Kaldır" : "Sabitle"}
+          </button>
+
+          <div className="flex gap-2">
+            {showDeleteConfirm ? (
+              <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <span className="text-xs text-red-600 font-medium">Emin misiniz?</span>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-2 py-1 text-xs font-medium text-gray-600 hover:bg-white rounded transition-colors"
+                >
+                  Hayır
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="px-2 py-1 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 rounded transition-colors"
+                >
+                  Evet
+                </button>
               </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            ) : (
+              <>
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Sil
+                </button>
+                <button
+                  onClick={onEdit}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-pro-primary hover:bg-pro-primary-hover rounded-lg transition-colors"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Düzenle
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -471,6 +393,8 @@ export function NotesCard() {
     const result = await createNote(title, content, color);
     if (result) {
       toast.success("Not eklendi");
+    } else {
+      toast.error("Not eklenemedi");
     }
   };
 
@@ -508,12 +432,10 @@ export function NotesCard() {
     <>
       <Card padding="lg" variant="elevated" className="h-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-pro-text">
-            Notlarım
-          </h3>
+          <h3 className="font-semibold text-pro-text">Notlarım</h3>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-medium"
+            className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-semibold"
           >
             <Plus className="h-3.5 w-3.5" />
             Ekle
@@ -524,7 +446,7 @@ export function NotesCard() {
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-12 bg-pro-surface-alt rounded-lg" />
+                <div className="h-14 bg-pro-surface-alt rounded-xl" />
               </div>
             ))}
           </div>
@@ -539,28 +461,41 @@ export function NotesCard() {
         ) : (
           <div className="space-y-2">
             {displayedNotes.map((note) => {
-              const colorStyles = getColorStyles(note.color);
+              const priority = getPriority(note.color as NoteColor);
               return (
                 <button
                   key={note.id}
                   onClick={() => setViewingNote(note)}
-                  className={clsx(
-                    "w-full text-left p-3 rounded-lg border transition-all hover:shadow-sm",
-                    colorStyles.bg,
-                    colorStyles.border,
-                    "hover:scale-[1.01]"
-                  )}
+                  className="w-full text-left p-3 rounded-xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200 group"
                 >
-                  <div className="flex items-start gap-2">
-                    {note.pinned && <Pin className="h-3 w-3 text-pro-primary shrink-0 mt-0.5" />}
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={clsx("w-1 h-full min-h-[36px] rounded-full shrink-0", priority.bg)}
+                    />
                     <div className="flex-1 min-w-0">
-                      <p className={clsx("text-sm font-medium truncate", colorStyles.text)}>{note.title}</p>
-                      {note.content && (
-                        <p className={clsx("text-xs truncate mt-0.5", colorStyles.text, "opacity-60")}>
-                          {note.content}
+                      <div className="flex items-center gap-2">
+                        {note.pinned && (
+                          <Pin className="h-3 w-3 text-pro-primary shrink-0" />
+                        )}
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {note.title}
                         </p>
+                      </div>
+                      {note.content && (
+                        <p className="text-xs text-gray-500 truncate mt-0.5">{note.content}</p>
                       )}
                     </div>
+                    <span
+                      className={clsx(
+                        "shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded",
+                        priority.bgLight,
+                        priority.value === "green" && "text-emerald-700",
+                        priority.value === "yellow" && "text-amber-700",
+                        priority.value === "red" && "text-red-700"
+                      )}
+                    >
+                      {priority.label}
+                    </span>
                   </div>
                 </button>
               );

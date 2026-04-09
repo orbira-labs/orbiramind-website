@@ -65,7 +65,7 @@ export default function AppointmentsPage() {
                 </h1>
                 
                 {/* View Mode Toggle */}
-                <div className="flex gap-1 bg-pro-surface rounded-xl p-1 shadow-sm border border-pro-border">
+                <div className="flex gap-1 bg-pro-surface rounded-xl p-1 shadow-[0_1px_2px_rgba(0,0,0,0.03)] border border-pro-border/50">
                     <button
                       onClick={() => setViewMode("calendar")}
                       className={clsx(

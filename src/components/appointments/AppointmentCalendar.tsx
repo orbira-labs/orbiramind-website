@@ -81,9 +81,9 @@ export function AppointmentCalendar({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-2xl shadow-sm border border-[#E5E0DB] overflow-hidden">
+    <div className="h-full flex flex-col bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E5E0DB]/60 overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-[#E5E0DB] flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-[#E5E0DB]/50 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-semibold text-[#2D3436] capitalize">
             {format(currentMonth, "MMMM yyyy", { locale: tr })}
@@ -113,12 +113,12 @@ export function AppointmentCalendar({
       </div>
 
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 border-b border-[#E5E0DB]">
+      <div className="grid grid-cols-7 border-b border-[#E5E0DB]/50">
         {WEEKDAYS.map((day, i) => (
           <div 
             key={day} 
             className={clsx(
-              "py-3 text-center text-xs font-semibold border-r border-[#E5E0DB] last:border-r-0",
+              "py-3 text-center text-xs font-semibold border-r border-[#E5E0DB]/40 last:border-r-0",
               i >= 5 ? "text-[#9CAAAF] bg-[#FAFAF7]" : "text-[#6B7C85]"
             )}
           >
@@ -147,7 +147,7 @@ export function AppointmentCalendar({
               <div
                 key={index}
                 className={clsx(
-                  "relative border-r border-b border-[#E5E0DB] transition-colors group",
+                  "relative border-r border-b border-[#E5E0DB]/40 transition-colors group",
                   index % 7 === 6 && "border-r-0",
                   isLastRow && "border-b-0",
                   !isCurrentMonth && "bg-[#FAFAF7]",
@@ -216,7 +216,7 @@ export function AppointmentCalendar({
       </div>
 
       {/* Legend */}
-      <div className="px-5 py-3 border-t border-[#E5E0DB] flex items-center gap-6 text-xs bg-[#FAFAF7]">
+      <div className="px-5 py-3 border-t border-[#E5E0DB]/50 flex items-center gap-6 text-xs bg-[#FAFAF7]">
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded bg-[#D4856A]" />
           <span className="text-[#6B7C85]">Planlandı</span>
