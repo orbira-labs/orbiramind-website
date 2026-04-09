@@ -47,7 +47,7 @@ export default function TestsPage() {
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
         <div className="mx-auto max-w-6xl">
           {/* Main Container - like Ofisim */}
-          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4">
+          <div className="bg-gradient-to-br from-[#5B7B6A]/12 to-[#5B7B6A]/5 rounded-2xl p-2.5 sm:p-3 space-y-3">
             {/* Stats Row */}
             <div className="grid grid-cols-3 gap-3">
               {creditBalance > 0 ? (
@@ -57,23 +57,23 @@ export default function TestsPage() {
                       <div className="h-10 w-10 rounded-xl bg-[var(--pro-analysis-light)] flex items-center justify-center">
                         <FlaskConical className="h-5 w-5 text-[var(--pro-analysis)]" />
                       </div>
-                      <p className="text-sm text-pro-text-secondary font-medium">Kalan MindTest Adedi</p>
+                      <p className="text-sm text-pro-text-secondary font-medium">Kalan MindTest</p>
                     </div>
                     <p className="text-3xl font-bold text-[var(--pro-analysis)]">{creditBalance}</p>
                   </div>
                 </Card>
               ) : (
-                <Card padding="md" variant="elevated" className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50">
+                <Card padding="md" variant="elevated" className="bg-gradient-to-br from-[#8B9D83]/10 to-[#8B9D83]/5 border-[#8B9D83]/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                        <FlaskConical className="h-5 w-5 text-amber-600" />
+                      <div className="h-10 w-10 rounded-xl bg-[#8B9D83]/20 flex items-center justify-center">
+                        <FlaskConical className="h-5 w-5 text-[#6B7D63]" />
                       </div>
-                      <p className="text-sm text-amber-700 font-medium">MindTest Krediniz Bitti</p>
+                      <p className="text-sm text-[#5B6B53] font-medium">MindTest Krediniz Bitti</p>
                     </div>
                     <button
                       onClick={() => router.push("/billing")}
-                      className="text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1"
+                      className="text-sm font-semibold text-[#5B7B6A] hover:text-[#4A6A59] transition-colors flex items-center gap-1"
                     >
                       Hemen Al →
                     </button>
@@ -83,23 +83,23 @@ export default function TestsPage() {
               <Card padding="md" variant="elevated">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                      <Send className="h-5 w-5 text-amber-600" />
+                    <div className="h-10 w-10 rounded-xl bg-[#8B9D83]/15 flex items-center justify-center">
+                      <Send className="h-5 w-5 text-[#6B7D63]" />
                     </div>
                     <p className="text-sm text-pro-text-secondary font-medium">İşlenmemiş Analizler</p>
                   </div>
-                  <p className="text-3xl font-bold text-amber-600">{counts.pending}</p>
+                  <p className="text-3xl font-bold text-[#6B7D63]">{counts.pending}</p>
                 </div>
               </Card>
               <Card padding="md" variant="elevated">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center">
-                      <Check className="h-5 w-5 text-green-600" />
+                    <div className="h-10 w-10 rounded-xl bg-[#5B7B6A]/15 flex items-center justify-center">
+                      <Check className="h-5 w-5 text-[#5B7B6A]" />
                     </div>
                     <p className="text-sm text-pro-text-secondary font-medium">Tamamlanan</p>
                   </div>
-                  <p className="text-3xl font-bold text-green-600">{counts.completed}</p>
+                  <p className="text-3xl font-bold text-[#5B7B6A]">{counts.completed}</p>
                 </div>
               </Card>
             </div>

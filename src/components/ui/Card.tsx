@@ -23,7 +23,7 @@ export function Card({
         "bg-pro-surface rounded-2xl relative overflow-hidden",
         // Variant styles
         variant === "default" && "border border-pro-border shadow-[var(--pro-shadow-sm)]",
-        variant === "elevated" && "border border-pro-border/50 shadow-[var(--pro-shadow-elevated)]",
+        variant === "elevated" && "border border-pro-border/50 shadow-[0_8px_24px_rgba(0,0,0,0.12),_6px_6px_20px_rgba(0,0,0,0.08)]",
         variant === "flat" && "border border-pro-border",
         // Hover effects - premium feel
         hover && [

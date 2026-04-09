@@ -18,11 +18,11 @@ import { useState, useEffect } from "react";
 import { useProContext } from "@/lib/context";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard },
-  { href: "/clients", label: "Danışanlar", icon: Users },
-  { href: "/appointments", label: "Randevular", icon: Calendar },
-  { href: "/tests", label: "Analizler", icon: FlaskConical },
-  { href: "/billing", label: "Satın Al", icon: CreditCard },
+  { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard, accent: false },
+  { href: "/clients", label: "Danışanlar", icon: Users, accent: false },
+  { href: "/appointments", label: "Randevular", icon: Calendar, accent: false },
+  { href: "/tests", label: "Analizler", icon: FlaskConical, accent: true },
+  { href: "/billing", label: "Satın Al", icon: CreditCard, accent: false },
 ];
 
 export function Sidebar() {
@@ -40,7 +40,7 @@ export function Sidebar() {
       className={clsx(
         "hidden lg:flex flex-col relative",
         "h-screen sticky top-0 transition-all duration-200",
-        "bg-gradient-to-b from-[#4A6A59] via-[#5B7B6A] to-[#4A6A59]",
+        "bg-[#5B7B6A]",
         collapsed ? "w-[68px]" : "w-[260px]"
       )}
     >
@@ -63,6 +63,7 @@ export function Sidebar() {
           <ChevronLeft className="h-4 w-4" />
         </button>
       </div>
+
 
       {/* Full neural mesh background */}
       <svg
@@ -287,18 +288,24 @@ export function Sidebar() {
                   "group relative flex items-center gap-3 rounded-xl transition-all duration-200",
                   collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
                   isActive
-                    ? "bg-white/20 text-white font-medium backdrop-blur-sm"
+                    ? item.accent 
+                      ? "bg-[#D4856A]/20 text-white font-medium backdrop-blur-sm"
+                      : "bg-white/20 text-white font-medium backdrop-blur-sm"
                     : "text-white/60 hover:bg-white/10 hover:text-white"
                 )}
                 title={collapsed ? item.label : undefined}
               >
                 {isActive && !collapsed && (
-                  <div className="absolute left-0 w-[3px] h-5 rounded-r-full bg-white" />
+                  <div className={clsx(
+                    "absolute left-0 w-[3px] h-5 rounded-r-full",
+                    item.accent ? "bg-[#D4856A]" : "bg-[#D4856A]"
+                  )} />
                 )}
                 <item.icon
                   className={clsx(
                     "h-5 w-5 shrink-0 transition-transform duration-200",
-                    !isActive && "group-hover:scale-110"
+                    !isActive && "group-hover:scale-110",
+                    item.accent && isActive && "text-[#D4856A]"
                   )}
                 />
                 {!collapsed && <span className="text-sm">{item.label}</span>}
@@ -311,60 +318,65 @@ export function Sidebar() {
         <div className="flex-1" />
       </div>
 
-      {/* Settings link */}
-      <div className="relative z-[1] shrink-0 border-t border-white/10 p-2.5">
-        <Link
-          href="/settings"
-          onClick={() => setPendingHref("/settings")}
-          className={clsx(
-            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/50 hover:bg-white/10 hover:text-white transition-all duration-200",
-            collapsed && "justify-center px-2",
-            (pendingHref ?? pathname).startsWith("/settings") && "bg-white/15 text-white"
-          )}
-        >
-          <Settings className="h-5 w-5 shrink-0" />
-          {!collapsed && <span className="text-sm">Ayarlar</span>}
-        </Link>
-      </div>
+      {/* Bottom section - subtle transition from main sidebar */}
+      <div className="relative z-[1] shrink-0 bg-[#4A5D52]">
+        {/* Subtle top border */}
+        <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
+        {/* Settings link */}
+        <div className="p-2.5">
+          <Link
+            href="/settings"
+            onClick={() => setPendingHref("/settings")}
+            className={clsx(
+              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/70 hover:bg-white/15 hover:text-white transition-all duration-200",
+              collapsed && "justify-center px-2",
+              (pendingHref ?? pathname).startsWith("/settings") && "bg-white/20 text-white"
+            )}
+          >
+            <Settings className="h-5 w-5 shrink-0" />
+            {!collapsed && <span className="text-sm">Ayarlar</span>}
+          </Link>
+        </div>
 
-      {/* User block */}
-      <div className="relative z-[1] shrink-0 border-t border-white/10 p-3.5">
-        <div
-          className={clsx(
-            "flex items-center",
-            collapsed ? "justify-center" : "gap-3"
-          )}
-        >
-          <div className="h-8 w-8 rounded-full bg-white/20 text-white text-xs font-semibold flex items-center justify-center">
-            {professional
-              ? `${professional.first_name.charAt(0)}${professional.last_name.charAt(0)}`
-              : "U"}
-          </div>
-          {!collapsed && professional && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {professional.first_name} {professional.last_name}
-              </p>
-              <button
-                onClick={signOut}
-                className="text-xs text-white/40 hover:text-white/80 transition-colors flex items-center gap-1 mt-0.5"
-              >
-                <LogOut className="h-3 w-3" />
-                Çıkış yap
-              </button>
+        {/* User block */}
+        <div className="border-t border-white/20 p-3.5">
+          <div
+            className={clsx(
+              "flex items-center",
+              collapsed ? "justify-center" : "gap-3"
+            )}
+          >
+            <div className="h-8 w-8 rounded-full bg-white/25 text-white text-xs font-semibold flex items-center justify-center">
+              {professional
+                ? `${professional.first_name.charAt(0)}${professional.last_name.charAt(0)}`
+                : "U"}
             </div>
-          )}
+            {!collapsed && professional && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {professional.first_name} {professional.last_name}
+                </p>
+                <button
+                  onClick={signOut}
+                  className="text-xs text-white/60 hover:text-white transition-colors flex items-center gap-1 mt-0.5"
+                >
+                  <LogOut className="h-3 w-3" />
+                  Çıkış yap
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Powered by label */}
-      {!collapsed && (
-        <div className="relative z-[1] shrink-0 px-4 pb-3 text-center">
-          <span className="text-[10px] text-white/30 tracking-wide">
-            Powered by <span className="font-medium">Orbira Labs</span>
-          </span>
-        </div>
-      )}
+        {/* Powered by label */}
+        {!collapsed && (
+          <div className="relative px-4 pb-3 text-center">
+            <span className="text-[10px] text-white/30 tracking-wide">
+              Powered by <span className="font-medium text-[#D4856A]">Orbira Labs</span>
+            </span>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

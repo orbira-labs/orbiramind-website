@@ -116,13 +116,18 @@ export default function LoginPage() {
 
               <button
                 onClick={() => setMode("test_code")}
-                className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-pro-primary/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
+                className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-[#C8745E]/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
               >
-                <div className="h-12 w-12 rounded-xl bg-pro-surface-alt flex items-center justify-center shrink-0 group-hover:bg-pro-surface-alt/80 transition-colors">
-                  <ClipboardList className="h-6 w-6 text-pro-text-secondary" />
+                <div className="h-12 w-12 rounded-xl bg-[#C8745E]/10 flex items-center justify-center shrink-0 group-hover:bg-[#C8745E]/20 transition-colors">
+                  <ClipboardList className="h-6 w-6 text-[#C8745E]" />
                 </div>
                 <div>
-                  <p className="text-[15px] font-semibold text-pro-text">Test Kodumu Gir</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[15px] font-semibold text-pro-text">Test Kodumu Gir</p>
+                    <span className="px-1.5 py-0.5 rounded-md bg-[#C8745E]/10 text-[#C8745E] text-[10px] font-bold uppercase tracking-wider">
+                      Yeni
+                    </span>
+                  </div>
                   <p className="text-sm text-pro-text-tertiary mt-0.5">
                     Uzmanınızdan aldığınız kodu girin
                   </p>
@@ -135,7 +140,7 @@ export default function LoginPage() {
                 Henüz üye değil misiniz?{" "}
                 <Link
                   href="/auth/register"
-                  className="text-pro-primary font-medium hover:underline"
+                  className="text-[#C8745E] font-medium hover:underline"
                 >
                   Hemen başlayın
                 </Link>
@@ -238,7 +243,7 @@ export default function LoginPage() {
                 Henüz üye değil misiniz?{" "}
                 <Link
                   href="/auth/register"
-                  className="text-pro-primary font-medium hover:underline"
+                  className="text-[#C8745E] font-medium hover:underline"
                 >
                   Hemen başlayın
                 </Link>

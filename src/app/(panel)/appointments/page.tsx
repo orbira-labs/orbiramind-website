@@ -53,9 +53,9 @@ export default function AppointmentsPage() {
         onClose={() => setEditApt(null)}
         onUpdated={() => { setEditApt(null); refresh(); }}
       />
-      <main className="flex-1 min-h-0 flex flex-col p-3 sm:p-5 lg:p-6">
+      <main className="flex-1 min-h-0 flex flex-col p-3 sm:p-5 lg:p-6 bg-[#FAFAF7]">
         <div className="w-full mx-auto max-w-6xl flex-1 min-h-0 flex flex-col">
-          <div className="flex-1 min-h-0 flex flex-col bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5">
+          <div className="flex-1 min-h-0 flex flex-col">
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
               <div className="flex items-center gap-4">

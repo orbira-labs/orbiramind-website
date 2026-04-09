@@ -3,11 +3,21 @@
 import { Shield, Lock, FileText } from "lucide-react";
 import Link from "next/link";
 
-interface TrustFooterProps {
-  showBadges?: boolean;
+function formatDateTurkish(): string {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.toLocaleDateString("tr-TR", { month: "long" });
+  const weekday = now.toLocaleDateString("tr-TR", { weekday: "long" });
+  const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  return `${day} ${month}, ${capitalizedWeekday}`;
 }
 
-export function TrustFooter({ showBadges = true }: TrustFooterProps) {
+interface TrustFooterProps {
+  showBadges?: boolean;
+  showDate?: boolean;
+}
+
+export function TrustFooter({ showBadges = true, showDate = false }: TrustFooterProps) {
   return (
     <footer className="mt-auto border-t border-pro-border bg-pro-surface-alt/50">
       <div className="px-4 sm:px-6 lg:px-8 py-4">
@@ -31,18 +41,26 @@ export function TrustFooter({ showBadges = true }: TrustFooterProps) {
             </div>
           )}
           
-          <div className="flex items-center justify-center gap-4 text-xs text-pro-text-tertiary">
-            <Link href="/privacy" className="hover:text-pro-text transition-colors">
-              Gizlilik Politikası
-            </Link>
-            <span className="text-pro-border">·</span>
-            <Link href="/terms" className="hover:text-pro-text transition-colors">
-              Kullanım Koşulları
-            </Link>
-            <span className="text-pro-border">·</span>
-            <Link href="/support" className="hover:text-pro-text transition-colors">
-              Destek
-            </Link>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 text-xs text-pro-text-tertiary">
+              <Link href="/privacy" className="hover:text-pro-text transition-colors">
+                Gizlilik Politikası
+              </Link>
+              <span className="text-pro-border">·</span>
+              <Link href="/terms" className="hover:text-pro-text transition-colors">
+                Kullanım Koşulları
+              </Link>
+              <span className="text-pro-border">·</span>
+              <Link href="/support" className="hover:text-pro-text transition-colors">
+                Destek
+              </Link>
+            </div>
+            
+            {showDate && (
+              <span className="text-xs text-pro-text-tertiary">
+                {formatDateTurkish()}
+              </span>
+            )}
           </div>
         </div>
       </div>

@@ -13,10 +13,8 @@ interface StatItem {
   icon: LucideIcon;
   href: string;
   trend?: number;
-  gradient: string;
   iconBg: string;
   iconColor: string;
-  accentBar: string;
   valueColor: string;
 }
 
@@ -54,11 +52,10 @@ export function QuickStats({ stats, loading = false }: QuickStatsProps) {
             <Card 
               hover 
               padding="none"
-              className={`relative overflow-hidden bg-gradient-to-br ${stat.gradient} border-white/60`}
+              className="bg-white border border-pro-border/60 shadow-[0_8px_24px_rgba(0,0,0,0.12),_6px_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.16),_8px_8px_24px_rgba(0,0,0,0.10)] transition-shadow"
             >
-              <div className={`absolute left-0 top-3 bottom-3 w-1 rounded-r-full ${stat.accentBar}`} />
               <div className="p-4 sm:p-5">
-                <div className="flex items-start justify-between pl-2">
+                <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs sm:text-sm text-pro-text-secondary font-medium">
                       {stat.label}

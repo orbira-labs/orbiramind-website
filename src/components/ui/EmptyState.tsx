@@ -13,7 +13,7 @@ interface EmptyStateProps {
   actionLabel?: string;
   onAction?: () => void;
   actionHref?: string;
-  actionVariant?: "primary" | "blue" | "client" | "appointment" | "analysis";
+  actionVariant?: "primary" | "accent" | "blue" | "client" | "appointment" | "analysis";
   secondaryActionLabel?: string;
   onSecondaryAction?: () => void;
 }

@@ -508,15 +508,14 @@ export function NotesCard() {
     <>
       <Card padding="lg" variant="elevated" className="h-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-pro-text flex items-center gap-2">
-            <span className="h-4 w-0.5 rounded-full bg-amber-500" />
+          <h3 className="font-semibold text-pro-text">
             Notlarım
           </h3>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1 text-sm text-pro-primary hover:underline"
+            className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-medium"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5" />
             Ekle
           </button>
         </div>
@@ -530,16 +529,12 @@ export function NotesCard() {
             ))}
           </div>
         ) : notes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <div className="h-12 w-12 rounded-xl bg-amber-100 flex items-center justify-center mb-3">
-              <StickyNote className="h-6 w-6 text-amber-600" />
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="h-14 w-14 rounded-2xl bg-pro-primary-light flex items-center justify-center mb-4">
+              <StickyNote className="h-6 w-6 text-pro-primary" />
             </div>
-            <p className="text-sm text-pro-text-secondary mb-1">Henüz not yok</p>
-            <p className="text-xs text-pro-text-tertiary mb-4">Hızlı hatırlatmalar için not ekleyin</p>
-            <Button variant="secondary" size="sm" onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-1" />
-              İlk Notunu Ekle
-            </Button>
+            <p className="text-sm font-medium text-pro-text mb-1">Not bulunmuyor</p>
+            <p className="text-xs text-pro-text-tertiary">Notlarınız burada görünecek</p>
           </div>
         ) : (
           <div className="space-y-2">

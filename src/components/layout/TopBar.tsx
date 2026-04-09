@@ -78,41 +78,22 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
       <AnalysisReadyPopup notification={analysisPopup} onDismiss={dismissAnalysisPopup} />
       <header className="h-auto min-h-[64px] border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-30">
         {showGreeting ? (
-          <div className="flex items-center gap-2.5 bg-white/35 border border-white/60 rounded-2xl px-3.5 py-2 shadow-sm">
-            {/* Date — primary */}
-            <div className="flex flex-col leading-none gap-1">
-              <span className="text-[10px] font-semibold tracking-widest uppercase text-[#5B7B6A]/70">
-                {formatWeekday()}
-              </span>
-              <span className="text-[15px] font-bold text-[#2D4A3C]">
-                {formatDayMonth()}
-              </span>
-            </div>
-
-            {/* Divider */}
-            <div className="self-stretch w-px bg-[#5B7B6A]/20 rounded-full" />
-
-            {/* Time — secondary */}
-            <div className="flex flex-col items-center leading-none gap-1">
-              <Clock className="h-3 w-3 text-[#5B7B6A]/50" />
-              <span className="text-[13px] font-semibold tabular-nums text-[#5B7B6A]">
-                {currentTime}
-              </span>
-            </div>
-          </div>
+          <h1 className="text-lg font-semibold text-[#3D5A4C]">Ofisim</h1>
         ) : (
           <h1 className="text-lg font-semibold text-[#3D5A4C]">{title}</h1>
         )}
 
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* MindTest Gönder Butonu */}
-          <button
-            onClick={() => setShowSendModal(true)}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-white/50 hover:bg-white/80 border border-white/70 hover:border-white text-[#3D5A4C] text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
-          >
-            <Send className="h-4 w-4" />
-            <span className="hidden sm:inline">MindTest Gönder</span>
-          </button>
+          {/* Danışan Kaydet button - only on dashboard */}
+          {showGreeting && (
+            <button
+              onClick={() => router.push("/clients?new=true")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4856A] hover:bg-[#C97B5D] text-white text-sm font-medium transition-all shadow-sm hover:shadow-md"
+            >
+              <span className="hidden sm:inline">Danışan Kaydet</span>
+              <span className="sm:hidden">+</span>
+            </button>
+          )}
 
           {/* Bildirimler */}
           <NotificationCenter

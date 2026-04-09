@@ -137,26 +137,24 @@ export default function ClientsPage() {
     <>
       <TopBar title="Danışanlar" />
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
-        <div className="mx-auto max-w-6xl">
-          {/* Main Container */}
-          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4">
-            {/* Count Cards */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4">
-              <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/70 border border-pro-border">
-                <span className="text-2xl font-bold text-pro-text">{counts.total}</span>
-                <span className="text-xs text-pro-text-secondary mt-1">Toplam</span>
-              </div>
-              <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-pro-success-light/50 border border-pro-success/20">
-                <span className="text-2xl font-bold text-pro-success">{counts.active}</span>
-                <span className="text-xs text-pro-text-secondary mt-1">Aktif</span>
-              </div>
-              <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-pro-warning-light/50 border border-pro-warning/20">
-                <span className="text-2xl font-bold text-pro-warning">{counts.passive}</span>
-                <span className="text-xs text-pro-text-secondary mt-1">Pasif</span>
-              </div>
+        <div className="mx-auto max-w-6xl space-y-4">
+          {/* Count Cards */}
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+            <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-pro-border/60 shadow-sm">
+              <span className="text-2xl font-bold text-pro-text">{counts.total}</span>
+              <span className="text-xs text-pro-text-secondary mt-1">Toplam</span>
             </div>
+            <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-pro-border/60 shadow-sm">
+              <span className="text-2xl font-bold text-[#5B7B6A]">{counts.active}</span>
+              <span className="text-xs text-pro-text-secondary mt-1">Aktif</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-pro-border/60 shadow-sm">
+              <span className="text-2xl font-bold text-[#D4856A]">{counts.passive}</span>
+              <span className="text-xs text-pro-text-secondary mt-1">Pasif</span>
+            </div>
+          </div>
 
-            <Card padding="lg" variant="elevated">
+          <Card padding="lg" variant="elevated" className="border border-pro-border/60 shadow-sm">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <div className="flex gap-1 bg-pro-surface-alt rounded-lg p-1">
@@ -290,7 +288,6 @@ export default function ClientsPage() {
                 </div>
               )}
             </Card>
-          </div>
         </div>
 
         {/* New Client Modal */}

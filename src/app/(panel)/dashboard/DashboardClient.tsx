@@ -51,33 +51,27 @@ const STAT_CARDS = [
     label: "Bugünkü Randevu",
     icon: Calendar,
     href: "/appointments",
-    gradient: "from-[#FDF5EE] to-[#F8EBD9]",
-    iconBg: "bg-[#C4956A]",
+    iconBg: "bg-[#5B7B6A]",
     iconColor: "text-white",
-    accentBar: "bg-[#C4956A]",
-    valueColor: "text-[#8B5E3C]",
+    valueColor: "text-pro-text",
   },
   {
     key: "pending_analyses" as const,
     label: "İşlenmemiş Analizler",
     icon: FlaskConical,
     href: "/tests",
-    gradient: "from-[#EBF0F8] to-[#D8E3F1]",
-    iconBg: "bg-[#5B7BA0]",
+    iconBg: "bg-[#D4856A]",
     iconColor: "text-white",
-    accentBar: "bg-[#5B7BA0]",
-    valueColor: "text-[#3A5270]",
+    valueColor: "text-pro-text",
   },
   {
     key: "active_clients" as const,
     label: "Aktif Danışan",
     icon: Users,
     href: "/clients",
-    gradient: "from-[#E8F0EB] to-[#D4E5DA]",
     iconBg: "bg-[#5B7B6A]",
     iconColor: "text-white",
-    accentBar: "bg-[#5B7B6A]",
-    valueColor: "text-[#3D5A4C]",
+    valueColor: "text-pro-text",
   },
 ];
 
@@ -219,22 +213,22 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
       />
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
         <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4">
+          <div className="space-y-4">
             <QuickStats stats={statCards} loading={loading} />
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card padding="lg" accent="primary" variant="elevated">
+              <Card padding="lg" variant="elevated">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-pro-text flex items-center gap-2">
-                    <span className="h-4 w-0.5 rounded-full bg-pro-primary" />
+                  <h3 className="font-semibold text-pro-text">
                     Yaklaşan Randevular
                   </h3>
-                  <Link
-                    href="/appointments"
-                    className="text-sm text-pro-primary hover:underline"
+                  <button
+                    onClick={() => setShowAppointmentModal(true)}
+                    className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-medium"
                   >
-                    Tümü
-                  </Link>
+                    <Plus className="h-3.5 w-3.5" />
+                    Oluştur
+                  </button>
                 </div>
                 {loading ? (
                   <div className="space-y-3">
@@ -249,16 +243,16 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     ))}
                   </div>
                 ) : upcomingAppointments.length === 0 ? (
-                  <EmptyState
-                    icon={Calendar}
-                    title="Henüz randevu yok"
-                    description="İlk randevunuzu oluşturun"
-                    actionLabel="Randevu Oluştur"
-                    onAction={() => setShowAppointmentModal(true)}
-                  />
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="h-14 w-14 rounded-2xl bg-pro-primary-light flex items-center justify-center mb-4">
+                      <Calendar className="h-6 w-6 text-pro-primary" />
+                    </div>
+                    <p className="text-sm font-medium text-pro-text mb-1">Randevu bulunmuyor</p>
+                    <p className="text-xs text-pro-text-tertiary">Yaklaşan randevularınız burada görünecek</p>
+                  </div>
                 ) : (
                   <div className="space-y-2">
-                    {upcomingAppointments.slice(0, 3).map((apt) => (
+                    {upcomingAppointments.slice(0, 4).map((apt) => (
                       <button
                         key={apt.id}
                         onClick={() =>
@@ -294,28 +288,21 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                         </div>
                       </button>
                     ))}
-                    <button
-                      onClick={() => setShowAppointmentModal(true)}
-                      className="flex items-center justify-center gap-1.5 w-full py-2 mt-1 text-xs font-medium text-pro-primary hover:bg-pro-primary-light rounded-lg transition-colors"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      Randevu Oluştur
-                    </button>
                   </div>
                 )}
               </Card>
 
-              <Card padding="lg" accent="accent" variant="elevated">
+              <Card padding="lg" variant="elevated">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-pro-text flex items-center gap-2">
-                    <span className="h-4 w-0.5 rounded-full bg-pro-accent" />
+                  <h3 className="font-semibold text-pro-text">
                     Son Analizler
                   </h3>
                   <Link
                     href="/tests"
-                    className="text-sm text-pro-primary hover:underline"
+                    className="flex items-center gap-1 text-sm text-[#D4856A] hover:text-[#C97B5D] font-medium"
                   >
-                    Tümü
+                    <Plus className="h-3.5 w-3.5" />
+                    MindTest Gönder
                   </Link>
                 </div>
                 {loading ? (
@@ -331,13 +318,13 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     ))}
                   </div>
                 ) : recentTests.length === 0 ? (
-                  <EmptyState
-                    icon={FlaskConical}
-                    title="Henüz analiz yok"
-                    description="İlk karakter analizinizi gönderin"
-                    actionLabel="Analiz Gönder"
-                    actionHref="/tests"
-                  />
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="h-14 w-14 rounded-2xl bg-[#FDF5F2] flex items-center justify-center mb-4">
+                      <FlaskConical className="h-6 w-6 text-[#D4856A]" />
+                    </div>
+                    <p className="text-sm font-medium text-pro-text mb-1">Analiz bulunmuyor</p>
+                    <p className="text-xs text-pro-text-tertiary">Gönderilen analizler burada görünecek</p>
+                  </div>
                 ) : (
                   <div className="space-y-2">
                     {recentTests.slice(0, 4).map((test) => {

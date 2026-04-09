@@ -48,9 +48,9 @@
   --pro-primary: #5B7B6A;
   --pro-primary-hover: #4A6A59;
   --pro-primary-light: #E8F0EB;
-  --pro-accent: #C4956A;
-  --pro-accent-hover: #B38459;
-  --pro-accent-light: #FDF5EE;
+  --pro-accent: #D4856A;
+  --pro-accent-hover: #C97B5D;
+  --pro-accent-light: #FDF5F2;
   --pro-text: #2D3436;
   /* Daha koyu, daha okunur secondary/tertiary renkler */
   --pro-text-secondary: #4A5568;
@@ -84,10 +84,10 @@
   --pro-appointment-muted: #EDE9FE;
   
   /* Analiz/Test = Mavi/Blue */
-  --pro-analysis: #3B82F6;
-  --pro-analysis-hover: #2563EB;
-  --pro-analysis-light: #EFF6FF;
-  --pro-analysis-muted: #DBEAFE;
+  --pro-analysis: #5D6B7A;
+  --pro-analysis-hover: #4D5A68;
+  --pro-analysis-light: #EBEEF1;
+  --pro-analysis-muted: #D8DEE4;
 
   /* Shadow katmanları - premium his için */
   --pro-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);

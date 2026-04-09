@@ -30,7 +30,7 @@ export function ProShell({
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 relative z-[1] overflow-y-auto">
           {children}
-          <TrustFooter showBadges={false} />
+          <TrustFooter showBadges={false} showDate={true} />
           <div className="h-20 lg:hidden" />
         </div>
         <BottomNav />
