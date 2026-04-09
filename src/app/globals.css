@@ -279,6 +279,15 @@ body {
   outline-offset: 2px;
 }
 
+/* Input/textarea focus - no outline, use border instead */
+input:focus-visible,
+textarea:focus-visible,
+input:focus,
+textarea:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Selection styles */
 ::selection {
   background: rgba(99, 102, 241, 0.3);

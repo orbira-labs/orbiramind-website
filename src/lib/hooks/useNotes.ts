@@ -71,9 +71,14 @@ export function useNotes() {
       if (createError) throw createError;
       setNotes((prev) => [data, ...prev]);
       return data;
-    } catch (err) {
-      console.error("Note creation error:", err);
-      setError(err instanceof Error ? err.message : "Not oluşturulamadı");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : typeof err === 'object' && err !== null && 'message' in err
+          ? String((err as { message: unknown }).message)
+          : "Not oluşturulamadı";
+      console.error("Note creation error:", errorMessage, err);
+      setError(errorMessage);
       return null;
     }
   };

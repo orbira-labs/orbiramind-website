@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Nunito } from "next/font/google";
+import { Geist_Mono, Nunito, Caveat } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -11,6 +11,13 @@ const geistMono = Geist_Mono({
 
 const nunito = Nunito({
   variable: "--font-nunito",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const caveat = Caveat({
+  variable: "--font-caveat",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
@@ -67,7 +74,7 @@ export default function RootLayout({
     <html lang="tr" suppressHydrationWarning>
       <body
         data-theme="pro"
-        className={`${geistMono.variable} ${nunito.variable} antialiased min-h-screen bg-[var(--background)] text-[var(--foreground)] font-[family-name:var(--font-nunito)]`}
+        className={`${geistMono.variable} ${nunito.variable} ${caveat.variable} antialiased min-h-screen bg-[var(--background)] text-[var(--foreground)] font-[family-name:var(--font-nunito)]`}
       >
         {children}
         <Toaster

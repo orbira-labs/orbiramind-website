@@ -56,20 +56,20 @@ const STAT_CARDS = [
     valueColor: "text-pro-text",
   },
   {
-    key: "pending_analyses" as const,
-    label: "İşlenmemiş Analizler",
-    icon: FlaskConical,
-    href: "/tests",
-    iconBg: "bg-[#D4856A]",
-    iconColor: "text-white",
-    valueColor: "text-pro-text",
-  },
-  {
     key: "active_clients" as const,
     label: "Aktif Danışan",
     icon: Users,
     href: "/clients",
     iconBg: "bg-[#5B7B6A]",
+    iconColor: "text-white",
+    valueColor: "text-pro-text",
+  },
+  {
+    key: "pending_analyses" as const,
+    label: "İşlenmemiş Analizler",
+    icon: FlaskConical,
+    href: "/tests",
+    iconBg: "bg-[#D4856A]",
     iconColor: "text-white",
     valueColor: "text-pro-text",
   },
@@ -298,6 +298,8 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                 )}
               </Card>
 
+              <NotesCard />
+
               <Card padding="lg" variant="elevated">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-pro-text">
@@ -416,8 +418,6 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                   </div>
                 )}
               </Card>
-
-              <NotesCard />
             </div>
           </div>
         </div>

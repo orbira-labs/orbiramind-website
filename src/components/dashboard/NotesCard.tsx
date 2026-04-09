@@ -138,7 +138,7 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Not başlığını yazın..."
-              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200/70 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-gray-400/60 transition-colors"
+              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus:bg-white focus:border-gray-300 transition-all"
               autoFocus
             />
           </div>
@@ -151,7 +151,7 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Detayları yazın..."
               rows={5}
-              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200/70 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-gray-400/60 transition-colors resize-none"
+              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus:bg-white focus:border-gray-300 transition-all resize-none"
             />
           </div>
         </div>
@@ -213,16 +213,32 @@ interface NoteDetailModalProps {
   open: boolean;
   onClose: () => void;
   onEdit: () => void;
-  onTogglePin: () => void;
   onDelete: () => void;
 }
+
+const NOTE_STYLES: Record<NoteColor, { bg: string; shadow: string; tape: string }> = {
+  green: {
+    bg: "bg-gradient-to-br from-emerald-100 via-emerald-50 to-green-100",
+    shadow: "shadow-[0_20px_60px_-10px_rgba(16,185,129,0.3)]",
+    tape: "bg-emerald-200/80",
+  },
+  yellow: {
+    bg: "bg-gradient-to-br from-amber-100 via-yellow-50 to-orange-50",
+    shadow: "shadow-[0_20px_60px_-10px_rgba(245,158,11,0.3)]",
+    tape: "bg-amber-200/80",
+  },
+  red: {
+    bg: "bg-gradient-to-br from-red-100 via-rose-50 to-pink-50",
+    shadow: "shadow-[0_20px_60px_-10px_rgba(239,68,68,0.3)]",
+    tape: "bg-red-200/80",
+  },
+};
 
 function NoteDetailModal({
   note,
   open,
   onClose,
   onEdit,
-  onTogglePin,
   onDelete,
 }: NoteDetailModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -253,7 +269,7 @@ function NoteDetailModal({
 
   if (!open) return null;
 
-  const priority = getPriority(note.color as NoteColor);
+  const style = NOTE_STYLES[note.color as NoteColor] || NOTE_STYLES.green;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={handleClose}>
@@ -267,114 +283,88 @@ function NoteDetailModal({
       <div
         onClick={(e) => e.stopPropagation()}
         className={clsx(
-          "relative w-full max-w-lg bg-white rounded-2xl shadow-xl transition-all duration-200",
-          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          "relative w-full max-w-sm max-h-[85vh] flex flex-col transition-all duration-300",
+          isVisible ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-90 -rotate-2"
         )}
       >
-        {/* Header */}
-        <div className="p-5 border-b border-gray-100">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className={clsx(
-                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-                    priority.bgLight,
-                    priority.border,
-                    "border"
-                  )}
-                >
-                  <span className={clsx("w-2 h-2 rounded-full", priority.bg)} />
-                  {priority.label} Önem
-                </span>
-                {note.pinned && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pro-primary/10 text-pro-primary">
-                    <Pin className="h-3 w-3" />
-                    Sabitli
-                  </span>
-                )}
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">{note.title}</h3>
-              <p className="text-xs text-gray-400 mt-1">
-                {new Date(note.updated_at).toLocaleDateString("tr-TR", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            <button
-              onClick={handleClose}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
+        {/* Tape effect */}
+        <div className={clsx(
+          "absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 rounded-sm rotate-0 z-10",
+          style.tape,
+          "shadow-sm"
+        )} />
 
-        {/* Content */}
-        {note.content && (
-          <div className="p-5">
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {note.content}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between p-5 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
+        {/* Note paper */}
+        <div
+          className={clsx(
+            "relative flex flex-col max-h-full min-h-[280px]",
+            style.bg,
+            style.shadow,
+            "before:absolute before:inset-0 before:bg-[linear-gradient(transparent_31px,rgba(0,0,0,0.04)_31px)] before:bg-[length:100%_32px] before:pointer-events-none"
+          )}
+          style={{
+            transform: "rotate(0.8deg)",
+            clipPath: "polygon(0.5% 0.8%, 3% 0.2%, 8% 0.6%, 15% 0.1%, 25% 0.5%, 35% 0.2%, 45% 0.7%, 55% 0.3%, 65% 0.6%, 75% 0.2%, 85% 0.5%, 92% 0.1%, 97% 0.4%, 99.5% 0.8%, 99.8% 3%, 99.3% 10%, 99.7% 20%, 99.2% 35%, 99.6% 50%, 99.3% 65%, 99.7% 80%, 99.4% 90%, 99.8% 97%, 99.2% 99.5%, 97% 99.8%, 90% 99.3%, 80% 99.7%, 65% 99.2%, 50% 99.6%, 35% 99.3%, 20% 99.7%, 10% 99.4%, 3% 99.8%, 0.5% 99.2%, 0.2% 97%, 0.6% 90%, 0.1% 80%, 0.5% 65%, 0.2% 50%, 0.7% 35%, 0.3% 20%, 0.6% 10%, 0.2% 3%)",
+          }}
+        >
+          {/* Close button */}
           <button
-            onClick={onTogglePin}
-            className={clsx(
-              "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-              note.pinned
-                ? "text-pro-primary bg-pro-primary/10 hover:bg-pro-primary/15"
-                : "text-gray-600 hover:bg-gray-100"
-            )}
+            onClick={handleClose}
+            className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-white/40 transition-colors z-10"
           >
-            <Pin className="h-4 w-4" />
-            {note.pinned ? "Sabiti Kaldır" : "Sabitle"}
+            <X className="h-4 w-4" />
           </button>
 
-          <div className="flex gap-2">
+          {/* Content area */}
+          <div className="px-8 pt-10 pb-6 min-h-[200px] overflow-y-auto flex-1">
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight pr-6 font-[family-name:var(--font-caveat)]">
+              {note.title}
+            </h2>
+
+            {/* Content */}
+            {note.content && (
+              <p className="mt-5 text-lg text-gray-700 leading-relaxed whitespace-pre-wrap font-[family-name:var(--font-caveat)]">
+                {note.content}
+              </p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="px-8 pb-6 pt-2">
             {showDeleteConfirm ? (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-                <span className="text-xs text-red-600 font-medium">Emin misiniz?</span>
+              <div className="flex items-center justify-center gap-3 py-2">
+                <span className="text-sm text-gray-600">Silmek istediğinize emin misiniz?</span>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-2 py-1 text-xs font-medium text-gray-600 hover:bg-white rounded transition-colors"
+                  className="px-3 py-1.5 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors"
                 >
-                  Hayır
+                  Vazgeç
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-2 py-1 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 rounded transition-colors"
+                  className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                 >
-                  Evet
+                  Evet, sil
                 </button>
               </div>
             ) : (
-              <>
+              <div className="flex items-center justify-end gap-2">
                 <button
                   onClick={handleDelete}
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-lg transition-colors"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                   Sil
                 </button>
                 <button
                   onClick={onEdit}
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-pro-primary hover:bg-pro-primary-hover rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white/60 hover:bg-white/80 rounded-lg transition-colors"
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-3.5 w-3.5" />
                   Düzenle
                 </button>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -466,12 +456,13 @@ export function NotesCard() {
                 <button
                   key={note.id}
                   onClick={() => setViewingNote(note)}
-                  className="w-full text-left p-3 rounded-xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200 group"
+                  className={clsx(
+                    "w-full text-left p-3 rounded-xl border hover:shadow-sm transition-all duration-200 group",
+                    priority.bgLight,
+                    priority.border
+                  )}
                 >
                   <div className="flex items-start gap-3">
-                    <div
-                      className={clsx("w-1 h-full min-h-[36px] rounded-full shrink-0", priority.bg)}
-                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         {note.pinned && (
@@ -482,20 +473,9 @@ export function NotesCard() {
                         </p>
                       </div>
                       {note.content && (
-                        <p className="text-xs text-gray-500 truncate mt-0.5">{note.content}</p>
+                        <p className="text-xs text-gray-600 truncate mt-0.5">{note.content}</p>
                       )}
                     </div>
-                    <span
-                      className={clsx(
-                        "shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded",
-                        priority.bgLight,
-                        priority.value === "green" && "text-emerald-700",
-                        priority.value === "yellow" && "text-amber-700",
-                        priority.value === "red" && "text-red-700"
-                      )}
-                    >
-                      {priority.label}
-                    </span>
                   </div>
                 </button>
               );
@@ -532,7 +512,6 @@ export function NotesCard() {
             setEditingNote(viewingNote);
             setViewingNote(null);
           }}
-          onTogglePin={() => handleTogglePin(viewingNote.id)}
           onDelete={() => handleDelete(viewingNote.id)}
         />
       )}
