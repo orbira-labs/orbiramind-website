@@ -330,7 +330,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     <div className="h-14 w-14 rounded-2xl bg-pro-success-light flex items-center justify-center mb-4">
                       <Check className="h-6 w-6 text-pro-success" />
                     </div>
-                    <p className="text-sm font-medium text-pro-text mb-1">Tüm analizler tamamlandı</p>
+                    <p className="text-sm font-medium text-pro-text mb-1">Bekleyen analiz yok</p>
                     <p className="text-xs text-pro-text-tertiary">Bekleyen test veya analiz bulunmuyor</p>
                   </div>
                 ) : (
