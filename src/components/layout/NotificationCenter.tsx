@@ -85,7 +85,10 @@ export function NotificationCenter({
         onClick={() => {
           const next = !isOpen;
           setIsOpen(next);
-          if (next) onOpen?.();
+          if (next) {
+            onOpen?.();
+            if (unreadCount > 0) onMarkAllAsRead?.();
+          }
         }}
         className={clsx(
           "relative p-2 transition-colors",

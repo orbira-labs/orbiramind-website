@@ -78,12 +78,25 @@ export function useAppointmentReminders() {
     return () => clearInterval(interval);
   }, []);
 
-  // Initialize audio element
+  const userInteractedRef = useRef(false);
+
+  // Initialize audio element and track user interaction for Chrome autoplay policy
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      audioRef.current = new Audio("/sounds/notification.mp3");
-      audioRef.current.volume = 0.5;
-    }
+    if (typeof window === "undefined") return;
+
+    audioRef.current = new Audio("/sounds/notification.mp3");
+    audioRef.current.volume = 0.5;
+
+    const markInteracted = () => {
+      userInteractedRef.current = true;
+    };
+    document.addEventListener("click", markInteracted, { once: true });
+    document.addEventListener("keydown", markInteracted, { once: true });
+
+    return () => {
+      document.removeEventListener("click", markInteracted);
+      document.removeEventListener("keydown", markInteracted);
+    };
   }, []);
 
   const fetchUpcomingAppointments = useCallback(async () => {
@@ -146,14 +159,18 @@ export function useAppointmentReminders() {
     };
   }, [professional?.id, fetchUpcomingAppointments]);
 
-  // Play notification sound
   const playSound = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        // Autoplay may be blocked, ignore error
-      });
-    }
+    if (!audioRef.current) return;
+
+    audioRef.current.currentTime = 0;
+    audioRef.current.play().catch(() => {
+      if (!userInteractedRef.current) {
+        const retryOnInteraction = () => {
+          audioRef.current?.play().catch(() => {});
+        };
+        document.addEventListener("click", retryOnInteraction, { once: true });
+      }
+    });
   }, []);
 
   // Generate notifications for appointments
