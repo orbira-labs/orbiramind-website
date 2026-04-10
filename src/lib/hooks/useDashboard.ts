@@ -138,12 +138,12 @@ export function useDashboard(initialData?: DashboardInitialData) {
       .map((t: Record<string, unknown>) => ({
         ...t,
         client: Array.isArray(t.client) ? t.client[0] || null : t.client,
-      }))
+      }) as Record<string, unknown> & { status: string; created_at: string; client: unknown })
       .sort((a, b) => {
-        const priorityA = statusPriority[a.status as string] ?? 99;
-        const priorityB = statusPriority[b.status as string] ?? 99;
+        const priorityA = statusPriority[a.status] ?? 99;
+        const priorityB = statusPriority[b.status] ?? 99;
         if (priorityA !== priorityB) return priorityA - priorityB;
-        return new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime();
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }) as DashboardTest[];
 
     const statsData = statsRes.data as { 
