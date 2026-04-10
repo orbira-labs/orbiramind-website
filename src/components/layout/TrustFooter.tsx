@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Lock, FileText } from "lucide-react";
+import { Smartphone } from "lucide-react";
 import Link from "next/link";
 
 function formatDateTurkish(): string {
@@ -17,50 +17,35 @@ interface TrustFooterProps {
   showDate?: boolean;
 }
 
-export function TrustFooter({ showBadges = true, showDate = false }: TrustFooterProps) {
+export function TrustFooter({ showBadges = true, showDate = true }: TrustFooterProps) {
   return (
     <footer className="mt-auto border-t border-pro-border bg-pro-surface-alt/50">
-      <div className="px-4 sm:px-6 lg:px-8 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 py-3">
         <div className="max-w-5xl mx-auto">
-          {showBadges && (
-            <div className="flex items-center justify-center gap-4 mb-3 flex-wrap">
-              <div className="flex items-center gap-1.5 text-xs text-pro-text-tertiary">
-                <Lock className="h-3.5 w-3.5" />
-                <span>Uçtan uca şifreli</span>
-              </div>
-              <div className="h-3 w-px bg-pro-border hidden sm:block" />
-              <div className="flex items-center gap-1.5 text-xs text-pro-text-tertiary">
-                <Shield className="h-3.5 w-3.5" />
-                <span>KVKK uyumlu</span>
-              </div>
-              <div className="h-3 w-px bg-pro-border hidden sm:block" />
-              <div className="flex items-center gap-1.5 text-xs text-pro-text-tertiary">
-                <FileText className="h-3.5 w-3.5" />
-                <span>Türkiye'de veri saklama</span>
-              </div>
-            </div>
-          )}
-          
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-xs text-pro-text-tertiary">
-              <Link href="/privacy" className="hover:text-pro-text transition-colors">
-                Gizlilik Politikası
-              </Link>
-              <span className="text-pro-border">·</span>
-              <Link href="/terms" className="hover:text-pro-text transition-colors">
-                Kullanım Koşulları
-              </Link>
-              <span className="text-pro-border">·</span>
-              <Link href="/support" className="hover:text-pro-text transition-colors">
-                Destek
-              </Link>
-            </div>
+            <Link 
+              href="https://orbiralabs.com" 
+              target="_blank"
+              className="text-xs text-pro-text-tertiary hover:text-pro-text transition-colors"
+            >
+              Powered by <span className="font-medium text-pro-accent">Orbira Labs</span>
+            </Link>
             
-            {showDate && (
-              <span className="text-xs text-pro-text-tertiary">
-                {formatDateTurkish()}
-              </span>
-            )}
+            <div className="flex items-center gap-4">
+              {showBadges && (
+                <div className="flex items-center gap-1.5 text-xs text-pro-text-tertiary">
+                  <Smartphone className="h-3.5 w-3.5" />
+                  <span>Mobil Uygulama</span>
+                  <span className="text-pro-accent font-medium">Çok Yakında</span>
+                </div>
+              )}
+              
+              {showDate && (
+                <span className="text-xs text-pro-text-tertiary">
+                  {formatDateTurkish()}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
