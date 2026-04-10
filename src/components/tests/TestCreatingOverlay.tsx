@@ -74,13 +74,16 @@ export function TestCreatingOverlay({ visible }: TestCreatingOverlayProps) {
           exit={{ opacity: 0, transition: { duration: 0.6 } }}
           transition={{ duration: 0.3 }}
         >
-          {/* Animated dark backdrop */}
+          {/* Solid dark backdrop to fully cover background */}
+          <div className="absolute inset-0 bg-black" />
+          
+          {/* Animated gradient overlay */}
           <motion.div
             className="absolute inset-0"
             animate={{
               background: COLOR_KEYFRAMES.bgFrom.map(
                 (from, i) =>
-                  `radial-gradient(ellipse at 50% 40%, ${from}, ${COLOR_KEYFRAMES.bgTo[i]}, rgba(0,0,0,0.97))`
+                  `radial-gradient(ellipse at 50% 40%, ${from}, ${COLOR_KEYFRAMES.bgTo[i]}, transparent)`
               ),
             }}
             transition={{

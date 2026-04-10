@@ -403,10 +403,12 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   async function handleFinalAnalysis() {
     if (!sessionId) return;
 
-    // Önce "processing" statüsünü kaydet - kullanıcı sayfayı kapatsa bile
-    // sunucu tarafında işlemin başladığını bilelim
+    // Analiz ekranını göster
+    setPhase("analyzing");
+
     try {
-      await fetch("/api/test/update-status", {
+      // Önce "processing" statüsünü kaydet
+      const statusRes = await fetch("/api/test/update-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -415,42 +417,49 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
           session_id: sessionId,
         }),
       });
+
+      if (!statusRes.ok) {
+        console.error("Processing status kaydedilemedi");
+      }
+
+      // Analizi tamamla ve sonuçları al
+      const data = await completeSession(sessionId, deepDiveAnswers, token);
+
+      // Sonuçları kaydet
+      const completeRes = await fetch("/api/test/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
+          status: "completed",
+          results_snapshot: data.results,
+        }),
+      });
+
+      if (!completeRes.ok) {
+        console.error("Completed status kaydedilemedi");
+      }
+
+      // Tamamlandı ekranını göster
+      setPhase("done");
     } catch (e) {
-      console.error("Processing status kaydedilemedi:", e);
-    }
-
-    // Hemen tamamlandı ekranını göster - kullanıcının beklemesine gerek yok
-    // Analiz arka planda devam edecek, sonuçlar uzman paneline gidecek
-    setPhase("done");
-
-    // Arka planda analizi tamamla (fire-and-forget)
-    // Kullanıcı sayfayı kapatsa bile bu istek sunucuya ulaşacak
-    completeSession(sessionId, deepDiveAnswers, token)
-      .then(async (data) => {
-        // Sonuçları kaydet
+      console.error("Analiz hatası:", e);
+      // Hata durumunda status'u güncelle
+      try {
         await fetch("/api/test/update-status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token,
-            status: "completed",
-            results_snapshot: data.results,
-          }),
-        });
-        console.log("Analiz başarıyla tamamlandı");
-      })
-      .catch((e) => {
-        console.error("Arka plan analiz hatası:", e);
-        // Hata durumunda status'u güncelle
-        fetch("/api/test/update-status", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             token,
             status: "error",
           }),
-        }).catch(() => {});
-      });
+        });
+      } catch {
+        // ignore
+      }
+      setError("Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+      setPhase("error");
+    }
   }
 
   // Progress calculation

@@ -55,7 +55,7 @@ export interface TestInvitation {
   client_id: string;
   token: string;
   test_type: string;
-  status: "sent" | "started" | "completed" | "reviewed" | "expired";
+  status: "sent" | "started" | "processing" | "completed" | "error" | "reviewed" | "expired";
   expires_at: string;
   session_id: string | null;
   results_snapshot: Record<string, unknown> | null;

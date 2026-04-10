@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validStatuses = ["started", "processing", "completed", "error"];
+    const validStatuses = ["sent", "started", "processing", "completed", "error", "expired", "reviewed"];
     if (!validStatuses.includes(status)) {
       return NextResponse.json(
         { error: "Invalid status" },
