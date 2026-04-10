@@ -155,6 +155,7 @@ export interface AnalysisResults {
   inferences: Insight[];
 }
 
+/** @deprecated Kör noktalar artık üretilmiyor */
 export interface BlindSpot {
   title: string;
   insight: string;
@@ -178,7 +179,7 @@ export interface Report {
     top5: StrengthWeakness[];
     weak5: StrengthWeakness[];
   };
-  blind_spots: BlindSpot[];
+  blind_spots?: BlindSpot[];
   coaching_roadmap: CoachingRoadmap;
   generated_at: string;
   model: string;

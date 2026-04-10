@@ -142,7 +142,7 @@ export function ReportPreviewModal({ open, onClose, data }: ReportPreviewModalPr
             <div>
               <p className="text-sm font-medium text-pro-text">AI Özeti</p>
               <p className="text-xs text-pro-text-secondary mt-1 leading-relaxed">
-                Detaylı karakter analizi, güçlü/zayıf yönler, kör noktalar ve 
+                Detaylı karakter analizi, güçlü/zayıf yönler ve
                 koçluk yol haritası için tam rapora göz atın.
               </p>
             </div>

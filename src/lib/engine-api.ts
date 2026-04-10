@@ -126,7 +126,7 @@ export interface Report {
     top5: { name: string; insight: string }[];
     weak5: { name: string; insight: string }[];
   };
-  blind_spots: {
+  blind_spots?: {
     title: string;
     insight: string;
     coach_tip: string;

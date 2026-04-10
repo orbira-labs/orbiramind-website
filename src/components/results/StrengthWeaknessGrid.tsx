@@ -9,32 +9,81 @@ interface StrengthWeaknessGridProps {
   weaknesses: StrengthWeakness[];
 }
 
+function StrengthCard({ item, index }: { item: StrengthWeakness; index: number }) {
+  return (
+    <motion.div
+      variants={staggerItem}
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      className="group relative p-5 rounded-2xl bg-white border border-green-100 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_30px_-6px_rgba(34,197,94,0.15)]"
+    >
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-green-400 to-emerald-500 rounded-l-2xl" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative flex gap-3">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-sm">
+          <span className="text-white text-xs font-bold">{index + 1}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-bold text-gray-900 text-[15px] mb-1.5 group-hover:text-green-800 transition-colors">
+            {item.name}
+          </h4>
+          <p className="text-sm text-gray-600 leading-relaxed">{item.insight}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function WeaknessCard({ item, index }: { item: StrengthWeakness; index: number }) {
+  return (
+    <motion.div
+      variants={staggerItem}
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      className="group relative p-5 rounded-2xl bg-white border border-amber-100 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_30px_-6px_rgba(245,158,11,0.15)]"
+    >
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500 rounded-l-2xl" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-50 to-transparent rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative flex gap-3">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-sm">
+          <span className="text-white text-xs font-bold">{index + 1}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-bold text-gray-900 text-[15px] mb-1.5 group-hover:text-amber-800 transition-colors">
+            {item.name}
+          </h4>
+          <p className="text-sm text-gray-600 leading-relaxed">{item.insight}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function StrengthWeaknessGrid({ strengths, weaknesses }: StrengthWeaknessGridProps) {
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid md:grid-cols-2 gap-8">
       <motion.div
         variants={staggerContainer}
         initial="initial"
         animate="animate"
         className="space-y-3"
       >
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="relative">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-md">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <div className="absolute -inset-1 bg-green-400/20 rounded-xl blur-md -z-10 animate-pulse-glow" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Güçlü Yönler</h3>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Güçlü Yönler</h3>
+            <p className="text-xs text-gray-500">{strengths.length} alan tespit edildi</p>
+          </div>
         </div>
         {strengths.map((item, idx) => (
-          <motion.div
-            key={idx}
-            variants={staggerItem}
-            className="p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100"
-          >
-            <h4 className="font-semibold text-green-800 mb-1">{item.name}</h4>
-            <p className="text-sm text-green-700/80 leading-relaxed">{item.insight}</p>
-          </motion.div>
+          <StrengthCard key={idx} item={item} index={idx} />
         ))}
       </motion.div>
 
@@ -44,23 +93,22 @@ export function StrengthWeaknessGrid({ strengths, weaknesses }: StrengthWeakness
         animate="animate"
         className="space-y-3"
       >
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="relative">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+              </svg>
+            </div>
+            <div className="absolute -inset-1 bg-amber-400/20 rounded-xl blur-md -z-10 animate-pulse-glow" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Gelişim Alanları</h3>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Gelişim Alanları</h3>
+            <p className="text-xs text-gray-500">{weaknesses.length} alan tespit edildi</p>
+          </div>
         </div>
         {weaknesses.map((item, idx) => (
-          <motion.div
-            key={idx}
-            variants={staggerItem}
-            className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100"
-          >
-            <h4 className="font-semibold text-amber-800 mb-1">{item.name}</h4>
-            <p className="text-sm text-amber-700/80 leading-relaxed">{item.insight}</p>
-          </motion.div>
+          <WeaknessCard key={idx} item={item} index={idx} />
         ))}
       </motion.div>
     </div>
