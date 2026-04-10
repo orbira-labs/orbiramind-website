@@ -403,8 +403,8 @@ export default function HomePage() {
             </div>
             
             <div className="flex flex-wrap items-center gap-8 text-sm">
-              <a href="#features" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</a>
-              <a href="#for-who" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</a>
+              <Link href="/#features" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</Link>
+              <Link href="/#for-who" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</Link>
               <Link href="/privacy" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Gizlilik</Link>
               <Link href="/terms" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kullanım Koşulları</Link>
               <a href="mailto:destek@orbiramind.com" className="text-[#D4856A] hover:text-[#C97B5D] font-medium transition-colors">Destek</a>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -17,6 +17,20 @@ export function LandingNavbar() {
     });
   }, [router]);
 
+  const scrollToSection = useCallback((e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navHeight = 80;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: elementPosition - navHeight,
+        behavior: "smooth"
+      });
+      window.history.pushState(null, "", `#${sectionId}`);
+    }
+  }, []);
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
@@ -31,9 +45,20 @@ export function LandingNavbar() {
         </Link>
         
         <div className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</a>
-          <a href="#for-who" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</a>
-          <a href="#testimonials" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">Referanslar</a>
+          <a 
+            href="#features" 
+            onClick={(e) => scrollToSection(e, "features")}
+            className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors"
+          >
+            Özellikler
+          </a>
+          <a 
+            href="#for-who" 
+            onClick={(e) => scrollToSection(e, "for-who")}
+            className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors"
+          >
+            Kimler İçin
+          </a>
         </div>
         
         <div className="flex items-center gap-3">
