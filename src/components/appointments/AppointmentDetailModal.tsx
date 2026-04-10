@@ -38,13 +38,19 @@ export interface AppointmentSlim {
   client?: { first_name: string; last_name: string } | null;
 }
 
+interface TraitItem {
+  trait: string;
+  label: string;
+  score: number;
+}
+
 interface LastTest {
   id: string;
   completed_at: string | null;
   results_snapshot: {
     wellness_score?: number;
-    top_strengths?: string[];
-    top_risks?: string[];
+    top_strengths?: TraitItem[];
+    top_risks?: TraitItem[];
   } | null;
 }
 
@@ -148,8 +154,8 @@ export function AppointmentDetailModal({
   const timeLabel = format(dateObj, "HH:mm", { locale: tr });
 
   const wellnessScore = lastTest?.results_snapshot?.wellness_score;
-  const strengths = lastTest?.results_snapshot?.top_strengths?.slice(0, 3) ?? [];
-  const risks = lastTest?.results_snapshot?.top_risks?.slice(0, 2) ?? [];
+  const strengths = (lastTest?.results_snapshot?.top_strengths ?? []).slice(0, 3).map(s => s.label ?? s.trait);
+  const risks = (lastTest?.results_snapshot?.top_risks ?? []).slice(0, 2).map(r => r.label ?? r.trait);
 
   const scoreColor =
     wellnessScore === undefined

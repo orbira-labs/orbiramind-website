@@ -84,15 +84,40 @@ export interface SubmitAnswersResponse {
   deep_dive_questions: DeepDiveQuestion[];
 }
 
+export interface DimensionScore {
+  id: string;
+  label: string;
+  score: number;
+}
+
+export interface TraitScore {
+  trait: string;
+  label: string;
+  score: number;
+}
+
+export interface PatternResult {
+  name: string;
+  type: string;
+  level: string;
+  description: string;
+}
+
+export interface InsightResult {
+  title: string;
+  insight: string;
+  severity: string;
+  suggestion?: string;
+}
+
 export interface AnalysisResults {
   wellness_score: number;
-  dimension_scores: Record<string, number>;
-  top_strengths: string[];
-  top_risks: string[];
-  traits: { id: string; name: string; active: boolean }[];
-  patterns: { id: string; type: string; description: string }[];
-  inferences: { id: string; title: string; description: string }[];
-  bmi_context: { bmi: number; category: string };
+  dimension_scores: DimensionScore[];
+  top_strengths: TraitScore[];
+  top_risks: TraitScore[];
+  traits: TraitScore[];
+  patterns: PatternResult[];
+  inferences: InsightResult[];
 }
 
 export interface Report {

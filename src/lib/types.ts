@@ -119,38 +119,40 @@ export interface ProfessionalStats {
   updated_at: string;
 }
 
-export interface Trait {
+export interface DimensionScore {
   id: string;
-  name: string;
-  active: boolean;
+  label: string;
+  score: number;
+}
+
+export interface TraitScore {
+  trait: string;
+  label: string;
+  score: number;
 }
 
 export interface Pattern {
-  id: string;
+  name: string;
   type: "risk" | "strength" | "contradiction";
+  level: string;
   description: string;
 }
 
-export interface Inference {
-  id: string;
+export interface Insight {
   title: string;
-  description: string;
-}
-
-export interface BMIContext {
-  bmi: number;
-  category: string;
+  insight: string;
+  severity: string;
+  suggestion?: string;
 }
 
 export interface AnalysisResults {
   wellness_score: number;
-  dimension_scores: Record<string, number>;
-  top_strengths: string[];
-  top_risks: string[];
-  traits: Trait[];
+  dimension_scores: DimensionScore[];
+  top_strengths: TraitScore[];
+  top_risks: TraitScore[];
+  traits: TraitScore[];
   patterns: Pattern[];
-  inferences: Inference[];
-  bmi_context: BMIContext;
+  inferences: Insight[];
 }
 
 export interface BlindSpot {
