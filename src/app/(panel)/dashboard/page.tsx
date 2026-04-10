@@ -23,8 +23,9 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
         "id, token, status, created_at, started_at, completed_at, client:clients(first_name, last_name)"
       )
       .eq("professional_id", userId)
+      .in("status", ["sent", "started", "completed"])
       .order("created_at", { ascending: false })
-      .limit(5),
+      .limit(10),
     supabase
       .from("professional_stats")
       .select("active_clients_count, todays_appointments_count, pending_analyses_count")
@@ -66,12 +67,23 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     })
   );
 
-  const recentTests = (testsRes.data as TestRow[] || []).map(
-    (t) => ({
+  const statusPriority: Record<string, number> = {
+    completed: 1,
+    started: 2,
+    sent: 3,
+  };
+
+  const pendingTests = (testsRes.data as TestRow[] || [])
+    .map((t) => ({
       ...t,
       client: Array.isArray(t.client) ? t.client[0] || null : t.client,
-    })
-  );
+    }))
+    .sort((a, b) => {
+      const priorityA = statusPriority[a.status] ?? 99;
+      const priorityB = statusPriority[b.status] ?? 99;
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
   const statsData = statsRes.data as {
     active_clients_count: number;
@@ -81,7 +93,7 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
 
   return {
     upcomingAppointments,
-    recentTests,
+    pendingTests,
     stats: {
       active_clients: statsData?.active_clients_count ?? 0,
       todays_appointments: statsData?.todays_appointments_count ?? 0,
@@ -96,7 +108,7 @@ export default async function DashboardPage() {
     ? await getDashboardData(user.id)
     : {
         upcomingAppointments: [],
-        recentTests: [],
+        pendingTests: [],
         stats: {
           active_clients: 0,
           todays_appointments: 0,

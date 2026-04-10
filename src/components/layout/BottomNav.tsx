@@ -13,11 +13,11 @@ import {
 import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard },
-  { href: "/clients", label: "Danışan", icon: Users },
-  { href: "/appointments", label: "Randevu", icon: Calendar },
-  { href: "/tests", label: "Analiz", icon: FlaskConical },
-  { href: "/billing", label: "Satın Al", icon: CreditCard },
+  { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard, accent: false },
+  { href: "/clients", label: "Danışan", icon: Users, accent: false },
+  { href: "/appointments", label: "Randevu", icon: Calendar, accent: false },
+  { href: "/tests", label: "Analiz", icon: FlaskConical, accent: false },
+  { href: "/billing", label: "Abonelik", icon: CreditCard, accent: true },
 ];
 
 export function BottomNav() {
@@ -41,13 +41,13 @@ export function BottomNav() {
               className={clsx(
                 "flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1.5 rounded-xl transition-all duration-200",
                 isActive
-                  ? "text-pro-primary"
-                  : "text-pro-text-tertiary active:text-pro-text active:scale-95"
+                  ? item.accent ? "text-[#D4856A]" : "text-pro-primary"
+                  : item.accent ? "text-[#D4856A]/70 active:text-[#D4856A] active:scale-95" : "text-pro-text-tertiary active:text-pro-text active:scale-95"
               )}
             >
               <div className={clsx(
                 "p-1 rounded-lg transition-colors duration-200",
-                isActive && "bg-pro-primary-light"
+                isActive && (item.accent ? "bg-[#D4856A]/10" : "bg-pro-primary-light")
               )}>
                 <item.icon className="h-5 w-5" />
               </div>

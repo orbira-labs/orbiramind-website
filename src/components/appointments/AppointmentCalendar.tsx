@@ -74,7 +74,7 @@ export function AppointmentCalendar({
       case "completed":
         return "bg-emerald-500 text-white";
       case "cancelled":
-        return "bg-gray-300 text-gray-600 line-through";
+        return "bg-red-100 text-red-600 line-through";
       default:
         return "bg-gray-400 text-white";
     }
@@ -151,8 +151,9 @@ export function AppointmentCalendar({
                   index % 7 === 6 && "border-r-0",
                   isLastRow && "border-b-0",
                   !isCurrentMonth && "bg-[#FAFAF7]",
-                  isCurrentMonth && isWeekendDay && "bg-[#FDFCFB]",
-                  isCurrentMonth && !isWeekendDay && "bg-white hover:bg-[#FDF8F6]"
+                  isCurrentMonth && isDayToday && "bg-emerald-50",
+                  isCurrentMonth && !isDayToday && isWeekendDay && "bg-[#FDFCFB]",
+                  isCurrentMonth && !isDayToday && !isWeekendDay && "bg-white hover:bg-[#FDF8F6]"
                 )}
               >
                 {/* Gün Header */}
@@ -160,7 +161,7 @@ export function AppointmentCalendar({
                   <span
                     className={clsx(
                       "inline-flex items-center justify-center h-7 w-7 rounded-full text-sm font-medium transition-all",
-                      isDayToday && "bg-[#D4856A] text-white shadow-sm",
+                      isDayToday && "text-emerald-700 font-semibold",
                       !isDayToday && isCurrentMonth && "text-[#2D3436]",
                       !isDayToday && !isCurrentMonth && "text-[#C4C4C4]"
                     )}
@@ -226,7 +227,7 @@ export function AppointmentCalendar({
           <span className="text-[#6B7C85]">Tamamlandı</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded bg-gray-300" />
+          <div className="h-3 w-3 rounded bg-red-200 border border-red-300" />
           <span className="text-[#6B7C85]">İptal</span>
         </div>
       </div>

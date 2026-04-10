@@ -32,7 +32,7 @@ export interface DashboardStats {
 
 export interface DashboardInitialData {
   upcomingAppointments: DashboardAppointment[];
-  recentTests: DashboardTest[];
+  pendingTests: DashboardTest[];
   stats: DashboardStats;
 }
 
@@ -74,44 +74,24 @@ function setCache(data: DashboardInitialData) {
 
 export function useDashboard(initialData?: DashboardInitialData) {
   const { professional } = useProContext();
-  const isMounted = useRef(false);
   const channelRef = useRef<ReturnType<
     ReturnType<typeof createClient>["channel"]
   > | null>(null);
 
-  // SSR'dan gelen initialData varsa önce onu kullan,
-  // yoksa sessionStorage cache'e bak, yoksa default
-  const resolveInitial = (): DashboardInitialData => {
-    if (initialData) return initialData;
-    if (typeof window !== "undefined") {
-      const cached = getCache();
-      if (cached) return cached;
-    }
-    return {
-      upcomingAppointments: [],
-      recentTests: [],
-      stats: DEFAULT_STATS,
-    };
-  };
-
-  const initial = useRef<DashboardInitialData | null>(null);
-  if (!isMounted.current) {
-    initial.current = resolveInitial();
-  }
-
   const supabase = useRef(createClient());
 
+  // Use initialData directly for initial state to ensure hydration consistency.
+  // Cache is only checked after mount when no initialData is provided.
   const [upcomingAppointments, setUpcomingAppointments] = useState<
     DashboardAppointment[]
-  >(initial.current?.upcomingAppointments ?? []);
-  const [recentTests, setRecentTests] = useState<DashboardTest[]>(
-    initial.current?.recentTests ?? []
+  >(initialData?.upcomingAppointments ?? []);
+  const [pendingTests, setPendingTests] = useState<DashboardTest[]>(
+    initialData?.pendingTests ?? []
   );
   const [stats, setStats] = useState<DashboardStats>(
-    initial.current?.stats ?? DEFAULT_STATS
+    initialData?.stats ?? DEFAULT_STATS
   );
-  // SSR initialData varsa veya cache varsa loading=false ile başla
-  const [loading, setLoading] = useState(!initial.current?.stats.active_clients && !initialData);
+  const [loading, setLoading] = useState(!initialData);
 
   const fetchData = useCallback(async () => {
     if (!professional?.id) return;
@@ -133,8 +113,9 @@ export function useDashboard(initialData?: DashboardInitialData) {
           "id, token, status, created_at, started_at, completed_at, client:clients(first_name, last_name)"
         )
         .eq("professional_id", professional.id)
+        .in("status", ["sent", "started", "completed"])
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(10),
       supabase.current
         .from("professional_stats")
         .select("active_clients_count, todays_appointments_count, pending_analyses_count")
@@ -147,12 +128,23 @@ export function useDashboard(initialData?: DashboardInitialData) {
       client: Array.isArray(a.client) ? a.client[0] || null : a.client,
     })) as DashboardAppointment[];
 
-    const newTests = (testsRes.data || []).map(
-      (t: Record<string, unknown>) => ({
+    const statusPriority: Record<string, number> = {
+      completed: 1,
+      started: 2,
+      sent: 3,
+    };
+
+    const newTests = (testsRes.data || [])
+      .map((t: Record<string, unknown>) => ({
         ...t,
         client: Array.isArray(t.client) ? t.client[0] || null : t.client,
-      })
-    ) as DashboardTest[];
+      }))
+      .sort((a, b) => {
+        const priorityA = statusPriority[a.status as string] ?? 99;
+        const priorityB = statusPriority[b.status as string] ?? 99;
+        if (priorityA !== priorityB) return priorityA - priorityB;
+        return new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime();
+      }) as DashboardTest[];
 
     const statsData = statsRes.data as { 
       active_clients_count: number; 
@@ -167,28 +159,34 @@ export function useDashboard(initialData?: DashboardInitialData) {
     };
 
     setUpcomingAppointments(newApts);
-    setRecentTests(newTests);
+    setPendingTests(newTests);
     setStats(newStats);
     setLoading(false);
 
     setCache({
       upcomingAppointments: newApts,
-      recentTests: newTests,
+      pendingTests: newTests,
       stats: newStats,
     });
   }, [professional?.id]);
 
   useEffect(() => {
-    isMounted.current = true;
     if (!professional?.id) return;
-    // SSR'dan data geldiyse skeleton gösterme, arka planda güncelle
+
+    // If initialData was provided (SSR), just refresh in background
     if (initialData) {
-      setLoading(false);
       fetchData();
       return;
     }
+
+    // No initialData: try to restore from cache, then fetch fresh data
     const cached = getCache();
-    if (cached) setLoading(false);
+    if (cached) {
+      setUpcomingAppointments(cached.upcomingAppointments);
+      setPendingTests(cached.pendingTests);
+      setStats(cached.stats);
+      setLoading(false);
+    }
     fetchData();
   }, [professional?.id, fetchData, initialData]);
 
@@ -231,5 +229,5 @@ export function useDashboard(initialData?: DashboardInitialData) {
     };
   }, [professional?.id, fetchData]);
 
-  return { upcomingAppointments, recentTests, stats, loading, refresh: fetchData };
+  return { upcomingAppointments, pendingTests, stats, loading, refresh: fetchData };
 }

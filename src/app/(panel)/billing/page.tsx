@@ -9,10 +9,16 @@ import {
   Eye,
   Route,
   ShieldAlert,
-  Layers,
   ScanSearch,
+  Sparkles,
+  Lock,
+  ClipboardList,
+  TrendingUp,
+  BrainCircuit,
+  FlaskConical,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 const OUTPUTS = [
   {
@@ -32,13 +38,8 @@ const OUTPUTS = [
   },
   {
     icon: Route,
-    title: "Koçluk Yol Haritası",
+    title: "Danışanın Yol Haritası",
     desc: "Acil, kısa ve orta vadeli somut müdahale adımları",
-  },
-  {
-    icon: Layers,
-    title: "10 Boyutlu Karakter Skoru",
-    desc: "Her boyut ayrı ayrı puanlanır — stres, uyku, empati, enerji ve dahası",
   },
   {
     icon: ScanSearch,
@@ -54,6 +55,8 @@ const PACKAGE_FEATURES = [
 ];
 
 export default function BillingPage() {
+  const [showProModal, setShowProModal] = useState(false);
+
   return (
     <>
       <TopBar title="Satın Al" />
@@ -96,7 +99,7 @@ export default function BillingPage() {
             </Card>
 
             {/* Pricing Cards */}
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-3 gap-4">
 
               {/* White card — 5 adet */}
               <div className="rounded-2xl border-2 border-pro-border bg-white overflow-hidden flex flex-col">
@@ -157,7 +160,141 @@ export default function BillingPage() {
                 </div>
               </div>
 
+              {/* Purple card — Pro Üyelik (Yakında) */}
+              <div className="rounded-2xl overflow-hidden flex flex-col relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
+                <div className="absolute top-0 right-0 w-[140px] h-[140px] rounded-full bg-white opacity-[0.08] blur-[50px]" />
+                <div className="absolute bottom-0 left-0 w-[100px] h-[100px] rounded-full bg-white opacity-[0.05] blur-[40px]" />
+
+                {/* Diagonal ribbon — top right */}
+                <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1">
+                  <span className="text-[11px] font-bold text-[#7C3AED] tracking-wide">Yakında</span>
+                </div>
+
+                <div className="relative px-6 py-5 border-b border-white/20">
+                  <p className="text-xs font-semibold text-white/80 uppercase tracking-wide mb-2">Pro Üyelik</p>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-6 w-6 text-white" />
+                    <span className="text-2xl font-bold text-white">Aylık</span>
+                  </div>
+                  <p className="text-xs text-white/55 mt-1">tam donanımlı asistanınız</p>
+                </div>
+
+                <div className="relative px-6 py-5 flex-1 flex flex-col">
+                  <ul className="space-y-2.5 flex-1">
+                    <li className="flex items-center gap-2 text-sm text-white/85">
+                      <Check className="h-4 w-4 text-white shrink-0" />
+                      Danışana Özel Ödevler
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-white/85">
+                      <Check className="h-4 w-4 text-white shrink-0" />
+                      İlerleme Analizi
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-white/85">
+                      <Check className="h-4 w-4 text-white shrink-0" />
+                      AI Seans Asistanı
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-white/85">
+                      <Check className="h-4 w-4 text-white shrink-0" />
+                      Aylık 15 MindTest Kredisi
+                    </li>
+                  </ul>
+                  <button
+                    onClick={() => setShowProModal(true)}
+                    className="mt-5 w-full py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white font-semibold border border-white/30 hover:bg-white/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    <Lock className="h-4 w-4" />
+                    Keşfet
+                  </button>
+                </div>
+              </div>
+
             </div>
+
+            {/* Pro Üyelik Modal */}
+            {showProModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div 
+                  className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                  onClick={() => setShowProModal(false)}
+                />
+                <div className="relative bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9] rounded-2xl p-6 max-w-lg w-full shadow-2xl overflow-hidden">
+                  <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-white opacity-[0.08] blur-[60px]" />
+                  <div className="absolute bottom-0 left-0 w-[150px] h-[150px] rounded-full bg-white opacity-[0.05] blur-[50px]" />
+                  
+                  <div className="relative">
+                    <div className="text-center mb-6">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 mb-4">
+                        <Sparkles className="h-8 w-8 text-white" />
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        Pro Üyelik Çok Yakında
+                      </h3>
+                      
+                      <p className="text-white/70">
+                        Danışanlarınızla aranızdaki bağı güçlendiren, seanslarınızı zenginleştiren AI destekli asistanınız.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3 mb-6">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                          <ClipboardList className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-medium text-sm">Danışana Özel Ödevler</p>
+                          <p className="text-white/60 text-xs mt-0.5">Analiz sonuçlarına göre AI'ın oluşturduğu bireysel gelişim görevleri</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                          <TrendingUp className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-medium text-sm">İlerleme Analizi</p>
+                          <p className="text-white/60 text-xs mt-0.5">Danışanın süreç boyunca gösterdiği değişimi görselleştiren detaylı raporlar</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                          <BrainCircuit className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-medium text-sm">AI Seans Asistanı</p>
+                          <p className="text-white/60 text-xs mt-0.5">Görüşme öncesi hazırlanan brifing: geçmiş notlar, ödev durumu ve odak önerileri</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                          <FlaskConical className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-medium text-sm">Aylık 15 MindTest Kredisi</p>
+                          <p className="text-white/60 text-xs mt-0.5">Her ay yenilenen analiz hakkı ile portföyünüzü sürekli güncel tutun</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 text-center">
+                      <p className="text-white/80 text-sm">
+                        ✨ Lansman için geri sayım başladı
+                      </p>
+                    </div>
+                    
+                    <button
+                      onClick={() => setShowProModal(false)}
+                      className="w-full py-3 rounded-xl bg-white text-[#7C3AED] font-semibold hover:bg-white/95 transition-all active:scale-[0.98]"
+                    >
+                      Sabırsızlanıyorum!
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* How we analyze — subtle link */}
             <div className="flex justify-center">

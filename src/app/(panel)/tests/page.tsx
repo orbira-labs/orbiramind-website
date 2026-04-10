@@ -86,7 +86,7 @@ export default function TestsPage() {
                     <div className="h-10 w-10 rounded-xl bg-[#8B9D83]/15 flex items-center justify-center">
                       <Send className="h-5 w-5 text-[#6B7D63]" />
                     </div>
-                    <p className="text-sm text-pro-text-secondary font-medium">İşlenmemiş Analizler</p>
+                    <p className="text-sm text-pro-text-secondary font-medium">Bekleyen Analizler</p>
                   </div>
                   <p className="text-3xl font-bold text-[#6B7D63]">{counts.pending}</p>
                 </div>

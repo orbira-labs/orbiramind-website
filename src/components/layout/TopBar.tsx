@@ -33,6 +33,13 @@ function formatTime(): string {
   });
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Günaydın";
+  if (hour < 18) return "İyi günler";
+  return "İyi akşamlar";
+}
+
 export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps) {
   const { professional } = useProContext();
   const router = useRouter();
@@ -78,7 +85,9 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
       <AnalysisReadyPopup notification={analysisPopup} onDismiss={dismissAnalysisPopup} />
       <header className="h-auto min-h-[64px] border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-30">
         {showGreeting ? (
-          <h1 className="text-lg font-semibold text-[#3D5A4C]">Ofisim</h1>
+          <h1 className="text-lg font-semibold text-[#3D5A4C]">
+            {getGreeting()}{professional?.first_name ? `, ${professional.first_name}` : ""}
+          </h1>
         ) : (
           <h1 className="text-lg font-semibold text-[#3D5A4C]">{title}</h1>
         )}

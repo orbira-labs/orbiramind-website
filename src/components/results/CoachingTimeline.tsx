@@ -46,7 +46,7 @@ export function CoachingTimeline({ roadmap }: CoachingTimelineProps) {
           </svg>
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">Koçluk Yol Haritası</h3>
+          <h3 className="text-xl font-semibold text-gray-900">Danışanın Yol Haritası</h3>
           <p className="text-sm text-gray-500">Önerilen aksiyon planı</p>
         </div>
       </div>

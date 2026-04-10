@@ -13,16 +13,17 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
+  ClipboardList,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useProContext } from "@/lib/context";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard, accent: false },
-  { href: "/clients", label: "Danışanlar", icon: Users, accent: false },
-  { href: "/appointments", label: "Randevular", icon: Calendar, accent: false },
-  { href: "/tests", label: "Analizler", icon: FlaskConical, accent: true },
-  { href: "/billing", label: "Satın Al", icon: CreditCard, accent: false },
+  { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard, accent: false, comingSoon: false },
+  { href: "/clients", label: "Danışanlar", icon: Users, accent: false, comingSoon: false },
+  { href: "/appointments", label: "Randevular", icon: Calendar, accent: false, comingSoon: false },
+  { href: "/tests", label: "Analizler", icon: FlaskConical, accent: true, comingSoon: false },
+  { href: "#", label: "Ödevler", icon: ClipboardList, accent: false, comingSoon: true },
 ];
 
 export function Sidebar() {
@@ -41,7 +42,7 @@ export function Sidebar() {
         "hidden lg:flex flex-col relative",
         "h-screen sticky top-0 transition-all duration-200",
         "bg-[#5B7B6A]",
-        collapsed ? "w-[68px]" : "w-[260px]"
+        collapsed ? "w-[64px]" : "w-[200px]"
       )}
     >
       {/* Header */}
@@ -70,7 +71,7 @@ export function Sidebar() {
         className="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none z-0"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="xMidYMid slice"
-        viewBox="0 0 260 800"
+        viewBox="0 0 200 800"
       >
         {/* Dense node grid */}
         <g fill="white">
@@ -278,7 +279,32 @@ export function Sidebar() {
         {/* Navigation links */}
         <nav className="shrink-0 py-4 px-2.5 space-y-1">
           {NAV_ITEMS.map((item) => {
-            const isActive = (pendingHref ?? pathname).startsWith(item.href);
+            const isActive = !item.comingSoon && (pendingHref ?? pathname).startsWith(item.href);
+            
+            if (item.comingSoon) {
+              return (
+                <div
+                  key={item.label}
+                  className={clsx(
+                    "group relative flex items-center gap-3 rounded-xl transition-all duration-200 cursor-not-allowed",
+                    collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
+                    "text-white/40"
+                  )}
+                  title={collapsed ? `${item.label} (Yakında)` : undefined}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="text-sm">{item.label}</span>
+                      <span className="ml-auto text-[10px] font-medium bg-[#7C3AED]/80 text-white px-1.5 py-0.5 rounded-full">
+                        Yakında
+                      </span>
+                    </>
+                  )}
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
@@ -322,8 +348,26 @@ export function Sidebar() {
       <div className="relative z-[1] shrink-0 bg-[#4A5D52]">
         {/* Subtle top border */}
         <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
+        {/* Abonelik link - highlighted */}
+        <div className="p-2.5 pb-1">
+          <Link
+            href="/billing"
+            onClick={() => setPendingHref("/billing")}
+            className={clsx(
+              "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
+              collapsed && "justify-center px-2",
+              (pendingHref ?? pathname).startsWith("/billing") 
+                ? "bg-[#D4856A]/30 text-white" 
+                : "text-[#D4856A] hover:bg-[#D4856A]/20 hover:text-white"
+            )}
+            title={collapsed ? "Abonelik" : undefined}
+          >
+            <CreditCard className="h-5 w-5 shrink-0" />
+            {!collapsed && <span className="text-sm font-medium">Abonelik</span>}
+          </Link>
+        </div>
         {/* Settings link */}
-        <div className="p-2.5">
+        <div className="px-2.5 pb-2.5">
           <Link
             href="/settings"
             onClick={() => setPendingHref("/settings")}

@@ -457,9 +457,8 @@ export function NotesCard() {
                   key={note.id}
                   onClick={() => setViewingNote(note)}
                   className={clsx(
-                    "w-full text-left p-3 rounded-xl border hover:shadow-sm transition-all duration-200 group",
-                    priority.bgLight,
-                    priority.border
+                    "w-full text-left p-3 rounded-xl hover:shadow-sm transition-all duration-200 group",
+                    priority.bgLight
                   )}
                 >
                   <div className="flex items-start gap-3">

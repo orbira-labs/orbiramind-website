@@ -66,7 +66,7 @@ const STAT_CARDS = [
   },
   {
     key: "pending_analyses" as const,
-    label: "İşlenmemiş Analizler",
+    label: "Bekleyen Analizler",
     icon: FlaskConical,
     href: "/tests",
     iconBg: "bg-[#D4856A]",
@@ -162,7 +162,7 @@ interface DashboardClientProps {
 
 export function DashboardClient({ initialData }: DashboardClientProps) {
   const { professional } = useProContext();
-  const { stats, upcomingAppointments, recentTests, loading, refresh } =
+  const { stats, upcomingAppointments, pendingTests, loading, refresh } =
     useDashboard(initialData);
   const [shareOpenId, setShareOpenId] = useState<string | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
@@ -253,8 +253,8 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     <div className="h-14 w-14 rounded-2xl bg-pro-primary-light flex items-center justify-center mb-4">
                       <Calendar className="h-6 w-6 text-pro-primary" />
                     </div>
-                    <p className="text-sm font-medium text-pro-text mb-1">Randevu bulunmuyor</p>
-                    <p className="text-xs text-pro-text-tertiary">Yaklaşan randevularınız burada görünecek</p>
+                    <p className="text-sm font-medium text-pro-text mb-1">Takviminiz boş</p>
+                    <p className="text-xs text-pro-text-tertiary">Kendinize zaman ayırın veya yeni randevu oluşturun</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -303,7 +303,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
               <Card padding="lg" variant="elevated">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-pro-text">
-                    Son Analizler
+                    Bekleyen Analizler
                   </h3>
                   <button
                     onClick={() => setShowSendTestModal(true)}
@@ -325,17 +325,17 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                       </div>
                     ))}
                   </div>
-                ) : recentTests.length === 0 ? (
+                ) : pendingTests.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="h-14 w-14 rounded-2xl bg-[#FDF5F2] flex items-center justify-center mb-4">
-                      <FlaskConical className="h-6 w-6 text-[#D4856A]" />
+                    <div className="h-14 w-14 rounded-2xl bg-pro-success-light flex items-center justify-center mb-4">
+                      <Check className="h-6 w-6 text-pro-success" />
                     </div>
-                    <p className="text-sm font-medium text-pro-text mb-1">Analiz bulunmuyor</p>
-                    <p className="text-xs text-pro-text-tertiary">Gönderilen analizler burada görünecek</p>
+                    <p className="text-sm font-medium text-pro-text mb-1">Tüm analizler tamamlandı</p>
+                    <p className="text-xs text-pro-text-tertiary">Bekleyen test veya analiz bulunmuyor</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {recentTests.slice(0, 4).map((test) => {
+                    {pendingTests.slice(0, 4).map((test) => {
                       const s = STATUS_MAP[test.status] || STATUS_MAP.sent;
                       const canViewResults = test.status === "completed" || test.status === "reviewed";
                       const isPending =

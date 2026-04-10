@@ -19,13 +19,6 @@ import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
 import { BlindSpotCard } from "@/components/results/BlindSpotCard";
 import { CoachingTimeline } from "@/components/results/CoachingTimeline";
 
-const DimensionRadar = dynamic(
-  () => import("@/components/results/DimensionRadar").then((m) => m.DimensionRadar),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="h-[350px] w-full rounded-xl" />,
-  }
-);
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
 
@@ -280,15 +273,9 @@ export default function TestResultPage() {
 
           {activeTab === "overview" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="grid md:grid-cols-2 gap-6">
-                <Card padding="lg">
-                  <WellnessGauge score={analysis.wellness_score} size="lg" />
-                </Card>
-                <Card padding="lg">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Boyut Skorları</h3>
-                  <DimensionRadar scores={analysis.dimension_scores} />
-                </Card>
-              </div>
+              <Card padding="lg">
+                <WellnessGauge score={analysis.wellness_score} size="lg" />
+              </Card>
 
               <Card padding="lg">
                 <StrengthWeaknessGrid
