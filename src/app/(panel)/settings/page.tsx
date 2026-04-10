@@ -268,6 +268,7 @@ export default function SettingsPage() {
                   <Link
                     href="/privacy"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-between p-3 rounded-xl hover:bg-pro-surface-alt transition-colors group"
                   >
                     <span className="text-sm text-pro-text-secondary group-hover:text-pro-text">Gizlilik Politikası</span>
@@ -276,6 +277,7 @@ export default function SettingsPage() {
                   <Link
                     href="/terms"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-between p-3 rounded-xl hover:bg-pro-surface-alt transition-colors group"
                   >
                     <span className="text-sm text-pro-text-secondary group-hover:text-pro-text">Kullanım Koşulları</span>
@@ -284,6 +286,7 @@ export default function SettingsPage() {
                   <Link
                     href="/support"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-between p-3 rounded-xl hover:bg-pro-surface-alt transition-colors group"
                   >
                     <span className="text-sm text-pro-text-secondary group-hover:text-pro-text">Destek</span>

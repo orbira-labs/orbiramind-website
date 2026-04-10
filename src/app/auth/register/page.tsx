@@ -110,6 +110,7 @@ export default function RegisterPage() {
                   <Link
                     href="/privacy"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-pro-primary underline hover:text-pro-primary-hover"
                   >
                     KVKK Aydınlatma Metni
@@ -133,6 +134,7 @@ export default function RegisterPage() {
                   <Link
                     href="/terms"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-pro-primary underline hover:text-pro-primary-hover"
                   >
                     Kullanım Koşulları

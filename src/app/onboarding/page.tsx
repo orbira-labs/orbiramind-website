@@ -247,7 +247,7 @@ export default function OnboardingPage() {
                   {...register("kvkk_accepted")}
                 />
                 <span className="text-sm text-pro-text-secondary">
-                  <a href="/privacy" target="_blank" className="text-pro-primary underline">
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-pro-primary underline">
                     KVKK Aydınlatma Metni
                   </a>
                   &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.
@@ -266,7 +266,7 @@ export default function OnboardingPage() {
                   {...register("terms_accepted")}
                 />
                 <span className="text-sm text-pro-text-secondary">
-                  <a href="/terms" target="_blank" className="text-pro-primary underline">
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-pro-primary underline">
                     Kullanım Koşulları
                   </a>
                   &apos;nı okudum ve kabul ediyorum.

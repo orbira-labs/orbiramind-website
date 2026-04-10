@@ -26,6 +26,7 @@ export function TrustFooter({ showBadges = true, showDate = true }: TrustFooterP
             <Link 
               href="https://orbiralabs.com" 
               target="_blank"
+              rel="noopener noreferrer"
               className="text-xs text-pro-text-tertiary hover:text-pro-text transition-colors"
             >
               Powered by <span className="font-medium text-pro-accent">Orbira Labs</span>
