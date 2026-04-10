@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Send, Clock } from "lucide-react";
+import { Send, Clock, Smartphone } from "lucide-react";
 import { Avatar } from "../ui/Avatar";
 import { NotificationCenter, type ProPanelNotification } from "./NotificationCenter";
 import { useProContext } from "@/lib/context";
@@ -103,6 +103,13 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
               <span className="sm:hidden">+</span>
             </button>
           )}
+
+          {/* Mobil Uygulama Badge */}
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/50 border border-[#B8CCBE]/60 backdrop-blur-sm">
+            <Smartphone className="h-3.5 w-3.5 text-[#6B8F7B]" />
+            <span className="text-xs font-medium text-[#5A7D68]">Mobil Uygulama</span>
+            <span className="text-[10px] text-[#8BA696] font-medium">Çok Yakında</span>
+          </div>
 
           {/* Bildirimler */}
           <NotificationCenter
