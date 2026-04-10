@@ -17,13 +17,13 @@ const PHASES = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
       </svg>
     ),
-    gradient: "from-red-500 to-rose-600",
-    gradientBg: "from-red-500/5 to-rose-500/5",
-    bgLight: "bg-red-50/50",
-    textColor: "text-red-700",
-    borderColor: "border-red-100",
-    dotColor: "bg-red-500",
-    shadowColor: "rgba(239,68,68,0.12)",
+    gradient: "from-rose-400 to-red-400",
+    gradientBg: "from-rose-50 to-red-50",
+    bgLight: "bg-rose-50/60",
+    textColor: "text-rose-600",
+    borderColor: "border-rose-200",
+    dotColor: "bg-rose-400",
+    shadowColor: "rgba(251,113,133,0.15)",
   },
   {
     key: "short_term" as const,
@@ -34,13 +34,13 @@ const PHASES = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    gradient: "from-amber-500 to-orange-500",
-    gradientBg: "from-amber-500/5 to-orange-500/5",
-    bgLight: "bg-amber-50/50",
-    textColor: "text-amber-700",
-    borderColor: "border-amber-100",
-    dotColor: "bg-amber-500",
-    shadowColor: "rgba(245,158,11,0.12)",
+    gradient: "from-amber-400 to-orange-400",
+    gradientBg: "from-amber-50 to-orange-50",
+    bgLight: "bg-amber-50/60",
+    textColor: "text-amber-600",
+    borderColor: "border-amber-200",
+    dotColor: "bg-amber-400",
+    shadowColor: "rgba(251,191,36,0.15)",
   },
   {
     key: "medium_term" as const,
@@ -51,28 +51,23 @@ const PHASES = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
       </svg>
     ),
-    gradient: "from-green-500 to-emerald-600",
-    gradientBg: "from-green-500/5 to-emerald-500/5",
-    bgLight: "bg-green-50/50",
-    textColor: "text-green-700",
-    borderColor: "border-green-100",
-    dotColor: "bg-green-500",
-    shadowColor: "rgba(34,197,94,0.12)",
+    gradient: "from-emerald-400 to-teal-500",
+    gradientBg: "from-emerald-50 to-teal-50",
+    bgLight: "bg-emerald-50/60",
+    textColor: "text-emerald-600",
+    borderColor: "border-emerald-200",
+    dotColor: "bg-emerald-400",
+    shadowColor: "rgba(52,211,153,0.15)",
   },
 ];
 
 const cardVariant = {
-  initial: { opacity: 0, y: 30, scale: 0.96 },
-  animate: (i: number) => ({
+  initial: { opacity: 1, y: 0, scale: 1 },
+  animate: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: {
-      delay: i * 0.2,
-      duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
-    },
-  }),
+  },
 };
 
 const itemVariant = {
@@ -105,7 +100,7 @@ export function CoachingTimeline({ roadmap }: CoachingTimelineProps) {
 
       {/* Desktop: Horizontal connector */}
       <div className="hidden md:block relative mb-8">
-        <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-red-300 via-amber-300 to-green-300 -translate-y-1/2" />
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-rose-300 via-amber-300 to-emerald-300 -translate-y-1/2" />
         <div className="flex justify-between px-[16.66%]">
           {PHASES.map((phase) => (
             <div key={phase.key} className="relative">
