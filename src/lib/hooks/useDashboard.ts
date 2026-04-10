@@ -134,17 +134,24 @@ export function useDashboard(initialData?: DashboardInitialData) {
       sent: 3,
     };
 
-    const newTests = (testsRes.data || [])
-      .map((t: Record<string, unknown>) => ({
-        ...t,
-        client: Array.isArray(t.client) ? t.client[0] || null : t.client,
-      }) as Record<string, unknown> & { status: string; created_at: string; client: unknown })
+    const newTests = ((testsRes.data || []) as Array<Record<string, unknown>>)
+      .map((t) => ({
+        id: t.id as string,
+        token: t.token as string,
+        status: t.status as string,
+        created_at: t.created_at as string,
+        started_at: t.started_at as string | null,
+        completed_at: t.completed_at as string | null,
+        client: Array.isArray(t.client) 
+          ? (t.client[0] as { first_name: string; last_name: string } | null) || null 
+          : (t.client as { first_name: string; last_name: string } | null),
+      }))
       .sort((a, b) => {
         const priorityA = statusPriority[a.status] ?? 99;
         const priorityB = statusPriority[b.status] ?? 99;
         if (priorityA !== priorityB) return priorityA - priorityB;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      }) as DashboardTest[];
+      });
 
     const statsData = statsRes.data as { 
       active_clients_count: number; 
