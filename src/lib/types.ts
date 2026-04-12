@@ -120,9 +120,13 @@ export interface ProfessionalStats {
 }
 
 export interface DimensionScore {
-  id: string;
+  dimension: string;
   label: string;
   score: number;
+  base?: number;
+  trait_modifier?: number;
+  pattern_modifier?: number;
+  has_data?: boolean;
 }
 
 export interface TraitScore {
@@ -145,6 +149,37 @@ export interface Insight {
   suggestion?: string;
 }
 
+export interface ProfileSummary {
+  age_range: string | null;
+  gender: string | null;
+  bmi_category: string | null;
+  bmi_raw: number | null;
+  chronotype: string | null;
+  thinking_style: string | null;
+  social_style: string | null;
+  stress_response: string | null;
+  primary_motivation: string | null;
+  life_phase: string | null;
+  routine_style: string | null;
+  social_role: string | null;
+  decision_style: string | null;
+  emotional_expression: string | null;
+  relationship_status: string | null;
+  living_situation: string | null;
+  work_status: string | null;
+  has_chronic_condition: boolean;
+  children_status: string | null;
+  nutrition_preference: string | null;
+}
+
+export interface BlindSpotItem {
+  title: string;
+  insight: string;
+  type: "hidden_strength" | "absence_signal" | "inconsistency";
+  severity: string;
+  suggestion: string | null;
+}
+
 export interface AnalysisResults {
   wellness_score: number;
   dimension_scores: DimensionScore[];
@@ -153,9 +188,10 @@ export interface AnalysisResults {
   traits: TraitScore[];
   patterns: Pattern[];
   inferences: Insight[];
+  profile_summary?: ProfileSummary;
+  blind_spots?: BlindSpotItem[];
 }
 
-/** @deprecated Kör noktalar artık üretilmiyor */
 export interface BlindSpot {
   title: string;
   insight: string;

@@ -13,6 +13,7 @@ import {
   BarChart3,
   ArrowUpDown,
   MapIcon,
+  Search,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -23,29 +24,37 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { WellnessGauge } from "@/components/results/WellnessGauge";
-
+import { ProfileCard } from "@/components/results/ProfileCard";
+import { DimensionRadar } from "@/components/results/DimensionRadar";
 import { StrengthWeaknessGrid } from "@/components/results/StrengthWeaknessGrid";
+import { BlindSpotCard } from "@/components/results/BlindSpotCard";
 import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
-
+import { InferenceCards } from "@/components/results/InferenceCards";
 import { CoachingTimeline } from "@/components/results/CoachingTimeline";
 
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
 
-type Tab = "overview" | "strengths" | "roadmap";
+type Tab = "overview" | "strengths" | "deep" | "roadmap";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
     id: "overview",
     label: "Genel Bakış",
     icon: <BarChart3 className="h-4 w-4" />,
-    description: "Skor & analiz",
+    description: "Kimlik & skorlar",
   },
   {
     id: "strengths",
     label: "Güçlü & Gelişim",
     icon: <ArrowUpDown className="h-4 w-4" />,
-    description: "Yönler & alanlar",
+    description: "Yönler & kör noktalar",
+  },
+  {
+    id: "deep",
+    label: "Derinlemesine",
+    icon: <Search className="h-4 w-4" />,
+    description: "Analiz & döngüler",
   },
   {
     id: "roadmap",
@@ -358,21 +367,59 @@ export default function TestResultPage() {
               exit="exit"
             >
               {activeTab === "overview" && (
-                <Card padding="lg" variant="elevated">
-                  <CharacterAnalysis
-                    text={report.character_analysis}
-                    scoreWidget={<WellnessGauge score={analysis.wellness_score} size="xs" />}
-                  />
-                </Card>
+                <div className="space-y-6">
+                  {analysis.profile_summary && (
+                    <Card padding="lg" variant="elevated">
+                      <ProfileCard summary={analysis.profile_summary} />
+                    </Card>
+                  )}
+
+                  <Card padding="lg" variant="elevated">
+                    <div className="flex justify-center mb-6">
+                      <WellnessGauge score={analysis.wellness_score} size="sm" />
+                    </div>
+                    {analysis.dimension_scores && analysis.dimension_scores.length > 0 && (
+                      <DimensionRadar
+                        scores={Object.fromEntries(
+                          analysis.dimension_scores
+                            .filter((d) => d.has_data !== false)
+                            .map((d) => [d.dimension, d.score])
+                        )}
+                      />
+                    )}
+                  </Card>
+                </div>
               )}
 
               {activeTab === "strengths" && (
-                <Card padding="lg" variant="elevated">
-                  <StrengthWeaknessGrid
-                    strengths={report.top5_and_weak5.top5}
-                    weaknesses={report.top5_and_weak5.weak5}
-                  />
-                </Card>
+                <div className="space-y-6">
+                  <Card padding="lg" variant="elevated">
+                    <StrengthWeaknessGrid
+                      strengths={report.top5_and_weak5.top5}
+                      weaknesses={report.top5_and_weak5.weak5}
+                    />
+                  </Card>
+
+                  {analysis.blind_spots && analysis.blind_spots.length > 0 && (
+                    <Card padding="lg" variant="elevated">
+                      <BlindSpotCard blindSpots={analysis.blind_spots} />
+                    </Card>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "deep" && (
+                <div className="space-y-6">
+                  <Card padding="lg" variant="elevated">
+                    <CharacterAnalysis text={report.character_analysis} />
+                  </Card>
+
+                  {analysis.inferences && analysis.inferences.length > 0 && (
+                    <Card padding="lg" variant="elevated">
+                      <InferenceCards inferences={analysis.inferences} />
+                    </Card>
+                  )}
+                </div>
               )}
 
               {activeTab === "roadmap" && (
