@@ -11,7 +11,7 @@ import {
   CheckCircle,
   Loader2,
   BarChart3,
-  BookOpen,
+  ArrowUpDown,
   MapIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -23,7 +23,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { WellnessGauge } from "@/components/results/WellnessGauge";
-import { DimensionRadar } from "@/components/results/DimensionRadar";
+
 import { StrengthWeaknessGrid } from "@/components/results/StrengthWeaknessGrid";
 import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
 
@@ -32,20 +32,20 @@ import { CoachingTimeline } from "@/components/results/CoachingTimeline";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
 
-type Tab = "overview" | "character" | "roadmap";
+type Tab = "overview" | "strengths" | "roadmap";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
     id: "overview",
     label: "Genel Bakış",
     icon: <BarChart3 className="h-4 w-4" />,
-    description: "Skor & boyutlar",
+    description: "Skor & analiz",
   },
   {
-    id: "character",
-    label: "Karakter Analizi",
-    icon: <BookOpen className="h-4 w-4" />,
-    description: "Kişilik profili",
+    id: "strengths",
+    label: "Güçlü & Gelişim",
+    icon: <ArrowUpDown className="h-4 w-4" />,
+    description: "Yönler & alanlar",
   },
   {
     id: "roadmap",
@@ -226,13 +226,6 @@ export default function TestResultPage() {
   const results = test.results_snapshot as unknown as TestResults;
   const { analysis, report } = results;
 
-  const dimensionScores: Record<string, number> = {};
-  if (analysis.dimension_scores) {
-    for (const dim of analysis.dimension_scores) {
-      dimensionScores[dim.id] = dim.score;
-    }
-  }
-
   return (
     <>
       <TopBar title="Analiz Sonucu" />
@@ -365,32 +358,20 @@ export default function TestResultPage() {
               exit="exit"
             >
               {activeTab === "overview" && (
-                <div className="space-y-6">
-                  {/* Score + Dimension side by side on desktop */}
-                  <div className="grid lg:grid-cols-2 gap-6">
-                    <Card padding="lg" variant="elevated">
-                      <WellnessGauge score={analysis.wellness_score} size="lg" />
-                    </Card>
-
-                    {Object.keys(dimensionScores).length > 0 && (
-                      <Card padding="lg" variant="elevated">
-                        <DimensionRadar scores={dimensionScores} />
-                      </Card>
-                    )}
-                  </div>
-
-                  <Card padding="lg" variant="elevated">
-                    <StrengthWeaknessGrid
-                      strengths={report.top5_and_weak5.top5}
-                      weaknesses={report.top5_and_weak5.weak5}
-                    />
-                  </Card>
-                </div>
+                <Card padding="lg" variant="elevated">
+                  <CharacterAnalysis
+                    text={report.character_analysis}
+                    scoreWidget={<WellnessGauge score={analysis.wellness_score} size="xs" />}
+                  />
+                </Card>
               )}
 
-              {activeTab === "character" && (
+              {activeTab === "strengths" && (
                 <Card padding="lg" variant="elevated">
-                  <CharacterAnalysis text={report.character_analysis} />
+                  <StrengthWeaknessGrid
+                    strengths={report.top5_and_weak5.top5}
+                    weaknesses={report.top5_and_weak5.weak5}
+                  />
                 </Card>
               )}
 

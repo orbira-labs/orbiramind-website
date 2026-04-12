@@ -251,10 +251,12 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   function handleStageCompleteContinue() {
     if (currentStage === 1) {
-      handleProfileSubmit();
-    } else if (currentStage === 2) {
-      setCurrentStage(3);
+      // Stage 1 (profil) bitti, Stage 2'ye (core) geç
+      setCurrentStage(2);
       setPhase("stage_intro");
+    } else if (currentStage === 2) {
+      // Stage 2 (core) bitti, şimdi profil + core cevaplarını gönder
+      handleProfileSubmit();
     }
   }
 
@@ -367,6 +369,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   async function handleProfileSubmit() {
+    // Bu fonksiyon Stage 2 (core) tamamlandığında çağrılır
+    // Profil + Core cevaplarını birlikte gönderir
     if (!sessionId || !sessionData) return;
 
     setError(null);
@@ -391,12 +395,12 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
       setCurrentIndex(0);
-      setCurrentStage(2);
+      setCurrentStage(3);
       setPhase("stage_intro");
     } catch (e) {
       console.error("Submit answers error:", e);
       setError("Cevaplar gönderilemedi. Lütfen tekrar deneyin.");
-      setPhase("profile");
+      setPhase("core");
     }
   }
 

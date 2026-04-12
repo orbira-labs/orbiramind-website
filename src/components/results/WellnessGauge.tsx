@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from "react";
 
 interface WellnessGaugeProps {
   score: number;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 }
 
 const SIZES = {
+  xs: { outer: 90, strokeWidth: 5, innerStroke: 2, fontSize: "text-lg", labelSize: "text-[10px]", gap: 8 },
   sm: { outer: 130, strokeWidth: 7, innerStroke: 3, fontSize: "text-2xl", labelSize: "text-xs", gap: 12 },
   md: { outer: 180, strokeWidth: 9, innerStroke: 4, fontSize: "text-4xl", labelSize: "text-sm", gap: 16 },
   lg: { outer: 220, strokeWidth: 10, innerStroke: 5, fontSize: "text-5xl", labelSize: "text-base", gap: 18 },
@@ -37,14 +38,6 @@ function getScoreLabel(score: number): string {
   return "Kritik";
 }
 
-function getScoreInsight(score: number): string {
-  if (score >= 8) return "Danışan hayat kalitesi oldukça yüksek seviyede";
-  if (score >= 6) return "Genel iyilik hali iyi, belirli alanlarda gelişim potansiyeli var";
-  if (score >= 4) return "Ortalama seviyede, gelişim alanlarına odaklanılmalı";
-  if (score >= 2) return "Dikkat gerektiren birçok alan mevcut";
-  return "Acil müdahale ve destek gerektiren durum";
-}
-
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
@@ -52,7 +45,6 @@ function easeOutCubic(t: number): number {
 export function WellnessGauge({ score, size = "md" }: WellnessGaugeProps) {
   const [displayScore, setDisplayScore] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [showInsight, setShowInsight] = useState(false);
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -71,7 +63,6 @@ export function WellnessGauge({ score, size = "md" }: WellnessGaugeProps) {
       } else {
         setDisplayScore(score);
         setHasAnimated(true);
-        setTimeout(() => setShowInsight(true), 300);
       }
     }
 
@@ -92,15 +83,16 @@ export function WellnessGauge({ score, size = "md" }: WellnessGaugeProps) {
   const color = getScoreColor(displayScore);
   const [gradStart, gradEnd] = getScoreGradient(displayScore);
   const label = getScoreLabel(displayScore);
-  const insight = getScoreInsight(score);
   const gradientId = `gauge-grad-${size}`;
   const glowId = `gauge-glow-${size}`;
 
   const canvasSize = outer + 24;
   const canvasCenter = canvasSize / 2;
 
+  const isCompact = size === "xs";
+
   return (
-    <div className="flex flex-col items-center py-2">
+    <div className={`flex flex-col items-center ${isCompact ? "" : "py-2"}`}>
       <div className="relative" style={{ width: canvasSize, height: canvasSize }}>
         {/* Breathing glow behind gauge */}
         <div
@@ -141,8 +133,8 @@ export function WellnessGauge({ score, size = "md" }: WellnessGaugeProps) {
             opacity={0.35}
           />
 
-          {/* Subtle tick marks */}
-          {Array.from({ length: 40 }).map((_, i) => {
+          {/* Subtle tick marks (hidden on xs) */}
+          {!isCompact && Array.from({ length: 40 }).map((_, i) => {
             const angle = (i / 40) * 360;
             const rad = (angle * Math.PI) / 180;
             const isMajor = i % 4 === 0;
@@ -204,8 +196,8 @@ export function WellnessGauge({ score, size = "md" }: WellnessGaugeProps) {
             className="transition-all duration-75"
           />
 
-          {/* Leading dot on outer arc */}
-          {displayScore > 0.3 && (() => {
+          {/* Leading dot on outer arc (hidden on xs) */}
+          {!isCompact && displayScore > 0.3 && (() => {
             const angle = (displayScore / 10) * 360;
             const rad = (angle * Math.PI) / 180;
             return (
@@ -236,19 +228,10 @@ export function WellnessGauge({ score, size = "md" }: WellnessGaugeProps) {
           >
             {label}
           </span>
-          <span className="text-[11px] text-gray-400 mt-0.5">/ 10</span>
+          {!isCompact && <span className="text-[11px] text-gray-400 mt-0.5">/ 10</span>}
         </div>
       </div>
 
-      <p className="mt-1 text-sm font-semibold text-gray-700 tracking-wide">Genel Skor</p>
-
-      <div
-        className={`mt-2 max-w-sm text-center transition-all duration-700 ${
-          showInsight ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-        }`}
-      >
-        <p className="text-[13px] text-gray-500 leading-relaxed">{insight}</p>
-      </div>
     </div>
   );
 }
