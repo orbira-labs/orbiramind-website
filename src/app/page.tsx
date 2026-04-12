@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Zap,
   CheckCircle2,
-  Play,
   TrendingUp,
   Lock,
   Palette
@@ -122,29 +121,25 @@ export default function HomePage() {
                 </div>
               </Link>
               <Link
-                href="#demo"
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1a1a1a] rounded-full font-semibold border-2 border-[#eee] hover:border-[#D4856A] hover:shadow-xl transition-all duration-300"
+                href="/how-it-works"
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1a1a1a] rounded-full font-semibold border-2 border-[#eee] hover:border-[#5B7B6A] hover:shadow-xl transition-all duration-300"
               >
-                <div className="h-8 w-8 rounded-full bg-[#D4856A]/10 flex items-center justify-center group-hover:bg-[#D4856A] transition-colors">
-                  <Play className="h-4 w-4 text-[#D4856A] group-hover:text-white transition-colors ml-0.5" />
+                <div className="h-8 w-8 rounded-full bg-[#5B7B6A]/10 flex items-center justify-center group-hover:bg-[#5B7B6A] transition-colors">
+                  <Brain className="h-4 w-4 text-[#5B7B6A] group-hover:text-white transition-colors" />
                 </div>
-                <span>Nasıl Çalışır?</span>
+                <span>Neden HAE & AQE?</span>
               </Link>
             </div>
             
             {/* Trust Row */}
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm">
-                <Shield className="h-4 w-4 text-[#5B7B6A]" />
-                <span className="text-[#666]">KVKK Uyumlu</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm">
-                <Lock className="h-4 w-4 text-[#5B7B6A]" />
-                <span className="text-[#666]">256-bit Şifreleme</span>
-              </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-[#D4856A]/10 rounded-full">
                 <Sparkles className="h-4 w-4 text-[#D4856A]" />
-                <span className="text-[#D4856A] font-medium">İlk analiz hediye!</span>
+                <span className="text-[#D4856A] font-medium">İlk Analiz Hediye!</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#5B7B6A]/10 rounded-full">
+                <Sparkles className="h-4 w-4 text-[#5B7B6A]" />
+                <span className="text-[#5B7B6A] font-medium">En Modern Platform</span>
               </div>
             </div>
           </div>

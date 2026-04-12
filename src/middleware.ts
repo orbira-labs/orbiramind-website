@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   "/privacy",
   "/terms",
   "/onboarding",
+  "/how-it-works",
 ];
 
 const AUTH_PAGES = ["/auth/login", "/auth/register", "/auth/verify"];

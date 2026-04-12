@@ -39,8 +39,8 @@ export function LandingNavbar() {
             <span className="text-white text-xl font-semibold">O</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-semibold text-[#1a1a1a] tracking-tight">OrbiraMind</span>
-            <span className="text-[10px] text-[#5B7B6A] font-medium -mt-0.5 tracking-wider uppercase">Wellness Platform</span>
+            <span className="text-lg font-semibold tracking-tight"><span className="text-[#1a1a1a]">Orbira</span><span className="text-[#D4856A]">Mind</span></span>
+            <span className="text-[10px] text-[#5B7B6A] font-medium -mt-0.5 tracking-wider uppercase">Human Analysis Platform</span>
           </div>
         </Link>
         

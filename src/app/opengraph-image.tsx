@@ -102,7 +102,7 @@ export default async function Image() {
                 textTransform: 'uppercase',
               }}
             >
-              Wellness Platform
+              Human Analysis Platform
             </span>
           </div>
         </div>
@@ -148,38 +148,26 @@ export default async function Image() {
               alignItems: 'center',
               gap: 8,
               padding: '8px 16px',
-              background: 'white',
-              borderRadius: 24,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            }}
-          >
-            <span style={{ fontSize: 14, color: '#666' }}>KVKK Uyumlu</span>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 16px',
-              background: 'white',
-              borderRadius: 24,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            }}
-          >
-            <span style={{ fontSize: 14, color: '#666' }}>256-bit Şifreleme</span>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 16px',
               background: 'rgba(212, 133, 106, 0.1)',
               borderRadius: 24,
             }}
           >
             <span style={{ fontSize: 14, color: '#D4856A', fontWeight: 500 }}>
-              İlk analiz hediye!
+              İlk Analiz Hediye!
+            </span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 16px',
+              background: 'rgba(91, 123, 106, 0.1)',
+              borderRadius: 24,
+            }}
+          >
+            <span style={{ fontSize: 14, color: '#5B7B6A', fontWeight: 500 }}>
+              En Modern Platform
             </span>
           </div>
         </div>
