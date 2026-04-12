@@ -44,12 +44,7 @@ const actionColors = {
   completed_analysis: "text-pro-success bg-pro-success-light",
 };
 
-export function ActionCenter({ 
-  pendingReports, 
-  upcomingAppointments, 
-  waitingAnalyses,
-  completedToday 
-}: ActionCenterProps) {
+function useActions({ pendingReports, upcomingAppointments, waitingAnalyses, completedToday }: ActionCenterProps): ActionItem[] {
   const actions: ActionItem[] = [];
 
   if (pendingReports > 0) {
@@ -96,10 +91,15 @@ export function ActionCenter({
     });
   }
 
+  return actions;
+}
+
+function DesktopActionCenter(props: ActionCenterProps) {
+  const actions = useActions(props);
   const hasActions = actions.length > 0;
 
   return (
-    <motion.div variants={cardReveal}>
+    <motion.div variants={cardReveal} className="desktop-only">
       <Card variant="elevated" padding="lg" className="h-full">
         <div className="flex items-center gap-2 mb-4">
           <div className="h-8 w-8 rounded-lg bg-pro-primary-light flex items-center justify-center">
@@ -155,5 +155,73 @@ export function ActionCenter({
         )}
       </Card>
     </motion.div>
+  );
+}
+
+function MobileActionCenter(props: ActionCenterProps) {
+  const actions = useActions(props);
+  const hasActions = actions.length > 0;
+
+  return (
+    <div className="mobile-only">
+      <div className="mobile-section-header px-0 pt-0">
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-lg bg-pro-primary-light flex items-center justify-center">
+            <Zap className="h-3.5 w-3.5 text-pro-primary" />
+          </div>
+          <h3 className="font-semibold text-pro-text text-sm">Bugün İçin</h3>
+        </div>
+      </div>
+
+      {!hasActions ? (
+        <div className="mobile-empty-state py-6">
+          <div className="h-10 w-10 rounded-full bg-pro-success-light flex items-center justify-center mb-2">
+            <CheckCircle2 className="h-5 w-5 text-pro-success" />
+          </div>
+          <p className="text-sm font-medium text-pro-text">Her şey yolunda!</p>
+          <p className="text-xs text-pro-text-tertiary">Bekleyen aksiyon yok</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {actions.map((action) => {
+            const Icon = actionIcons[action.type];
+            const colorClass = actionColors[action.type];
+
+            return (
+              <Link key={action.id} href={action.href}>
+                <div className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface active:bg-pro-surface-alt touch-manipulation">
+                  <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${colorClass}`}>
+                    <Icon className="h-4.5 w-4.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-pro-text line-clamp-1">
+                        {action.title}
+                      </p>
+                      {action.priority === "high" && (
+                        <Badge variant="warning" size="sm">Öncelikli</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-pro-text-tertiary line-clamp-1">
+                      {action.subtitle}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-pro-text-tertiary shrink-0" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function ActionCenter(props: ActionCenterProps) {
+  return (
+    <>
+      <DesktopActionCenter {...props} />
+      <MobileActionCenter {...props} />
+    </>
   );
 }

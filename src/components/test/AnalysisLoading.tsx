@@ -24,174 +24,339 @@ export function AnalysisLoading() {
   }, [stepIndex]);
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex items-center justify-center p-4 pt-safe pb-safe relative overflow-hidden">
-      {/* Animated background glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] rounded-full bg-gradient-to-br from-[#5B7B6A]/20 to-[#7A9A8A]/10 blur-3xl"
-        />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-8 md:p-12 max-w-md w-full text-center relative z-10"
-      >
-        <div className="relative w-20 sm:w-28 h-20 sm:h-28 mx-auto mb-5 sm:mb-8">
-          {/* Outer pulsing ring */}
+    <>
+      {/* ========== MOBILE VIEW ========== */}
+      <div className="md:hidden min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] flex flex-col pt-safe pb-safe relative overflow-hidden">
+        {/* Lighter animated background for mobile */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.2, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-full bg-[#5B7B6A]/20"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.2, 0.35, 0.2],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full bg-gradient-to-br from-[#5B7B6A]/15 to-[#7A9A8A]/8 blur-2xl"
           />
-          
-          <svg className="w-20 sm:w-28 h-20 sm:h-28 relative z-10" viewBox="0 0 100 100">
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#E5E7EB"
-              strokeWidth="6"
-            />
-            <motion.circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="url(#analysisGradient)"
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeDasharray="251.2"
-              strokeDashoffset="62.8"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              style={{ transformOrigin: "center" }}
-            />
-            <defs>
-              <linearGradient id="analysisGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#5B7B6A" />
-                <stop offset="50%" stopColor="#7A9A8A" />
-                <stop offset="100%" stopColor="#5B7B6A" />
-              </linearGradient>
-            </defs>
-          </svg>
-          
-          <div className="absolute inset-0 flex items-center justify-center z-20">
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <svg className="w-7 sm:w-10 h-7 sm:h-10 text-[#5B7B6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </motion.div>
-          </div>
         </div>
 
-        <motion.h2
-          key={stepIndex}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-base sm:text-xl font-semibold text-gray-900 mb-1.5 sm:mb-2"
-        >
-          {LOADING_STEPS[stepIndex].label}
-        </motion.h2>
-        <p className="text-gray-500 text-xs sm:text-sm mb-5 sm:mb-8">
-          Bu işlem 20-30 saniye sürebilir
-        </p>
-
-        <div className="space-y-2 sm:space-y-2.5">
-          {LOADING_STEPS.map((step, idx) => (
-            <motion.div
-              key={idx}
-              initial={false}
-              animate={{
-                backgroundColor:
-                  idx < stepIndex
-                    ? "rgb(240 253 244)"
-                    : idx === stepIndex
-                    ? "rgba(91, 123, 106, 0.1)"
-                    : "rgb(249 250 251)",
-              }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl"
-            >
+        <div className="flex-1 flex items-center justify-center px-4 py-6">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg p-5 w-full max-w-sm text-center relative z-10"
+          >
+            {/* Smaller spinner for mobile */}
+            <div className="relative w-16 h-16 mx-auto mb-4">
               <motion.div
+                animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.2, 0.4] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full bg-[#5B7B6A]/15"
+              />
+              
+              <svg className="w-16 h-16 relative z-10" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="#E5E7EB"
+                  strokeWidth="5"
+                />
+                <motion.circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="url(#analysisGradientMobile)"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  strokeDasharray="251.2"
+                  strokeDashoffset="62.8"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  style={{ transformOrigin: "center" }}
+                />
+                <defs>
+                  <linearGradient id="analysisGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#5B7B6A" />
+                    <stop offset="100%" stopColor="#7A9A8A" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <svg className="w-6 h-6 text-[#5B7B6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+
+            <motion.h2
+              key={stepIndex}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="text-sm font-semibold text-gray-900 mb-1"
+            >
+              {LOADING_STEPS[stepIndex].label}
+            </motion.h2>
+            <p className="text-gray-500 text-[11px] mb-4">
+              Bu işlem 20-30 saniye sürebilir
+            </p>
+
+            {/* Compact step list for mobile */}
+            <div className="space-y-1.5">
+              {LOADING_STEPS.map((step, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={false}
+                  animate={{
+                    backgroundColor:
+                      idx < stepIndex
+                        ? "rgb(240 253 244)"
+                        : idx === stepIndex
+                        ? "rgba(91, 123, 106, 0.08)"
+                        : "rgb(249 250 251)",
+                  }}
+                  transition={{ duration: 0.25 }}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      backgroundColor:
+                        idx < stepIndex
+                          ? "#22C55E"
+                          : idx === stepIndex
+                          ? "#5B7B6A"
+                          : "#E5E7EB",
+                    }}
+                    transition={{ duration: 0.25 }}
+                    className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
+                  >
+                    {idx < stepIndex ? (
+                      <svg
+                        className="w-2.5 h-2.5 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : idx === stepIndex ? (
+                      <motion.div
+                        animate={{ opacity: [1, 0.4, 1] }}
+                        transition={{ duration: 1.2, repeat: Infinity }}
+                        className="w-1.5 h-1.5 bg-white rounded-full"
+                      />
+                    ) : (
+                      <div className="w-1 h-1 bg-gray-400 rounded-full" />
+                    )}
+                  </motion.div>
+                  <span
+                    className={`text-[11px] font-medium transition-colors duration-200 text-left ${
+                      idx < stepIndex
+                        ? "text-green-700"
+                        : idx === stepIndex
+                        ? "text-[#5B7B6A]"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {step.label.replace("...", "")}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="mt-4 pt-3 border-t border-gray-100"
+            >
+              <p className="text-[10px] text-gray-400 flex items-center justify-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                Lütfen sayfayı kapatmayın
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ========== DESKTOP VIEW ========== */}
+      <div className="hidden md:flex min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] to-[#E8F0EC] items-center justify-center p-4 pt-safe pb-safe relative overflow-hidden">
+        {/* Animated background glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#5B7B6A]/20 to-[#7A9A8A]/10 blur-3xl"
+          />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-12 max-w-md w-full text-center relative z-10"
+        >
+          <div className="relative w-28 h-28 mx-auto mb-8">
+            {/* Outer pulsing ring */}
+            <motion.div
+              animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.2, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 rounded-full bg-[#5B7B6A]/20"
+            />
+            
+            <svg className="w-28 h-28 relative z-10" viewBox="0 0 100 100">
+              <circle
+                cx="50"
+                cy="50"
+                r="40"
+                fill="none"
+                stroke="#E5E7EB"
+                strokeWidth="6"
+              />
+              <motion.circle
+                cx="50"
+                cy="50"
+                r="40"
+                fill="none"
+                stroke="url(#analysisGradientDesktop)"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray="251.2"
+                strokeDashoffset="62.8"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "center" }}
+              />
+              <defs>
+                <linearGradient id="analysisGradientDesktop" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#5B7B6A" />
+                  <stop offset="50%" stopColor="#7A9A8A" />
+                  <stop offset="100%" stopColor="#5B7B6A" />
+                </linearGradient>
+              </defs>
+            </svg>
+            
+            <div className="absolute inset-0 flex items-center justify-center z-20">
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <svg className="w-10 h-10 text-[#5B7B6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </motion.div>
+            </div>
+          </div>
+
+          <motion.h2
+            key={stepIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-xl font-semibold text-gray-900 mb-2"
+          >
+            {LOADING_STEPS[stepIndex].label}
+          </motion.h2>
+          <p className="text-gray-500 text-sm mb-8">
+            Bu işlem 20-30 saniye sürebilir
+          </p>
+
+          <div className="space-y-2.5">
+            {LOADING_STEPS.map((step, idx) => (
+              <motion.div
+                key={idx}
                 initial={false}
                 animate={{
                   backgroundColor:
                     idx < stepIndex
-                      ? "#22C55E"
+                      ? "rgb(240 253 244)"
                       : idx === stepIndex
-                      ? "#5B7B6A"
-                      : "#E5E7EB",
-                  scale: idx === stepIndex ? [1, 1.1, 1] : 1,
+                      ? "rgba(91, 123, 106, 0.1)"
+                      : "rgb(249 250 251)",
                 }}
-                transition={{
-                  backgroundColor: { duration: 0.3 },
-                  scale: { duration: 1, repeat: idx === stepIndex ? Infinity : 0 },
-                }}
-                className="w-5 sm:w-6 h-5 sm:h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl"
               >
-                {idx < stepIndex ? (
-                  <motion.svg
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </motion.svg>
-                ) : idx === stepIndex ? (
-                  <motion.div
-                    animate={{ opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                    className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full"
-                  />
-                ) : (
-                  <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-gray-400 rounded-full" />
-                )}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    backgroundColor:
+                      idx < stepIndex
+                        ? "#22C55E"
+                        : idx === stepIndex
+                        ? "#5B7B6A"
+                        : "#E5E7EB",
+                    scale: idx === stepIndex ? [1, 1.1, 1] : 1,
+                  }}
+                  transition={{
+                    backgroundColor: { duration: 0.3 },
+                    scale: { duration: 1, repeat: idx === stepIndex ? Infinity : 0 },
+                  }}
+                  className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                >
+                  {idx < stepIndex ? (
+                    <motion.svg
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-3.5 h-3.5 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </motion.svg>
+                  ) : idx === stepIndex ? (
+                    <motion.div
+                      animate={{ opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                      className="w-2 h-2 bg-white rounded-full"
+                    />
+                  ) : (
+                    <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                  )}
+                </motion.div>
+                <span
+                  className={`text-sm font-medium transition-colors duration-300 text-left ${
+                    idx < stepIndex
+                      ? "text-green-700"
+                      : idx === stepIndex
+                      ? "text-[#5B7B6A]"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {step.label.replace("...", "")}
+                </span>
               </motion.div>
-              <span
-                className={`text-xs sm:text-sm font-medium transition-colors duration-300 text-left ${
-                  idx < stepIndex
-                    ? "text-green-700"
-                    : idx === stepIndex
-                    ? "text-[#5B7B6A]"
-                    : "text-gray-400"
-                }`}
-              >
-                {step.label.replace("...", "")}
-              </span>
-            </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-5 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100"
-        >
-          <p className="text-[10px] sm:text-xs text-gray-400 flex items-center justify-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            Lütfen sayfayı kapatmayın
-          </p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 pt-6 border-t border-gray-100"
+          >
+            <p className="text-xs text-gray-400 flex items-center justify-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Lütfen sayfayı kapatmayın
+            </p>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </div>
+      </div>
+    </>
   );
 }

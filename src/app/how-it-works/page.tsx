@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-xl">
+      {/* Navigation - Desktop */}
+      <nav className="desktop-only fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-lg shadow-[#5B7B6A]/20">
@@ -33,8 +33,29 @@ export default function HowItWorksPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6 sm:px-8 lg:px-12">
+      {/* Navigation - Mobile */}
+      <nav className="mobile-only fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-xl pt-safe">
+        <div className="px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-md shadow-[#5B7B6A]/20">
+              <span className="text-white text-lg font-semibold">O</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-semibold tracking-tight"><span className="text-[#1a1a1a]">Orbira</span><span className="text-[#D4856A]">Mind</span></span>
+            </div>
+          </Link>
+          
+          <Link
+            href="/"
+            className="flex items-center justify-center h-10 w-10 rounded-xl bg-[#f5f5f5] text-[#666] active:bg-[#eee] transition-colors touch-manipulation"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero Section - Desktop */}
+      <section className="desktop-only pt-32 pb-16 px-6 sm:px-8 lg:px-12">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#5B7B6A]/10 to-[#D4856A]/10 rounded-full mb-8">
             <Brain className="h-4 w-4 text-[#5B7B6A]" />
@@ -52,8 +73,26 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* The Problem Section */}
-      <section className="py-16 px-6 sm:px-8 lg:px-12">
+      {/* Hero Section - Mobile */}
+      <section className="mobile-only pt-24 pb-10 px-4">
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#5B7B6A]/10 to-[#D4856A]/10 rounded-full mb-5">
+            <Brain className="h-3.5 w-3.5 text-[#5B7B6A]" />
+            <span className="text-xs font-medium text-[#5B7B6A]">Hybrid Teknoloji</span>
+          </div>
+          
+          <h1 className="text-3xl font-bold text-[#1a1a1a] leading-tight mb-4">
+            Neden <span className="text-[#5B7B6A]">HAE</span> & <span className="text-[#D4856A]">AQE</span>?
+          </h1>
+          
+          <p className="text-base text-[#666] px-2">
+            İnsanı anlamak için tek başına yapay zeka yetmez. Tek başına algoritma da. Biz ikisini birleştirdik.
+          </p>
+        </div>
+      </section>
+
+      {/* The Problem Section - Desktop */}
+      <section className="desktop-only py-16 px-6 sm:px-8 lg:px-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-[#1a1a1a] mb-4">Klasik Yaklaşımların Sorunu</h2>
@@ -190,8 +229,144 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* The Solution Section */}
-      <section className="py-16 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-[#FAFAF8] to-white">
+      {/* The Problem Section - Mobile */}
+      <section className="mobile-only py-10 px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-2">Klasik Yaklaşımların Sorunu</h2>
+          <p className="text-sm text-[#666]">Her iki yaklaşımın da güçlü ve zayıf yanları var</p>
+        </div>
+
+        <div className="space-y-6">
+          {/* Only AI - Mobile */}
+          <div className="relative bg-white rounded-2xl p-5 border-2 border-[#D4856A]/20 shadow-md">
+            <div className="absolute -top-3 left-5 px-3 py-0.5 bg-[#D4856A]/10 rounded-full border border-[#D4856A]/30">
+              <span className="text-xs font-medium text-[#D4856A]">Sadece Yapay Zeka</span>
+            </div>
+            
+            <div className="mt-3 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[#D4856A]/10 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-4 w-4 text-[#D4856A]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-sm mb-0.5">Tahmin Edebilir, Yanılabilir</h3>
+                  <p className="text-xs text-[#666]">
+                    AI her seferinde farklı yorumlar üretebilir.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[#D4856A]/10 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-4 w-4 text-[#D4856A]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-sm mb-0.5">Yüksek Maliyet</h3>
+                  <p className="text-xs text-[#666]">
+                    Her analiz için yoğun AI işlem gücü gerekir.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[#D4856A]/10 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-4 w-4 text-[#D4856A]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-sm mb-0.5">Kara Kutu Problemi</h3>
+                  <p className="text-xs text-[#666]">
+                    Neden bu sonuca ulaştığını açıklayamaz.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual - Mobile */}
+            <div className="mt-5 p-3 bg-gradient-to-br from-[#D4856A]/5 to-[#D4856A]/10 rounded-xl">
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4856A] to-[#c4745a] flex items-center justify-center text-white font-bold text-xs">
+                  AI
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#999]" />
+                <div className="h-9 w-9 rounded-lg bg-[#f5f5f5] flex items-center justify-center">
+                  <span className="text-lg">🎲</span>
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#999]" />
+                <div className="px-3 py-1.5 bg-[#D4856A]/20 rounded-md text-xs text-[#D4856A] font-medium">
+                  ?
+                </div>
+              </div>
+              <p className="text-center text-[10px] text-[#999] mt-2">Her seferinde farklı sonuç riski</p>
+            </div>
+          </div>
+
+          {/* Only Algorithm - Mobile */}
+          <div className="relative bg-white rounded-2xl p-5 border-2 border-[#1a1a1a]/10 shadow-md">
+            <div className="absolute -top-3 left-5 px-3 py-0.5 bg-[#1a1a1a]/5 rounded-full border border-[#1a1a1a]/20">
+              <span className="text-xs font-medium text-[#1a1a1a]">Sadece Algoritma</span>
+            </div>
+            
+            <div className="mt-3 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[#1a1a1a]/5 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-4 w-4 text-[#666]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-sm mb-0.5">Yüzeysel Kalır</h3>
+                  <p className="text-xs text-[#666]">
+                    Sadece sayısal skorlar üretir, bağlam kuramaz.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[#1a1a1a]/5 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-4 w-4 text-[#666]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-sm mb-0.5">Esnek Değil</h3>
+                  <p className="text-xs text-[#666]">
+                    Herkese aynı soruları sorar, sıkıcıdır.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[#1a1a1a]/5 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-4 w-4 text-[#666]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-sm mb-0.5">Tutarsızlıkları Kaçırır</h3>
+                  <p className="text-xs text-[#666]">
+                    Çelişkili cevapları fark edemez.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual - Mobile */}
+            <div className="mt-5 p-3 bg-gradient-to-br from-[#f5f5f5] to-[#eee] rounded-xl">
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#1a1a1a] to-[#333] flex items-center justify-center text-white font-bold text-[10px]">
+                  01
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#999]" />
+                <div className="h-9 w-9 rounded-lg bg-white flex items-center justify-center border border-[#eee]">
+                  <span className="text-lg">📊</span>
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#999]" />
+                <div className="px-3 py-1.5 bg-[#1a1a1a]/10 rounded-md text-xs text-[#666] font-medium">
+                  72/100
+                </div>
+              </div>
+              <p className="text-center text-[10px] text-[#999] mt-2">Sadece kuru sayılar, anlam yok</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Solution Section - Desktop */}
+      <section className="desktop-only py-16 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-[#FAFAF8] to-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#5B7B6A]/10 rounded-full mb-6">
@@ -285,8 +460,95 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* How It Works Flow */}
-      <section className="py-16 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-white to-[#FAFAF8]">
+      {/* The Solution Section - Mobile */}
+      <section className="mobile-only py-10 px-4 bg-gradient-to-b from-[#FAFAF8] to-white">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#5B7B6A]/10 rounded-full mb-4">
+            <Sparkles className="h-3.5 w-3.5 text-[#5B7B6A]" />
+            <span className="text-xs font-medium text-[#5B7B6A]">Çözüm</span>
+          </div>
+          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-2">İkisinin Mükemmel Birleşimi</h2>
+          <p className="text-sm text-[#666]">Deterministik hassasiyet + AI derinliği</p>
+        </div>
+
+        {/* Hybrid Visual - Mobile */}
+        <div className="bg-white rounded-2xl p-5 border-2 border-[#5B7B6A]/20 shadow-lg mb-6">
+          {/* Flow Diagram - Mobile */}
+          <div className="space-y-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                1
+              </div>
+              <div className="flex-1 p-3 bg-[#5B7B6A]/5 rounded-lg border border-[#5B7B6A]/20">
+                <p className="font-semibold text-[#1a1a1a] text-sm">Algoritma hassasiyeti sağlar</p>
+                <p className="text-xs text-[#666]">Tutarlı hesaplamalar</p>
+              </div>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="w-0.5 h-4 bg-gradient-to-b from-[#5B7B6A] to-[#D4856A]"></div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#D4856A] to-[#c4745a] flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                2
+              </div>
+              <div className="flex-1 p-3 bg-[#D4856A]/5 rounded-lg border border-[#D4856A]/20">
+                <p className="font-semibold text-[#1a1a1a] text-sm">AI derinlik katar</p>
+                <p className="text-xs text-[#666]">Bağlam ve doğrulama</p>
+              </div>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="w-0.5 h-4 bg-gradient-to-b from-[#D4856A] to-[#1a1a1a]"></div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#1a1a1a] to-[#333] flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div className="flex-1 p-3 bg-gradient-to-r from-[#5B7B6A]/10 to-[#D4856A]/10 rounded-lg border border-[#5B7B6A]/20">
+                <p className="font-semibold text-[#1a1a1a] text-sm">Güvenilir, derin analiz</p>
+                <p className="text-xs text-[#666]">Tutarlı + anlamlı</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Benefits - Mobile */}
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-3 p-3 bg-[#f8f8f6] rounded-lg">
+              <CheckCircle2 className="h-5 w-5 text-[#5B7B6A] flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-[#1a1a1a] text-sm">%95 daha düşük maliyet</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 bg-[#f8f8f6] rounded-lg">
+              <CheckCircle2 className="h-5 w-5 text-[#5B7B6A] flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-[#1a1a1a] text-sm">Tutarlı sonuçlar</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 bg-[#f8f8f6] rounded-lg">
+              <CheckCircle2 className="h-5 w-5 text-[#5B7B6A] flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-[#1a1a1a] text-sm">Derin içgörüler</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 bg-[#f8f8f6] rounded-lg">
+              <CheckCircle2 className="h-5 w-5 text-[#5B7B6A] flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-[#1a1a1a] text-sm">Tutarsızlık tespiti</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Flow - Desktop */}
+      <section className="desktop-only py-16 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-white to-[#FAFAF8]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#1a1a1a] mb-4">Pratikte Nasıl Çalışır?</h2>
@@ -337,8 +599,58 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6 sm:px-8 lg:px-12">
+      {/* How It Works Flow - Mobile */}
+      <section className="mobile-only py-10 px-4 bg-gradient-to-b from-white to-[#FAFAF8]">
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-bold text-[#1a1a1a] mb-2">Pratikte Nasıl Çalışır?</h2>
+          <p className="text-sm text-[#666]">Link gönder, gerisini biz halledelim</p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-[#eee] shadow-sm">
+            <div className="h-10 w-10 rounded-lg bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              1
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-[#1a1a1a] text-sm">Link gönderin</h3>
+              <p className="text-xs text-[#666]">Tek tıklama ile başlar</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-[#eee] shadow-sm">
+            <div className="h-10 w-10 rounded-lg bg-[#D4856A] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              2
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-[#1a1a1a] text-sm">AQE sorular sorar</h3>
+              <p className="text-xs text-[#666]">Kişiye özel, sıkılmadan</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-[#eee] shadow-sm">
+            <div className="h-10 w-10 rounded-lg bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              3
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-[#1a1a1a] text-sm">HAE analiz yapar</h3>
+              <p className="text-xs text-[#666]">Algoritma + AI doğrulaması</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#5B7B6A]/10 to-[#D4856A]/10 rounded-xl border border-[#5B7B6A]/20">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#1a1a1a] to-[#333] flex items-center justify-center text-white flex-shrink-0">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-[#1a1a1a] text-sm">Rapor hazır</h3>
+              <p className="text-xs text-[#666]">Karakter analizi + yol haritası</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Desktop */}
+      <section className="desktop-only py-20 px-6 sm:px-8 lg:px-12">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1a1a] mb-6">
             İlk analiziniz bizden hediye
@@ -356,8 +668,27 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-[#eee]">
+      {/* CTA Section - Mobile */}
+      <section className="mobile-only py-12 px-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-3">
+            İlk analiziniz bizden hediye
+          </h2>
+          <p className="text-sm text-[#666] mb-6 px-2">
+            Hiçbir ödeme bilgisi gerekmez. Hemen deneyin, farkı görün.
+          </p>
+          <Link
+            href="/auth/register"
+            className="inline-flex items-center justify-center gap-2 w-full max-w-xs px-6 py-3.5 bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white rounded-xl font-semibold active:scale-[0.98] transition-transform touch-manipulation"
+          >
+            <span>Ücretsiz Başla</span>
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer - Desktop */}
+      <footer className="desktop-only py-8 px-6 border-t border-[#eee]">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-[#999]">© 2026 OrbiraMind. Tüm hakları saklıdır.</p>
           <div className="flex items-center gap-6">
@@ -368,6 +699,22 @@ export default function HowItWorksPage() {
               Kullanım Koşulları
             </Link>
           </div>
+        </div>
+      </footer>
+
+      {/* Footer - Mobile */}
+      <footer className="mobile-only py-6 px-4 border-t border-[#eee] pb-safe">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="text-sm text-[#666] active:text-[#1a1a1a] transition-colors touch-manipulation">
+              Gizlilik
+            </Link>
+            <span className="text-[#ccc]">·</span>
+            <Link href="/terms" className="text-sm text-[#666] active:text-[#1a1a1a] transition-colors touch-manipulation">
+              Kullanım Koşulları
+            </Link>
+          </div>
+          <p className="text-xs text-[#999]">© 2026 OrbiraMind. Tüm hakları saklıdır.</p>
         </div>
       </footer>
     </div>

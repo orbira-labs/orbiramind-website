@@ -83,39 +83,68 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
       <SendTestModal open={showSendModal} onClose={() => setShowSendModal(false)} onSent={handleTestSent} />
       <AppointmentReminderPopup notification={appointmentPopup} onDismiss={dismissAppointmentPopup} />
       <AnalysisReadyPopup notification={analysisPopup} onDismiss={dismissAnalysisPopup} />
-      <header className="h-auto min-h-[64px] border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-30">
-        {showGreeting ? (
-          <h1 className="text-lg font-semibold text-[#3D5A4C]">
-            {getGreeting()}{professional?.first_name ? `, ${professional.first_name}` : ""}
-          </h1>
-        ) : (
-          <h1 className="text-lg font-semibold text-[#3D5A4C]">{title}</h1>
-        )}
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Danışan Kaydet button - only on dashboard */}
-          {showGreeting && (
-            <button
-              onClick={() => router.push("/clients?new=true")}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4856A] hover:bg-[#C97B5D] text-white text-sm font-medium transition-all shadow-sm hover:shadow-md"
-            >
-              <span className="hidden sm:inline">Danışan Kaydet</span>
-              <span className="sm:hidden">+</span>
-            </button>
+      
+      <header className="sticky top-0 z-30">
+        {/* Desktop Header */}
+        <div className="hidden md:flex h-16 border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] items-center justify-between px-6 lg:px-8">
+          {showGreeting ? (
+            <h1 className="text-lg font-semibold text-[#3D5A4C]">
+              {getGreeting()}{professional?.first_name ? `, ${professional.first_name}` : ""}
+            </h1>
+          ) : (
+            <h1 className="text-lg font-semibold text-[#3D5A4C]">{title}</h1>
           )}
 
-          {/* Bildirimler */}
-          <NotificationCenter
-            notifications={notifications}
-            onMarkAsRead={markAsRead}
-            onMarkAllAsRead={markAllAsRead}
-            onNotificationClick={handleNotificationClick}
-            onOpen={triggerLoad}
-            triggerClassName="text-[#6B8F7B] hover:bg-white/60 hover:text-[#3D5A4C]"
-          />
+          <div className="flex items-center gap-3">
+            {showGreeting && (
+              <button
+                onClick={() => router.push("/clients?new=true")}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4856A] hover:bg-[#C97B5D] text-white text-sm font-medium transition-all shadow-sm hover:shadow-md"
+              >
+                Danışan Kaydet
+              </button>
+            )}
 
-          {/* Mobil Avatar */}
-          <div className="lg:hidden">
+            <NotificationCenter
+              notifications={notifications}
+              onMarkAsRead={markAsRead}
+              onMarkAllAsRead={markAllAsRead}
+              onNotificationClick={handleNotificationClick}
+              onOpen={triggerLoad}
+              triggerClassName="text-[#6B8F7B] hover:bg-white/60 hover:text-[#3D5A4C]"
+            />
+          </div>
+        </div>
+
+        {/* Mobile Header */}
+        <div className="flex md:hidden h-14 border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] items-center justify-between px-4 pt-[env(safe-area-inset-top)]">
+          {showGreeting ? (
+            <h1 className="text-base font-semibold text-[#3D5A4C] truncate max-w-[180px]">
+              {getGreeting()}{professional?.first_name ? `, ${professional.first_name}` : ""}
+            </h1>
+          ) : (
+            <h1 className="text-base font-semibold text-[#3D5A4C] truncate max-w-[200px]">{title}</h1>
+          )}
+
+          <div className="flex items-center gap-2">
+            {showGreeting && (
+              <button
+                onClick={() => router.push("/clients?new=true")}
+                className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#D4856A] active:bg-[#C97B5D] text-white text-lg font-medium transition-colors"
+              >
+                +
+              </button>
+            )}
+
+            <NotificationCenter
+              notifications={notifications}
+              onMarkAsRead={markAsRead}
+              onMarkAllAsRead={markAllAsRead}
+              onNotificationClick={handleNotificationClick}
+              onOpen={triggerLoad}
+              triggerClassName="w-9 h-9 text-[#6B8F7B] active:bg-white/60 active:text-[#3D5A4C]"
+            />
+
             <Avatar
               firstName={professional?.first_name || "U"}
               lastName={professional?.last_name || ""}

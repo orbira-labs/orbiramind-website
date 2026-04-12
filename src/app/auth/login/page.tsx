@@ -90,7 +90,7 @@ export default function LoginPage() {
         {mode === "choice" && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+              <h1 className="text-2xl md:text-[28px] font-semibold text-pro-text">
                 Hoş geldiniz
               </h1>
               <p className="mt-1.5 text-[15px] text-pro-text-secondary leading-relaxed">
@@ -101,10 +101,10 @@ export default function LoginPage() {
             <div className="space-y-3">
               <button
                 onClick={() => setMode("login")}
-                className="w-full flex items-center gap-4 p-5 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] rounded-2xl shadow-lg shadow-[#5B7B6A]/20 hover:shadow-xl hover:shadow-[#5B7B6A]/30 transition-all text-left group"
+                className="w-full flex items-center gap-4 p-4 md:p-5 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] rounded-2xl shadow-lg shadow-[#5B7B6A]/20 hover:shadow-xl hover:shadow-[#5B7B6A]/30 transition-all text-left group touch-manipulation"
               >
-                <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition-colors">
-                  <LogIn className="h-6 w-6 text-white" />
+                <div className="h-11 w-11 md:h-12 md:w-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition-colors">
+                  <LogIn className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div>
                   <p className="text-[15px] font-semibold text-white">Uzman Girişi</p>
@@ -116,10 +116,10 @@ export default function LoginPage() {
 
               <button
                 onClick={() => setMode("test_code")}
-                className="w-full flex items-center gap-4 p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-[#C8745E]/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group"
+                className="w-full flex items-center gap-4 p-4 md:p-5 bg-pro-surface rounded-2xl border border-pro-border shadow-[var(--pro-shadow-md)] hover:border-[#C8745E]/40 hover:shadow-[var(--pro-shadow-lg)] transition-all text-left group touch-manipulation"
               >
-                <div className="h-12 w-12 rounded-xl bg-[#C8745E]/10 flex items-center justify-center shrink-0 group-hover:bg-[#C8745E]/20 transition-colors">
-                  <ClipboardList className="h-6 w-6 text-[#C8745E]" />
+                <div className="h-11 w-11 md:h-12 md:w-12 rounded-xl bg-[#C8745E]/10 flex items-center justify-center shrink-0 group-hover:bg-[#C8745E]/20 transition-colors">
+                  <ClipboardList className="h-5 w-5 md:h-6 md:w-6 text-[#C8745E]" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -154,12 +154,12 @@ export default function LoginPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMode("choice")}
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors"
+                className="h-10 w-10 md:h-8 md:w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors touch-manipulation"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+                <h1 className="text-2xl md:text-[28px] font-semibold text-pro-text">
                   Test Kodunu Gir
                 </h1>
                 <p className="mt-0.5 text-[15px] text-pro-text-secondary leading-relaxed">
@@ -168,9 +168,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
+            <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
               <form onSubmit={handleTestCodeSubmit} className="space-y-4">
-                <div>
+                <div className="mobile-form-group md:block">
                   <label className="block text-sm font-medium text-pro-text mb-1.5">
                     Test Kodu
                   </label>
@@ -181,10 +181,10 @@ export default function LoginPage() {
                     placeholder="Örn: abc123def456"
                     autoComplete="off"
                     autoFocus
-                    className="w-full px-4 py-2.5 rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary font-mono tracking-wide"
+                    className="mobile-input md:w-full md:min-h-0 md:px-4 md:py-2.5 md:rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary font-mono tracking-wide"
                   />
                 </div>
-                <Button type="submit" fullWidth size="lg" disabled={!testCode.trim()}>
+                <Button type="submit" fullWidth size="lg" disabled={!testCode.trim()} className="mobile-btn md:w-full">
                   <ClipboardList className="h-4 w-4" />
                   Teste Başla
                 </Button>
@@ -198,12 +198,12 @@ export default function LoginPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMode("choice")}
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors"
+                className="h-10 w-10 md:h-8 md:w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors touch-manipulation"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+                <h1 className="text-2xl md:text-[28px] font-semibold text-pro-text">
                   Tekrar hoş geldiniz
                 </h1>
                 <p className="mt-0.5 text-[15px] text-pro-text-secondary leading-relaxed">
@@ -212,26 +212,32 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
+            <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Input
-                  label="Email"
-                  type="email"
-                  placeholder="ornek@email.com"
-                  autoComplete="email"
-                  error={errors.email?.message}
-                  {...register("email")}
-                />
-                <Input
-                  label="Şifre"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  error={errors.password?.message}
-                  {...register("password")}
-                />
+                <div className="mobile-form-group md:block">
+                  <Input
+                    label="Email"
+                    type="email"
+                    placeholder="ornek@email.com"
+                    autoComplete="email"
+                    error={errors.email?.message}
+                    className="mobile-input md:w-full md:min-h-0"
+                    {...register("email")}
+                  />
+                </div>
+                <div className="mobile-form-group md:block">
+                  <Input
+                    label="Şifre"
+                    type="password"
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    error={errors.password?.message}
+                    className="mobile-input md:w-full md:min-h-0"
+                    {...register("password")}
+                  />
+                </div>
 
-                <Button type="submit" fullWidth loading={loading} size="lg">
+                <Button type="submit" fullWidth loading={loading} size="lg" className="mobile-btn md:w-full">
                   <LogIn className="h-4 w-4" />
                   Giriş Yap
                 </Button>

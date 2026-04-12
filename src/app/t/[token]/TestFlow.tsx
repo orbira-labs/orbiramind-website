@@ -625,8 +625,59 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
           : "bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC]"
       )}
     >
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-white/50 pt-safe">
+      {/* ========== MOBILE HEADER ========== */}
+      <div className="md:hidden sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-100/50 pt-safe">
+        <div className="px-3 py-2">
+          {/* Compact mobile header row */}
+          <div className="flex items-center gap-2 mb-1.5">
+            <button
+              onClick={goPrev}
+              disabled={currentIndex === 0}
+              className={clsx(
+                "p-1.5 -ml-1 rounded-lg transition-all touch-manipulation",
+                currentIndex === 0
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-600 active:bg-gray-100 active:scale-95"
+              )}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="flex-1 flex items-center justify-center gap-1.5">
+              <span className="text-[10px] font-semibold text-[#5B7B6A] bg-[#5B7B6A]/10 px-2 py-0.5 rounded-full">
+                {progress.label}
+              </span>
+              {(phase === "core" && dimensionLabel) && (
+                <span className={clsx("text-[10px] font-medium px-1.5 py-0.5 rounded-full", currentTheme?.badge, currentTheme?.badgeText)}>
+                  {dimensionLabel}
+                </span>
+              )}
+              {(phase === "deep_dive" && poolLabel) && (
+                <span className={clsx("text-[10px] font-medium px-1.5 py-0.5 rounded-full", currentTheme?.badge, currentTheme?.badgeText)}>
+                  {poolLabel}
+                </span>
+              )}
+            </div>
+
+            <span className="text-[11px] text-gray-500 font-semibold tabular-nums min-w-[40px] text-right">
+              {currentIndex + 1}/{totalPages}
+            </span>
+          </div>
+
+          {/* Thin mobile progress bar */}
+          <div className="h-1 bg-gray-200/60 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-[#5B7B6A] to-[#7A9A8A]"
+              initial={false}
+              animate={{ width: `${progress.subProgress}%` }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ========== DESKTOP HEADER ========== */}
+      <div className="hidden md:block sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-white/50 pt-safe">
         <div className="max-w-xl mx-auto px-4 py-3">
           {/* Back button and progress */}
           <div className="flex items-center gap-3 mb-3">

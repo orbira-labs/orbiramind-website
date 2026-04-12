@@ -28,11 +28,17 @@ export function ProShell({
       <div className="flex h-screen overflow-hidden bg-[var(--background)] relative">
         <PageDecoration />
         <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 relative z-[1] overflow-y-auto">
+        
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 relative z-[1] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+          {/* Mobile safe-area top padding handled by TopBar */}
           {children}
           <TrustFooter showBadges={false} showDate={true} />
-          <div className="h-20 lg:hidden" />
+          
+          {/* Mobile bottom spacer for BottomNav + safe area */}
+          <div className="h-20 pb-[env(safe-area-inset-bottom)] lg:hidden" />
         </div>
+        
         <BottomNav />
       </div>
     </ProProvider>

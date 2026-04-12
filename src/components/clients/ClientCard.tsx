@@ -33,7 +33,7 @@ interface ClientCardProps {
   lastContactAt?: string;
   onSendAnalysis?: () => void;
   onScheduleAppointment?: () => void;
-  viewMode?: "card" | "row";
+  viewMode?: "card" | "row" | "mobile";
   rowActions?: RowActionsCallbacks;
 }
 
@@ -55,6 +55,50 @@ export function ClientCard({
 
   const needsAttention = daysSinceContact !== null && daysSinceContact > 14;
 
+  /* ============================================================
+     MOBILE VIEW - Kompakt liste item görünümü
+     ============================================================ */
+  if (viewMode === "mobile") {
+    return (
+      <Link href={`/clients/${client.id}`} className="mobile-list-item touch-manipulation">
+        <Avatar firstName={client.first_name} lastName={client.last_name} size="md" />
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-pro-text truncate">
+              {client.first_name} {client.last_name}
+            </p>
+            {needsAttention && (
+              <div className="h-4 w-4 rounded-full bg-pro-warning-light flex items-center justify-center shrink-0">
+                <AlertCircle className="h-2.5 w-2.5 text-pro-warning" />
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2 mt-0.5">
+            <Badge 
+              variant={(statusInfo?.color as "success" | "warning" | "muted") || "muted"} 
+              size="sm"
+              dot
+            >
+              {statusInfo?.label || client.status}
+            </Badge>
+            {analysisInfo?.status === "completed" && (
+              <Badge variant="success" size="sm">Rapor</Badge>
+            )}
+            {analysisInfo?.status === "pending" && (
+              <Badge variant="warning" size="sm">Bekliyor</Badge>
+            )}
+          </div>
+        </div>
+        
+        <ChevronRight className="h-5 w-5 text-pro-text-tertiary shrink-0" />
+      </Link>
+    );
+  }
+
+  /* ============================================================
+     DESKTOP ROW VIEW - Mevcut row görünümü (değiştirilmedi)
+     ============================================================ */
   if (viewMode === "row") {
     if (rowActions) {
       return (
@@ -181,6 +225,9 @@ export function ClientCard({
     );
   }
 
+  /* ============================================================
+     DESKTOP CARD VIEW - Mevcut kart görünümü (değiştirilmedi)
+     ============================================================ */
   return (
     <Link href={`/clients/${client.id}`}>
       <Card hover padding="md" className="group h-full">

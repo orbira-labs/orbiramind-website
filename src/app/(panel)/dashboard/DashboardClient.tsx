@@ -217,7 +217,8 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         onClose={() => setShowSendTestModal(false)}
         onSent={refresh}
       />
-      <main className="flex-1 p-3 sm:p-5 lg:p-6">
+      {/* Desktop Layout */}
+      <main className="desktop-only flex-1 p-5 lg:p-6">
         <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="space-y-4">
             <QuickStats stats={statCards} loading={loading} />
@@ -419,6 +420,212 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                 )}
               </Card>
             </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Mobile Layout */}
+      <main className="mobile-only flex-1 p-3 pb-safe">
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="space-y-4">
+            <QuickStats stats={statCards} loading={loading} />
+
+            {/* Yaklaşan Randevular - Mobile */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-pro-text text-sm">
+                  Yaklaşan Randevular
+                </h3>
+                <button
+                  onClick={() => setShowAppointmentModal(true)}
+                  className="flex items-center gap-1 text-xs text-pro-primary font-semibold touch-target touch-manipulation"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Oluştur
+                </button>
+              </div>
+              {loading ? (
+                <div className="space-y-2">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="mobile-card flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : upcomingAppointments.length === 0 ? (
+                <div className="mobile-empty-state py-8">
+                  <div className="h-12 w-12 rounded-xl bg-pro-primary-light flex items-center justify-center mb-3">
+                    <Calendar className="h-5 w-5 text-pro-primary" />
+                  </div>
+                  <p className="text-sm font-medium text-pro-text">Takviminiz boş</p>
+                  <p className="text-xs text-pro-text-tertiary mt-0.5">Yeni randevu oluşturun</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {upcomingAppointments.slice(0, 3).map((apt) => (
+                    <button
+                      key={apt.id}
+                      onClick={() =>
+                        setSelectedApt({
+                          id: apt.id,
+                          client_id: apt.client_id,
+                          starts_at: apt.starts_at,
+                          duration_minutes: apt.duration_minutes,
+                          note: apt.note ?? null,
+                          status: apt.status ?? "scheduled",
+                          client: apt.client,
+                        })
+                      }
+                      className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface w-full text-left active:bg-pro-surface-alt touch-manipulation"
+                    >
+                      <Avatar
+                        firstName={apt.client?.first_name || "?"}
+                        lastName={apt.client?.last_name || ""}
+                        size="sm"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-pro-text line-clamp-1">
+                          {apt.client?.first_name} {apt.client?.last_name}
+                        </p>
+                        <p className="text-xs text-pro-text-tertiary">
+                          {formatDayLabel(apt.starts_at)}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-semibold text-pro-text">
+                          {formatTime(apt.starts_at)}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Bekleyen Analizler - Mobile */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-pro-text text-sm">
+                  Bekleyen Analizler
+                </h3>
+                <button
+                  onClick={() => setShowSendTestModal(true)}
+                  className="flex items-center gap-1 text-xs text-[#D4856A] font-semibold touch-target touch-manipulation"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Gönder
+                </button>
+              </div>
+              {loading ? (
+                <div className="space-y-2">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="mobile-card flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : pendingTests.length === 0 ? (
+                <div className="mobile-empty-state py-8">
+                  <div className="h-12 w-12 rounded-xl bg-pro-success-light flex items-center justify-center mb-3">
+                    <Check className="h-5 w-5 text-pro-success" />
+                  </div>
+                  <p className="text-sm font-medium text-pro-text">Bekleyen analiz yok</p>
+                  <p className="text-xs text-pro-text-tertiary mt-0.5">Tüm testler tamamlandı</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {pendingTests.slice(0, 3).map((test) => {
+                    const s = STATUS_MAP[test.status] || STATUS_MAP.sent;
+                    const canViewResults = test.status === "completed" || test.status === "reviewed";
+                    const isPending =
+                      test.status !== "completed" &&
+                      test.status !== "reviewed" &&
+                      test.status !== "expired";
+                    const profName = professional
+                      ? `${professional.first_name} ${professional.last_name}`
+                      : "";
+
+                    return (
+                      <button
+                        key={test.id}
+                        onClick={() =>
+                          setSelectedAnalysis({
+                            id: test.id,
+                            token: test.token,
+                            status: test.status,
+                            created_at: test.created_at,
+                            started_at: test.started_at,
+                            completed_at: test.completed_at,
+                            client: test.client,
+                          })
+                        }
+                        className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface w-full text-left active:bg-pro-surface-alt touch-manipulation"
+                      >
+                        <Avatar
+                          firstName={test.client?.first_name || "?"}
+                          lastName={test.client?.last_name || ""}
+                          size="sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-pro-text line-clamp-1">
+                            {test.client?.first_name} {test.client?.last_name}
+                          </p>
+                          <p className="text-xs text-pro-text-tertiary">
+                            {formatRelative(test.created_at)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant={s.variant} size="sm" dot>
+                            {s.label}
+                          </Badge>
+                          {canViewResults && (
+                            <span className="p-1.5 rounded-lg text-pro-primary">
+                              <Eye className="h-4 w-4" />
+                            </span>
+                          )}
+                          {isPending && (
+                            <div className="relative">
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShareOpenId(
+                                    shareOpenId === test.id ? null : test.id
+                                  );
+                                }}
+                                className="p-1.5 rounded-lg text-pro-text-tertiary active:text-pro-primary active:bg-pro-primary-light touch-manipulation"
+                              >
+                                <Share2 className="h-4 w-4" />
+                              </span>
+                              {shareOpenId === test.id && (
+                                <SharePopover
+                                  testToken={test.token}
+                                  clientName={test.client?.first_name || ""}
+                                  professionalName={profName}
+                                  onClose={() => setShareOpenId(null)}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+
+            {/* Notes - Mobile */}
+            <section>
+              <NotesCard />
+            </section>
           </div>
         </div>
       </main>

@@ -12,8 +12,10 @@ import { CreateAppointmentModal } from "@/components/appointments";
 import { AppointmentDetailModal, type AppointmentSlim } from "@/components/appointments/AppointmentDetailModal";
 import { EditAppointmentModal } from "@/components/appointments/EditAppointmentModal";
 import { AppointmentCalendar } from "@/components/appointments/AppointmentCalendar";
-import { Calendar, Plus, Clock, CalendarDays, List, Loader2 } from "lucide-react";
+import { Calendar, Plus, Clock, CalendarDays, List, Loader2, ChevronRight } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 import { clsx } from "clsx";
 
 type ViewMode = "calendar" | "list";
@@ -53,7 +55,11 @@ export default function AppointmentsPage() {
         onClose={() => setEditApt(null)}
         onUpdated={() => { setEditApt(null); refresh(); }}
       />
-      <main className="flex-1 min-h-0 flex flex-col p-3 sm:p-5 lg:p-6 bg-[#FAFAF7]">
+
+      {/* ══════════════════════════════════════════════════════════
+          DESKTOP VIEW - Takvim grid görünümü
+          ══════════════════════════════════════════════════════════ */}
+      <main className="desktop-only flex-1 min-h-0 flex flex-col p-3 sm:p-5 lg:p-6 bg-[#FAFAF7]">
         <div className="w-full mx-auto max-w-6xl flex-1 min-h-0 flex flex-col">
           <div className="flex-1 min-h-0 flex flex-col">
             {/* Page Header */}
@@ -232,6 +238,160 @@ export default function AppointmentsPage() {
             )}
           </div>
         </div>
+      </main>
+
+      {/* ══════════════════════════════════════════════════════════
+          MOBILE VIEW - Liste görünümü ve kompakt takvim
+          ══════════════════════════════════════════════════════════ */}
+      <main className="mobile-only flex-1 min-h-0 flex flex-col bg-[#FAFAF7]">
+        {/* Mobile Header */}
+        <div className="mobile-section-header bg-[#FAFAF7]">
+          <h1 className="text-lg font-bold text-pro-text flex items-center gap-2">
+            <span className="h-4 w-1 rounded-full bg-[var(--pro-appointment)]" />
+            Randevular
+          </h1>
+        </div>
+
+        {/* Mobile Filter Chips */}
+        <div className="px-4 pb-3">
+          <div className="mobile-scroll-snap gap-2 pb-1">
+            {(["upcoming", "past", "all"] as Filter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={clsx(
+                  "mobile-chip touch-manipulation",
+                  filter === f && "mobile-chip-active"
+                )}
+              >
+                {f === "upcoming" ? `Yaklaşan (${counts.upcoming})` : f === "past" ? `Geçmiş (${counts.past})` : `Tümü (${counts.total})`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          {loading ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="mobile-card flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-5" />
+                </div>
+              ))}
+            </div>
+          ) : appointments.length === 0 ? (
+            <div className="mobile-empty-state">
+              <div className="h-16 w-16 rounded-full bg-pro-appointment-light flex items-center justify-center mb-4">
+                <Calendar className="h-8 w-8 text-pro-appointment" />
+              </div>
+              <h3 className="text-base font-semibold text-pro-text mb-1">Randevu yok</h3>
+              <p className="text-sm text-pro-text-secondary mb-4">
+                {filter === "upcoming"
+                  ? "Yaklaşan randevunuz bulunmuyor"
+                  : "Randevu kaydınız bulunmuyor"}
+              </p>
+              <button
+                onClick={() => handleCreateAppointment()}
+                className="mobile-btn bg-pro-primary text-white"
+              >
+                <Plus className="h-5 w-5" />
+                Randevu Ekle
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {appointments.map((apt) => {
+                const dateObj = new Date(apt.starts_at);
+                const dayNumber = format(dateObj, "d", { locale: tr });
+                const monthShort = format(dateObj, "MMM", { locale: tr });
+                const timeLabel = format(dateObj, "HH:mm", { locale: tr });
+                
+                return (
+                  <button
+                    key={apt.id}
+                    type="button"
+                    onClick={() => setSelectedApt(apt as AppointmentSlim)}
+                    className="mobile-card w-full flex items-center gap-3 touch-manipulation active:scale-[0.98] transition-transform"
+                  >
+                    {/* Date Badge */}
+                    <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-pro-appointment-light">
+                      <span className="text-sm font-bold text-pro-appointment leading-none">{dayNumber}</span>
+                      <span className="text-[10px] font-medium text-pro-appointment/70 uppercase">{monthShort}</span>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-sm font-semibold text-pro-text truncate">
+                        {apt.client?.first_name} {apt.client?.last_name}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-pro-text-secondary flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {timeLabel}
+                        </span>
+                        <span className="text-xs text-pro-text-tertiary">·</span>
+                        <span className="text-xs text-pro-text-tertiary">{apt.duration_minutes} dk</span>
+                      </div>
+                    </div>
+                    
+                    {/* Status & Arrow */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge
+                        variant={
+                          apt.status === "completed"
+                            ? "success"
+                            : apt.status === "cancelled"
+                              ? "danger"
+                              : "info"
+                        }
+                        size="sm"
+                      >
+                        {apt.status === "scheduled"
+                          ? "Planlandı"
+                          : apt.status === "completed"
+                            ? "Tamamlandı"
+                            : "İptal"}
+                      </Badge>
+                      <ChevronRight className="h-4 w-4 text-pro-text-tertiary" />
+                    </div>
+                  </button>
+                );
+              })}
+              
+              {/* Load More Button */}
+              {hasMore && (
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="w-full py-4 text-sm font-medium text-pro-text-secondary flex items-center justify-center gap-2 disabled:opacity-50 touch-manipulation"
+                >
+                  {loadingMore ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Yükleniyor...
+                    </>
+                  ) : (
+                    "Daha Fazla Yükle"
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile FAB */}
+        <button
+          onClick={() => handleCreateAppointment()}
+          className="mobile-fab bg-pro-primary text-white touch-manipulation active:scale-95 transition-transform"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
       </main>
     </>
   );

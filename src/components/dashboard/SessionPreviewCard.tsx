@@ -50,13 +50,13 @@ function getTimeUntil(dateString: string): string {
   return `${Math.floor(diffMins / 1440)} gün`;
 }
 
-export function SessionPreviewCard({ session, onViewSummary }: SessionPreviewCardProps) {
+function DesktopSessionPreviewCard({ session }: SessionPreviewCardProps) {
   const timeUntil = getTimeUntil(session.startsAt);
   const isToday = new Date(session.startsAt).toDateString() === new Date().toDateString();
   const isSoon = isToday && parseInt(timeUntil) < 60;
 
   return (
-    <motion.div variants={cardReveal}>
+    <motion.div variants={cardReveal} className="desktop-only">
       <Card 
         variant="elevated" 
         padding="lg"
@@ -148,5 +148,75 @@ export function SessionPreviewCard({ session, onViewSummary }: SessionPreviewCar
         </div>
       </Card>
     </motion.div>
+  );
+}
+
+function MobileSessionPreviewCard({ session }: SessionPreviewCardProps) {
+  const timeUntil = getTimeUntil(session.startsAt);
+  const isToday = new Date(session.startsAt).toDateString() === new Date().toDateString();
+  const isSoon = isToday && parseInt(timeUntil) < 60;
+
+  return (
+    <div className="mobile-only">
+      <Link href="/appointments">
+        <div 
+          className={`mobile-card p-3 active:scale-[0.98] transition-transform touch-manipulation ${
+            isSoon ? "border-pro-warning/40 bg-gradient-to-br from-pro-warning-light/30 to-pro-surface" : ""
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <Avatar
+              firstName={session.clientFirstName}
+              lastName={session.clientLastName}
+              size="md"
+            />
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-pro-text line-clamp-1">
+                  {session.clientName}
+                </p>
+                {isSoon && (
+                  <Badge variant="warning" size="sm">Yaklaşıyor</Badge>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-3 mt-1 text-xs text-pro-text-secondary">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-pro-text-tertiary" />
+                  <span>{formatTime(session.startsAt)}</span>
+                </div>
+                <span className="text-pro-warning font-medium">{timeUntil} sonra</span>
+              </div>
+            </div>
+            
+            <ChevronRight className="h-5 w-5 text-pro-text-tertiary shrink-0" />
+          </div>
+
+          {!session.hasRecentAnalysis && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-pro-warning">
+              <AlertTriangle className="h-3 w-3" />
+              <span>Analiz önerilir</span>
+            </div>
+          )}
+
+          {session.hasRecentAnalysis && session.analysisHighlights && session.analysisHighlights.length > 0 && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-pro-text-secondary">
+              <FileText className="h-3 w-3 text-[var(--pro-analysis)]" />
+              <span className="line-clamp-1">{session.analysisHighlights[0]}</span>
+            </div>
+          )}
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+export function SessionPreviewCard(props: SessionPreviewCardProps) {
+  return (
+    <>
+      <DesktopSessionPreviewCard {...props} />
+      <MobileSessionPreviewCard {...props} />
+    </>
   );
 }

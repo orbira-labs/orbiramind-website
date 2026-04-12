@@ -63,47 +63,56 @@ export default function RegisterPage() {
     <AuthLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+          <h1 className="text-2xl md:text-[28px] font-semibold text-pro-text">
             Yolculuğunuz burada başlıyor
           </h1>
           <p className="mt-1.5 text-[15px] text-pro-text-secondary leading-relaxed">
-            Danışanlarınızın karakterini analiz edin,<br className="hidden sm:block" />
+            Danışanlarınızın karakterini analiz edin,<br className="hidden md:block" />
             daha derin bir anlayışla yönlendirin.
           </p>
         </div>
 
-        <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
+        <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input
-              label="Email"
-              type="email"
-              placeholder="ornek@email.com"
-              autoComplete="email"
-              error={errors.email?.message}
-              {...reg("email")}
-            />
-            <Input
-              label="Şifre"
-              type="password"
-              placeholder="En az 8 karakter"
-              autoComplete="new-password"
-              error={errors.password?.message}
-              {...reg("password")}
-            />
-            <Input
-              label="Şifre Tekrar"
-              type="password"
-              placeholder="Şifrenizi tekrar girin"
-              autoComplete="new-password"
-              error={errors.confirmPassword?.message}
-              {...reg("confirmPassword")}
-            />
+            <div className="mobile-form-group md:block">
+              <Input
+                label="Email"
+                type="email"
+                placeholder="ornek@email.com"
+                autoComplete="email"
+                error={errors.email?.message}
+                className="mobile-input md:w-full md:min-h-0"
+                {...reg("email")}
+              />
+            </div>
+            <div className="mobile-form-group md:block">
+              <Input
+                label="Şifre"
+                type="password"
+                placeholder="En az 8 karakter"
+                autoComplete="new-password"
+                error={errors.password?.message}
+                className="mobile-input md:w-full md:min-h-0"
+                {...reg("password")}
+              />
+            </div>
+            <div className="mobile-form-group md:block">
+              <Input
+                label="Şifre Tekrar"
+                type="password"
+                placeholder="Şifrenizi tekrar girin"
+                autoComplete="new-password"
+                error={errors.confirmPassword?.message}
+                className="mobile-input md:w-full md:min-h-0"
+                {...reg("confirmPassword")}
+              />
+            </div>
 
             <div className="space-y-3 pt-1">
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex items-start gap-3 cursor-pointer touch-manipulation">
                 <input
                   type="checkbox"
-                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  className="mt-0.5 h-5 w-5 md:h-4 md:w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
                   {...reg("kvkk_accepted")}
                 />
                 <span className="text-xs text-pro-text-secondary leading-relaxed">
@@ -119,15 +128,15 @@ export default function RegisterPage() {
                 </span>
               </label>
               {errors.kvkk_accepted?.message && (
-                <p className="text-xs text-pro-danger pl-7">
+                <p className="text-xs text-pro-danger pl-8 md:pl-7">
                   {errors.kvkk_accepted.message}
                 </p>
               )}
 
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex items-start gap-3 cursor-pointer touch-manipulation">
                 <input
                   type="checkbox"
-                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  className="mt-0.5 h-5 w-5 md:h-4 md:w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
                   {...reg("terms_accepted")}
                 />
                 <span className="text-xs text-pro-text-secondary leading-relaxed">
@@ -143,13 +152,13 @@ export default function RegisterPage() {
                 </span>
               </label>
               {errors.terms_accepted?.message && (
-                <p className="text-xs text-pro-danger pl-7">
+                <p className="text-xs text-pro-danger pl-8 md:pl-7">
                   {errors.terms_accepted.message}
                 </p>
               )}
             </div>
 
-            <Button type="submit" fullWidth loading={loading} size="lg">
+            <Button type="submit" fullWidth loading={loading} size="lg" className="mobile-btn md:w-full">
               <Sparkles className="h-4 w-4" />
               Ücretsiz Başla
             </Button>

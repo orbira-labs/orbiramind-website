@@ -122,11 +122,11 @@ function VerifyForm() {
   return (
     <AuthLayout>
       <div className="space-y-6">
-        <div className="text-center lg:text-left">
-          <div className="mx-auto lg:mx-0 h-12 w-12 rounded-2xl bg-pro-primary-light flex items-center justify-center mb-4">
+        <div className="text-center md:text-left">
+          <div className="mx-auto md:mx-0 h-12 w-12 rounded-2xl bg-pro-primary-light flex items-center justify-center mb-4">
             <ShieldCheck className="h-6 w-6 text-pro-primary" />
           </div>
-          <h1 className="text-2xl sm:text-[28px] font-semibold text-pro-text">
+          <h1 className="text-2xl md:text-[28px] font-semibold text-pro-text">
             Neredeyse tamam
           </h1>
           <p className="mt-1.5 text-[15px] text-pro-text-secondary leading-relaxed">
@@ -135,8 +135,8 @@ function VerifyForm() {
           </p>
         </div>
 
-        <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-7 shadow-[var(--pro-shadow-md)]">
-          <div className="flex justify-center gap-2.5 sm:gap-3" onPaste={handlePaste}>
+        <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
+          <div className="flex justify-center gap-2 md:gap-3" onPaste={handlePaste}>
             {code.map((digit, i) => (
               <input
                 key={i}
@@ -147,7 +147,7 @@ function VerifyForm() {
                 value={digit}
                 onChange={(e) => handleChange(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className="w-11 h-14 sm:w-13 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-pro-border bg-[var(--pro-surface-alt)] text-pro-text focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary transition-all"
+                className="w-12 h-14 md:w-13 md:h-16 text-center text-2xl font-bold rounded-xl border-2 border-pro-border bg-[var(--pro-surface-alt)] text-pro-text focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary transition-all touch-manipulation"
               />
             ))}
           </div>
@@ -161,7 +161,7 @@ function VerifyForm() {
             ) : (
               <button
                 onClick={handleResend}
-                className="text-sm text-pro-primary font-medium hover:underline"
+                className="text-sm text-pro-primary font-medium hover:underline touch-manipulation min-h-[44px] flex items-center justify-center mx-auto"
               >
                 Kodu tekrar gönder
               </button>
@@ -171,7 +171,7 @@ function VerifyForm() {
           <Button
             fullWidth
             size="lg"
-            className="mt-6"
+            className="mt-6 mobile-btn md:w-full"
             loading={loading}
             disabled={code.some((d) => !d)}
             onClick={handleVerify}

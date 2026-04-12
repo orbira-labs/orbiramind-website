@@ -5,13 +5,14 @@ import { clsx } from "clsx";
 import { Loader2 } from "lucide-react";
 
 type Variant = "primary" | "secondary" | "accent" | "ghost" | "danger" | "blue" | "orange" | "purple" | "client" | "appointment" | "analysis";
-type Size = "sm" | "md" | "lg";
+type Size = "sm" | "md" | "lg" | "mobile";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   loading?: boolean;
   fullWidth?: boolean;
+  touchTarget?: boolean;
 }
 
 const variantStyles: Record<Variant, string> = {
@@ -43,6 +44,7 @@ const sizeStyles: Record<Size, string> = {
   sm: "px-3.5 py-1.5 text-sm rounded-lg gap-1.5",
   md: "px-4.5 py-2.5 text-sm rounded-xl gap-2",
   lg: "px-6 py-3 text-[15px] rounded-xl gap-2",
+  mobile: "px-4 py-3 text-base rounded-xl gap-2 min-h-[44px]",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -52,6 +54,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size = "md",
       loading = false,
       fullWidth = false,
+      touchTarget = false,
       disabled,
       className,
       children,
@@ -72,6 +75,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variantStyles[variant],
           sizeStyles[size],
           fullWidth && "w-full",
+          touchTarget && "min-h-[44px] min-w-[44px]",
           className
         )}
         {...props}

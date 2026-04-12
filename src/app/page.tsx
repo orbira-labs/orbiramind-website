@@ -59,8 +59,12 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#FAFAF8]">
       <LandingNavbar />
 
-      {/* Hero - Compact & Powerful */}
-      <section className="pt-28 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-8 lg:px-12 relative overflow-hidden">
+      {/* ============================================================
+          HERO SECTION
+          ============================================================ */}
+
+      {/* Desktop Hero */}
+      <section className="desktop-only pt-36 pb-24 px-8 lg:px-12 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-[10%] w-72 h-72 bg-[#5B7B6A]/15 rounded-full blur-3xl animate-pulse" />
@@ -88,7 +92,7 @@ export default function HomePage() {
             </div>
             
             {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1a1a1a] leading-[1.05] tracking-tight mb-6">
+            <h1 className="text-6xl lg:text-7xl font-bold text-[#1a1a1a] leading-[1.05] tracking-tight mb-6">
               Danışanlarınızın
               <br />
               <span className="relative">
@@ -103,17 +107,17 @@ export default function HomePage() {
             </h1>
             
             {/* Subtitle */}
-            <p className="text-xl sm:text-2xl text-[#555] max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="text-2xl text-[#555] max-w-2xl mx-auto mb-10 leading-relaxed">
               <span className="font-semibold text-[#1a1a1a]">HAE & AQE motorları</span> ile bilimsel kişilik analizi.
-              <br className="hidden sm:block" />
+              <br />
               <span className="text-[#D4856A] font-medium">Tek platformda</span> danışan yönetimi ve içgörü raporları.
             </p>
             
             {/* CTA Group */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            <div className="flex flex-row items-center justify-center gap-4 mb-12">
               <Link
                 href="/auth/register"
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white rounded-full font-semibold hover:shadow-2xl hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-300"
+                className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white rounded-full font-semibold hover:shadow-2xl hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-300"
               >
                 <span>Hemen Başla</span>
                 <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-[#D4856A] transition-colors">
@@ -122,7 +126,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/how-it-works"
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1a1a1a] rounded-full font-semibold border-2 border-[#eee] hover:border-[#5B7B6A] hover:shadow-xl transition-all duration-300"
+                className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1a1a1a] rounded-full font-semibold border-2 border-[#eee] hover:border-[#5B7B6A] hover:shadow-xl transition-all duration-300"
               >
                 <div className="h-8 w-8 rounded-full bg-[#5B7B6A]/10 flex items-center justify-center group-hover:bg-[#5B7B6A] transition-colors">
                   <Brain className="h-4 w-4 text-[#5B7B6A] group-hover:text-white transition-colors" />
@@ -146,8 +150,84 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Value Props - Visual Grid */}
-      <section id="features" className="py-20 sm:py-28 px-6 sm:px-8 lg:px-12">
+      {/* Mobile Hero */}
+      <section className="mobile-only pt-24 pb-12 px-5 relative overflow-hidden">
+        {/* Simplified Background for Mobile */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-10 left-0 w-48 h-48 bg-[#5B7B6A]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-0 w-40 h-40 bg-[#D4856A]/15 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="relative">
+          {/* Compact Badge */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-white/50">
+              <div className="flex -space-x-1">
+                <div className="h-5 w-5 rounded-full bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center ring-1 ring-white">
+                  <Brain className="h-2.5 w-2.5 text-white" />
+                </div>
+                <div className="h-5 w-5 rounded-full bg-gradient-to-br from-[#D4856A] to-[#B86B52] flex items-center justify-center ring-1 ring-white">
+                  <Heart className="h-2.5 w-2.5 text-white" />
+                </div>
+              </div>
+              <span className="text-xs font-medium text-[#1a1a1a]">AI Kişilik Analizi</span>
+            </div>
+          </div>
+          
+          {/* Mobile Headline */}
+          <h1 className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-tight mb-4 text-center">
+            Danışanlarınızın
+            <br />
+            <span className="bg-gradient-to-r from-[#5B7B6A] via-[#4A6A59] to-[#D4856A] bg-clip-text text-transparent">
+              İç Dünyasını
+            </span>
+            {" "}Keşfedin
+          </h1>
+          
+          {/* Mobile Subtitle */}
+          <p className="text-base text-[#555] text-center mb-8 leading-relaxed px-2">
+            <span className="font-semibold text-[#1a1a1a]">HAE & AQE</span> ile bilimsel kişilik analizi.
+            <span className="text-[#D4856A] font-medium"> Tek platformda</span> danışan yönetimi.
+          </p>
+          
+          {/* Mobile CTA - Stacked */}
+          <div className="flex flex-col gap-3 mb-8">
+            <Link
+              href="/auth/register"
+              className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white rounded-2xl font-semibold shadow-lg touch-manipulation"
+            >
+              <span>Hemen Başla</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-white text-[#1a1a1a] rounded-2xl font-semibold border border-[#eee] touch-manipulation"
+            >
+              <Brain className="h-4 w-4 text-[#5B7B6A]" />
+              <span>Neden HAE & AQE?</span>
+            </Link>
+          </div>
+          
+          {/* Mobile Trust Badges - Horizontal Scroll */}
+          <div className="flex justify-center gap-3">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#D4856A]/10 rounded-full">
+              <Sparkles className="h-3 w-3 text-[#D4856A]" />
+              <span className="text-xs text-[#D4856A] font-medium">İlk Analiz Hediye!</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#5B7B6A]/10 rounded-full">
+              <Sparkles className="h-3 w-3 text-[#5B7B6A]" />
+              <span className="text-xs text-[#5B7B6A] font-medium">Modern Platform</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FEATURES SECTION
+          ============================================================ */}
+
+      {/* Desktop Features */}
+      <section id="features" className="desktop-only py-28 px-8 lg:px-12">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16">
@@ -155,7 +235,7 @@ export default function HomePage() {
               <Zap className="h-4 w-4 text-[#D4856A]" />
               <span className="text-sm font-semibold text-[#1a1a1a]">Neden OrbiraMind?</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] tracking-tight">
+            <h2 className="text-5xl font-bold text-[#1a1a1a] tracking-tight">
               Fark yaratan <span className="text-[#D4856A]">üç</span> özellik
             </h2>
           </div>
@@ -163,17 +243,17 @@ export default function HomePage() {
           {/* Bento Grid */}
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Main Feature - AI Engine */}
-            <div className="lg:col-span-2 group relative p-8 sm:p-10 bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] rounded-[32px] overflow-hidden">
+            <div className="lg:col-span-2 group relative p-10 bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] rounded-[32px] overflow-hidden">
               <div className="absolute top-0 right-0 w-80 h-80 bg-[#5B7B6A]/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-[#D4856A]/30 transition-colors duration-700" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#D4856A]/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
               
-              <div className="relative grid sm:grid-cols-2 gap-8 items-center">
+              <div className="relative grid grid-cols-2 gap-8 items-center">
                 <div>
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm text-white/90 mb-6">
                     <Brain className="h-4 w-4 text-[#D4856A]" />
                     <span>Orbira Labs Teknolojisi</span>
                   </div>
-                  <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+                  <h3 className="text-4xl font-bold text-white mb-4 leading-tight">
                     HAE & AQE
                     <br />
                     <span className="text-[#D4856A]">Analiz Motorları</span>
@@ -241,16 +321,100 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* For Who - Horizontal Scroll Feel */}
-      <section id="for-who" className="py-20 sm:py-28 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-[#F5F5F3] to-[#FAFAF8]">
+      {/* Mobile Features */}
+      <section id="features-mobile" className="mobile-only py-14 px-5">
+        <div className="max-w-lg mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#5B7B6A]/10 to-[#D4856A]/10 rounded-full mb-4">
+              <Zap className="h-3.5 w-3.5 text-[#D4856A]" />
+              <span className="text-xs font-semibold text-[#1a1a1a]">Neden OrbiraMind?</span>
+            </div>
+            <h2 className="text-2xl font-bold text-[#1a1a1a] tracking-tight">
+              Fark yaratan <span className="text-[#D4856A]">özellikler</span>
+            </h2>
+          </div>
+          
+          {/* Mobile Feature Cards - Horizontal Scroll */}
+          <div className="mobile-scroll-snap gap-4 pb-4 -mx-5 px-5">
+            {/* AI Engine Card */}
+            <div className="min-w-[280px] p-5 bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] rounded-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4856A]/20 rounded-full blur-2xl" />
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-10 w-10 rounded-xl bg-[#D4856A]/20 flex items-center justify-center">
+                    <Brain className="h-5 w-5 text-[#D4856A]" />
+                  </div>
+                  <span className="text-xs text-white/70">Orbira Labs</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">HAE & AQE</h3>
+                <p className="text-sm text-white/60 mb-4">Bilimsel kişilik analizi motorları</p>
+                <div className="flex gap-1.5">
+                  {["16 Tip", "Duygusal Zeka", "Stres"].map((tag) => (
+                    <span key={tag} className="px-2 py-1 bg-white/10 rounded-full text-[10px] text-white/80">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Accuracy Card */}
+            <div className="min-w-[160px] p-5 bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] rounded-2xl text-white">
+              <TrendingUp className="h-8 w-8 text-white/80 mb-3" />
+              <div className="text-3xl font-bold mb-1">%88</div>
+              <p className="text-sm text-white/80">Doğruluk</p>
+            </div>
+
+            {/* Portfolio Card */}
+            <div className="min-w-[200px] p-5 bg-white rounded-2xl border border-[#eee]">
+              <div className="h-10 w-10 rounded-xl bg-[#D4856A]/10 flex items-center justify-center mb-3">
+                <Users className="h-5 w-5 text-[#D4856A]" />
+              </div>
+              <h3 className="text-base font-bold text-[#1a1a1a] mb-1">Danışan Portföyü</h3>
+              <p className="text-sm text-[#666]">Profiller, notlar, seanslar</p>
+            </div>
+
+            {/* Reports Card */}
+            <div className="min-w-[200px] p-5 bg-white rounded-2xl border border-[#eee]">
+              <div className="h-10 w-10 rounded-xl bg-[#5B7B6A]/10 flex items-center justify-center mb-3">
+                <BarChart3 className="h-5 w-5 text-[#5B7B6A]" />
+              </div>
+              <h3 className="text-base font-bold text-[#1a1a1a] mb-1">İçgörü Raporları</h3>
+              <p className="text-sm text-[#666]">Görsel ve anlaşılır</p>
+            </div>
+
+            {/* Minimal Card */}
+            <div className="min-w-[200px] p-5 bg-white rounded-2xl border border-[#eee] mr-5">
+              <div className="h-10 w-10 rounded-xl bg-[#E8D5B7] flex items-center justify-center mb-3">
+                <Palette className="h-5 w-5 text-[#8B6914]" />
+              </div>
+              <h3 className="text-base font-bold text-[#1a1a1a] mb-1">Minimal Arayüz</h3>
+              <p className="text-sm text-[#666]">Huzurlu tasarım</p>
+            </div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="flex justify-center gap-1.5 mt-4">
+            <div className="w-6 h-1 rounded-full bg-[#D4856A]" />
+            <div className="w-1.5 h-1 rounded-full bg-[#D4856A]/30" />
+            <div className="w-1.5 h-1 rounded-full bg-[#D4856A]/30" />
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FOR WHO SECTION
+          ============================================================ */}
+
+      {/* Desktop For Who */}
+      <section id="for-who" className="desktop-only py-28 px-8 lg:px-12 bg-gradient-to-b from-[#F5F5F3] to-[#FAFAF8]">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12">
+          <div className="flex flex-row items-end justify-between gap-8 mb-12">
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4856A]/10 rounded-full mb-4">
                 <Heart className="h-4 w-4 text-[#D4856A]" />
                 <span className="text-sm font-semibold text-[#D4856A]">Kimler İçin?</span>
               </div>
-              <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] tracking-tight">
+              <h2 className="text-5xl font-bold text-[#1a1a1a] tracking-tight">
                 Sizin için <span className="text-[#5B7B6A]">tasarlandı</span>
               </h2>
             </div>
@@ -259,7 +423,7 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Psikologlar */}
             <div className="group p-6 bg-white rounded-3xl border border-[#eee] hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1 transition-all duration-300">
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#5B7B6A]/30 flex items-center justify-center mb-4">
@@ -339,10 +503,128 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Final CTA - Impactful */}
-      <section className="py-20 sm:py-28 px-6 sm:px-8 lg:px-12">
+      {/* Mobile For Who - Single Column */}
+      <section id="for-who-mobile" className="mobile-only py-14 px-5 bg-gradient-to-b from-[#F5F5F3] to-[#FAFAF8]">
+        <div className="max-w-lg mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#D4856A]/10 rounded-full mb-4">
+              <Heart className="h-3.5 w-3.5 text-[#D4856A]" />
+              <span className="text-xs font-semibold text-[#D4856A]">Kimler İçin?</span>
+            </div>
+            <h2 className="text-2xl font-bold text-[#1a1a1a] tracking-tight mb-2">
+              Sizin için <span className="text-[#5B7B6A]">tasarlandı</span>
+            </h2>
+            <p className="text-sm text-[#666]">
+              Psikoloji ve wellness profesyonelleri için.
+            </p>
+          </div>
+          
+          {/* Single Column Cards */}
+          <div className="space-y-3">
+            {/* Psikologlar */}
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#5B7B6A]/30 flex items-center justify-center">
+                <PsychologyIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-bold text-[#1a1a1a]">Psikologlar</h3>
+                  <span className="text-xs text-[#D4856A] font-medium">Klinik</span>
+                </div>
+                <div className="flex gap-2 text-xs text-[#666]">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Kişilik analizi
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Terapi
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Yaşam Koçları */}
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#D4856A] to-[#D4856A]/30 flex items-center justify-center">
+                <GrowthIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-bold text-[#1a1a1a]">Yaşam Koçları</h3>
+                  <span className="text-xs text-[#D4856A] font-medium">ICF</span>
+                </div>
+                <div className="flex gap-2 text-xs text-[#666]">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Hedef
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Davranış
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Terapistler */}
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#5B7B6A]/30 flex items-center justify-center">
+                <ConnectionIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-bold text-[#1a1a1a]">Terapistler</h3>
+                  <span className="text-xs text-[#D4856A] font-medium">Aile & Çift</span>
+                </div>
+                <div className="flex gap-2 text-xs text-[#666]">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    İlişki
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Uyum
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Wellness */}
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#D4856A] to-[#D4856A]/30 flex items-center justify-center">
+                <WellnessIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-bold text-[#1a1a1a]">Wellness Uzmanları</h3>
+                  <span className="text-xs text-[#D4856A] font-medium">Bütünsel</span>
+                </div>
+                <div className="flex gap-2 text-xs text-[#666]">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Stres
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-[#5B7B6A]" />
+                    Mindfulness
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          CTA SECTION
+          ============================================================ */}
+
+      {/* Desktop CTA */}
+      <section className="desktop-only py-28 px-8 lg:px-12">
         <div className="max-w-4xl mx-auto">
-          <div className="relative p-12 sm:p-16 bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] rounded-[48px] text-center overflow-hidden">
+          <div className="relative p-16 bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] rounded-[48px] text-center overflow-hidden">
             {/* Animated Orbs */}
             <div className="absolute top-0 left-0 w-full h-full">
               <div className="absolute top-10 left-10 w-32 h-32 bg-[#5B7B6A]/40 rounded-full blur-3xl animate-pulse" />
@@ -356,24 +638,24 @@ export default function HomePage() {
                 <span className="text-white/90 text-sm font-medium">İlk kullanıcılara 1 analiz hediye</span>
               </div>
               
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+              <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
                 Bugün başlayın
               </h2>
               <p className="text-xl text-white/60 mb-10 max-w-lg mx-auto">
                 Kayıt tamamen ücretsiz. Kredi kartı gerekmez.
               </p>
               
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex flex-row items-center justify-center gap-4">
                 <Link
                   href="/auth/register"
-                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-[#D4856A] to-[#C97B5D] text-white rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-[#D4856A]/30 hover:-translate-y-0.5 transition-all duration-300"
+                  className="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-[#D4856A] to-[#C97B5D] text-white rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-[#D4856A]/30 hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <span>Ücretsiz Hesap Oluştur</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/auth/login"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-5 text-white/70 hover:text-white rounded-full font-medium transition-all"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-5 text-white/70 hover:text-white rounded-full font-medium transition-all"
                 >
                   Zaten hesabım var
                 </Link>
@@ -383,10 +665,55 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer - Minimal */}
-      <footer className="py-12 px-6 sm:px-8 lg:px-12 border-t border-[#eee]">
+      {/* Mobile CTA */}
+      <section className="mobile-only py-12 px-5">
+        <div className="relative p-8 bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] rounded-3xl text-center overflow-hidden">
+          {/* Simplified Background */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#5B7B6A]/30 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 w-28 h-28 bg-[#D4856A]/20 rounded-full blur-2xl" />
+          </div>
+          
+          <div className="relative">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur rounded-full mb-5">
+              <Sparkles className="h-3 w-3 text-[#D4856A]" />
+              <span className="text-white/90 text-xs font-medium">1 analiz hediye</span>
+            </div>
+            
+            <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">
+              Bugün başlayın
+            </h2>
+            <p className="text-sm text-white/60 mb-6">
+              Ücretsiz kayıt. Kredi kartı gerekmez.
+            </p>
+            
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/auth/register"
+                className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-gradient-to-r from-[#D4856A] to-[#C97B5D] text-white rounded-2xl font-bold shadow-lg touch-manipulation"
+              >
+                <span>Ücretsiz Hesap Oluştur</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/auth/login"
+                className="flex items-center justify-center w-full py-3 text-white/70 font-medium touch-manipulation"
+              >
+                Zaten hesabım var
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FOOTER
+          ============================================================ */}
+
+      {/* Desktop Footer */}
+      <footer className="desktop-only py-12 px-8 lg:px-12 border-t border-[#eee]">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-12">
+          <div className="flex flex-row items-center justify-between gap-8 mb-12">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-lg">
                 <span className="text-white text-2xl font-bold">O</span>
@@ -397,7 +724,7 @@ export default function HomePage() {
               </div>
             </div>
             
-            <div className="flex flex-wrap items-center gap-8 text-sm">
+            <div className="flex items-center gap-8 text-sm">
               <Link href="/#features" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</Link>
               <Link href="/#for-who" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</Link>
               <Link href="/privacy" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Gizlilik</Link>
@@ -406,7 +733,7 @@ export default function HomePage() {
             </div>
           </div>
           
-          <div className="pt-8 border-t border-[#eee] flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#999]">
+          <div className="pt-8 border-t border-[#eee] flex flex-row items-center justify-between gap-4 text-sm text-[#999]">
             <p>© 2026 Orbira Labs. Tüm hakları saklıdır.</p>
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-2">
@@ -419,6 +746,48 @@ export default function HomePage() {
               </span>
             </div>
           </div>
+        </div>
+      </footer>
+
+      {/* Mobile Footer */}
+      <footer className="mobile-only py-10 px-5 border-t border-[#eee] pb-safe">
+        <div className="max-w-lg mx-auto">
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-md">
+              <span className="text-white text-lg font-bold">O</span>
+            </div>
+            <div>
+              <span className="text-lg font-bold text-[#1a1a1a]">OrbiraMind</span>
+              <p className="text-[10px] text-[#999]">by Orbira Labs</p>
+            </div>
+          </div>
+          
+          {/* Links - Two Rows */}
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm mb-6">
+            <Link href="/#features-mobile" className="text-[#666]">Özellikler</Link>
+            <Link href="/#for-who-mobile" className="text-[#666]">Kimler İçin</Link>
+            <Link href="/privacy" className="text-[#666]">Gizlilik</Link>
+            <Link href="/terms" className="text-[#666]">Koşullar</Link>
+            <a href="mailto:destek@orbiramind.com" className="text-[#D4856A] font-medium">Destek</a>
+          </div>
+          
+          {/* Trust Badges */}
+          <div className="flex justify-center gap-4 mb-6">
+            <span className="flex items-center gap-1.5 text-xs text-[#999]">
+              <Shield className="h-3.5 w-3.5" />
+              KVKK
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-[#999]">
+              <Lock className="h-3.5 w-3.5" />
+              TR Sunucu
+            </span>
+          </div>
+          
+          {/* Copyright */}
+          <p className="text-center text-xs text-[#999]">
+            © 2026 Orbira Labs
+          </p>
         </div>
       </footer>
     </div>

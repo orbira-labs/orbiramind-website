@@ -21,39 +21,77 @@ const SCALE_COLORS = [
 
 export function LikertScale({ value, onChange, labels = DEFAULT_LABELS, accentColor }: LikertScaleProps) {
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 sm:gap-3">
-        {[1, 2, 3, 4, 5].map((num) => {
-          const isSelected = value === num;
-          const colors = SCALE_COLORS[num - 1];
-          const label = labels[num - 1];
+    <>
+      {/* ========== MOBILE VIEW ========== */}
+      <div className="md:hidden space-y-3">
+        <div className="flex gap-1.5">
+          {[1, 2, 3, 4, 5].map((num) => {
+            const isSelected = value === num;
+            const colors = SCALE_COLORS[num - 1];
+            const label = labels[num - 1];
 
-          return (
-            <button
-              key={num}
-              onClick={() => onChange(num)}
-              className={clsx(
-                "flex-1 min-h-[56px] sm:min-h-[64px] py-3 sm:py-4 rounded-2xl font-bold transition-all duration-200",
-                "border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-2",
-                "flex flex-col items-center justify-center gap-1 leading-tight",
-                "touch-manipulation select-none",
-                "active:scale-95 sm:active:scale-100",
-                isSelected
-                  ? `${colors.active} text-white border-transparent shadow-xl scale-[1.02] ${colors.ring}`
-                  : `${colors.bg} ${colors.border} ${colors.text} hover:scale-[1.02] hover:shadow-md`
-              )}
-              style={isSelected && accentColor ? { boxShadow: `0 8px 25px ${accentColor}30` } : undefined}
-            >
-              <span className="text-xs sm:text-sm font-black opacity-70">{num}</span>
-              {label && (
-                <span className="text-[10px] sm:text-xs font-semibold text-center px-1 leading-tight line-clamp-2">
-                  {label}
-                </span>
-              )}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={num}
+                onClick={() => onChange(num)}
+                className={clsx(
+                  "flex-1 min-h-[52px] py-2.5 rounded-xl font-bold transition-all duration-150",
+                  "border-2 focus:outline-none",
+                  "flex flex-col items-center justify-center gap-0.5 leading-tight",
+                  "touch-manipulation select-none",
+                  "active:scale-95",
+                  isSelected
+                    ? `${colors.active} text-white border-transparent shadow-md`
+                    : `${colors.bg} ${colors.border} ${colors.text}`
+                )}
+                style={isSelected && accentColor ? { boxShadow: `0 6px 18px ${accentColor}25` } : undefined}
+              >
+                <span className="text-xs font-black opacity-80">{num}</span>
+                {label && (
+                  <span className="text-[9px] font-semibold text-center px-0.5 leading-tight line-clamp-2">
+                    {label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      {/* ========== DESKTOP VIEW ========== */}
+      <div className="hidden md:block space-y-4">
+        <div className="flex gap-3">
+          {[1, 2, 3, 4, 5].map((num) => {
+            const isSelected = value === num;
+            const colors = SCALE_COLORS[num - 1];
+            const label = labels[num - 1];
+
+            return (
+              <button
+                key={num}
+                onClick={() => onChange(num)}
+                className={clsx(
+                  "flex-1 min-h-[64px] py-4 rounded-2xl font-bold transition-all duration-200",
+                  "border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-2",
+                  "flex flex-col items-center justify-center gap-1 leading-tight",
+                  "touch-manipulation select-none",
+                  isSelected
+                    ? `${colors.active} text-white border-transparent shadow-xl scale-[1.02] ${colors.ring}`
+                    : `${colors.bg} ${colors.border} ${colors.text} hover:scale-[1.02] hover:shadow-md`
+                )}
+                style={isSelected && accentColor ? { boxShadow: `0 8px 25px ${accentColor}30` } : undefined}
+              >
+                <span className="text-sm font-black opacity-70">{num}</span>
+                {label && (
+                  <span className="text-xs font-semibold text-center px-1 leading-tight line-clamp-2">
+                    {label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }

@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import type { Client } from "@/lib/types";
 import { clsx } from "clsx";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 
 export interface AppointmentSlim {
   id: string;
@@ -70,6 +71,7 @@ export function AppointmentDetailModal({
   const router = useRouter();
   const supabase = useRef(createSupabase());
   const overlayRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const [client, setClient] = useState<Client | null>(null);
   const [lastTest, setLastTest] = useState<LastTest | null>(null);
@@ -165,6 +167,260 @@ export function AppointmentDetailModal({
         : wellnessScore >= 45
           ? "text-pro-warning"
           : "text-pro-danger";
+
+  if (isMobile) {
+    return (
+      <>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              className="mobile-modal pt-safe"
+              initial={{ opacity: 0, y: "100%" }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              {/* Mobile Header */}
+              <div className="mobile-modal-header border-b-0 bg-gradient-to-br from-[#3D5A4C] via-[#4A6858] to-[#5B7B6A]">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <CalendarDays className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-white">Randevu Detayı</h2>
+                    <p className="text-xs text-white/70">{dayNumber} {monthName}, {dayName}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 -mr-2 rounded-lg text-white/60 active:bg-white/10 transition-colors touch-manipulation"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Mobile Content */}
+              <div className="flex-1 overflow-y-auto">
+                {/* Client Card */}
+                <div className="p-4 bg-gradient-to-br from-[#3D5A4C] via-[#4A6858] to-[#5B7B6A]">
+                  <button
+                    onClick={() => client && router.push(`/clients/${client.id}`)}
+                    className="w-full mobile-card bg-white/10 backdrop-blur-sm border-white/20 flex items-center gap-3 touch-manipulation active:scale-[0.98] transition-transform"
+                    disabled={!client}
+                  >
+                    <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-base font-semibold text-white">{clientName}</p>
+                      {client && (
+                        <p className="text-xs text-white/60 flex items-center gap-1">
+                          Danışan kartına git
+                          <ChevronRight className="h-3 w-3" />
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                </div>
+
+                {/* Time & Duration */}
+                <div className="p-4 flex gap-3">
+                  <div className="flex-1 mobile-card flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-pro-primary-light flex items-center justify-center">
+                      <Clock className="h-5 w-5 text-pro-primary" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-pro-text">{timeLabel}</p>
+                      <p className="text-xs text-pro-text-tertiary">Saat</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 mobile-card flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-pro-accent-light flex items-center justify-center">
+                      <Timer className="h-5 w-5 text-pro-accent" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-pro-text">{apt.duration_minutes}</p>
+                      <p className="text-xs text-pro-text-tertiary">Dakika</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                {(apt.status === "cancelled" || apt.status === "completed") && (
+                  <div className="px-4 pb-3">
+                    <Badge
+                      variant={apt.status === "cancelled" ? "danger" : "success"}
+                      className="w-full justify-center py-2"
+                    >
+                      {apt.status === "cancelled" ? "İptal Edildi" : "Tamamlandı"}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Note Section */}
+                <div className="px-4 pb-3">
+                  <div className="mobile-card">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-8 w-8 rounded-lg bg-pro-primary/10 flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-pro-primary" />
+                      </div>
+                      <p className="text-sm font-semibold text-pro-text">Randevu Notu</p>
+                    </div>
+                    {apt.note ? (
+                      <p className="text-sm text-pro-text-secondary leading-relaxed">{apt.note}</p>
+                    ) : (
+                      <p className="text-sm text-pro-text-tertiary italic">Bu randevu için not eklenmemiş</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Analysis Section */}
+                <div className="px-4 pb-4">
+                  <div className="mobile-card">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-8 w-8 rounded-lg bg-pro-accent/10 flex items-center justify-center">
+                        <TrendingUp className="h-4 w-4 text-pro-accent" />
+                      </div>
+                      <p className="text-sm font-semibold text-pro-text">Analiz Raporu</p>
+                    </div>
+
+                    {loadingData ? (
+                      <div className="animate-pulse space-y-2">
+                        <div className="h-4 w-24 bg-pro-border rounded" />
+                        <div className="h-3 w-32 bg-pro-border rounded" />
+                      </div>
+                    ) : lastTest ? (
+                      <button
+                        onClick={() => router.push(`/tests/${lastTest.id}`)}
+                        className="w-full text-left touch-manipulation"
+                      >
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge variant="success" size="sm" dot>Tamamlandı</Badge>
+                        </div>
+                        
+                        {wellnessScore !== undefined && (
+                          <div className="flex items-center gap-4">
+                            <div className="text-center bg-pro-surface-alt rounded-xl px-4 py-2 border border-pro-border">
+                              <p className={clsx("text-2xl font-bold", scoreColor)}>{wellnessScore}</p>
+                              <p className="text-[10px] text-pro-text-tertiary">Wellness</p>
+                            </div>
+                            <div className="flex-1 space-y-1.5">
+                              {strengths.length > 0 && (
+                                <div className="flex items-center gap-2">
+                                  <TrendingUp className="h-4 w-4 text-pro-success shrink-0" />
+                                  <p className="text-xs text-pro-text-secondary truncate">{strengths[0]}</p>
+                                </div>
+                              )}
+                              {risks.length > 0 && (
+                                <div className="flex items-center gap-2">
+                                  <Shield className="h-4 w-4 text-pro-warning shrink-0" />
+                                  <p className="text-xs text-pro-text-secondary truncate">{risks[0]}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-pro-primary mt-3 flex items-center gap-1">
+                          Raporu görüntüle
+                          <ChevronRight className="h-3 w-3" />
+                        </p>
+                      </button>
+                    ) : (
+                      <div>
+                        <p className="text-sm text-pro-text-tertiary italic mb-1">Henüz analiz yok</p>
+                        <p className="text-xs text-pro-text-tertiary">Randevu öncesi analiz gönderin</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Cancel Confirmation */}
+                <AnimatePresence>
+                  {confirmCancel && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="px-4 pb-4 overflow-hidden"
+                    >
+                      <div className="rounded-xl border border-pro-danger/30 bg-red-50 p-4">
+                        <div className="flex items-start gap-2 mb-4">
+                          <AlertTriangle className="h-5 w-5 text-pro-danger shrink-0" />
+                          <p className="text-sm text-pro-danger font-medium">
+                            Randevuyu iptal etmek istediğinize emin misiniz?
+                          </p>
+                        </div>
+                        <div className="flex gap-3">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => setConfirmCancel(false)}
+                            className="flex-1 min-h-[44px]"
+                          >
+                            Vazgeç
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="danger"
+                            loading={cancelling}
+                            onClick={handleCancel}
+                            className="flex-1 min-h-[44px]"
+                          >
+                            İptal Et
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Mobile Action Bar */}
+              {apt.status === "scheduled" && !confirmCancel && (
+                <div className="mobile-action-bar">
+                  <Button
+                    type="button"
+                    variant="orange"
+                    onClick={() => onEditRequest?.(apt)}
+                    className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
+                  >
+                    <CalendarClock className="h-5 w-5" />
+                    Ertele
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="blue"
+                    onClick={() => setShowSendTest(true)}
+                    className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
+                  >
+                    <Send className="h-5 w-5" />
+                    Test Gönder
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmCancel(true)}
+                    className="h-12 w-12 rounded-xl border border-red-200 bg-red-50 text-red-500 flex items-center justify-center active:scale-95 transition-transform touch-manipulation"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <SendTestModal
+          open={showSendTest}
+          onClose={() => setShowSendTest(false)}
+          onSent={() => {
+            setShowSendTest(false);
+            fetchData();
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <>

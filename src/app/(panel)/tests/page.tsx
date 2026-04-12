@@ -12,7 +12,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SendTestModal } from "@/components/tests/SendTestModal";
-import { FlaskConical, Eye, Link2, Check, Send, Loader2 } from "lucide-react";
+import { FlaskConical, Eye, Link2, Check, Send, Loader2, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { TEST_STATUSES } from "@/lib/constants";
 import { clsx } from "clsx";
@@ -44,9 +44,12 @@ export default function TestsPage() {
         onClose={() => setShowSendModal(false)}
         onSent={refresh}
       />
-      <main className="flex-1 p-3 sm:p-5 lg:p-6">
+
+      {/* ============================================================
+          DESKTOP VIEW - Grid Layout
+          ============================================================ */}
+      <main className="desktop-only flex-1 p-3 sm:p-5 lg:p-6">
         <div className="mx-auto max-w-6xl">
-          {/* Main Container - like Ofisim */}
           <div className="bg-gradient-to-br from-[#5B7B6A]/12 to-[#5B7B6A]/5 rounded-2xl p-2.5 sm:p-3 space-y-3">
             {/* Stats Row */}
             <div className="grid grid-cols-3 gap-3">
@@ -239,6 +242,173 @@ export default function TestsPage() {
               )}
             </Card>
           </div>
+        </div>
+      </main>
+
+      {/* ============================================================
+          MOBILE VIEW - List Layout
+          ============================================================ */}
+      <main className="mobile-only flex-1 pb-20">
+        {/* Mobile Stats - Horizontal Scroll */}
+        <div className="px-4 py-3">
+          <div className="mobile-scroll-snap gap-3 pb-2">
+            {creditBalance > 0 ? (
+              <div className="mobile-stat-card min-w-[140px]">
+                <div className="h-10 w-10 rounded-xl bg-[var(--pro-analysis-light)] flex items-center justify-center mb-2">
+                  <FlaskConical className="h-5 w-5 text-[var(--pro-analysis)]" />
+                </div>
+                <p className="text-2xl font-bold text-[var(--pro-analysis)]">{creditBalance}</p>
+                <p className="text-xs text-pro-text-secondary">Kalan Test</p>
+              </div>
+            ) : (
+              <button
+                onClick={() => router.push("/billing")}
+                className="mobile-stat-card min-w-[140px] bg-gradient-to-br from-[#8B9D83]/10 to-[#8B9D83]/5 border-[#8B9D83]/30"
+              >
+                <div className="h-10 w-10 rounded-xl bg-[#8B9D83]/20 flex items-center justify-center mb-2">
+                  <FlaskConical className="h-5 w-5 text-[#6B7D63]" />
+                </div>
+                <p className="text-xs text-[#5B6B53] font-medium">Kredi Bitti</p>
+                <p className="text-xs text-[#5B7B6A] font-semibold mt-1">Al →</p>
+              </button>
+            )}
+            <div className="mobile-stat-card min-w-[120px]">
+              <div className="h-10 w-10 rounded-xl bg-[#8B9D83]/15 flex items-center justify-center mb-2">
+                <Send className="h-5 w-5 text-[#6B7D63]" />
+              </div>
+              <p className="text-2xl font-bold text-[#6B7D63]">{counts.pending}</p>
+              <p className="text-xs text-pro-text-secondary">Bekleyen</p>
+            </div>
+            <div className="mobile-stat-card min-w-[120px]">
+              <div className="h-10 w-10 rounded-xl bg-[#5B7B6A]/15 flex items-center justify-center mb-2">
+                <Check className="h-5 w-5 text-[#5B7B6A]" />
+              </div>
+              <p className="text-2xl font-bold text-[#5B7B6A]">{counts.completed}</p>
+              <p className="text-xs text-pro-text-secondary">Tamamlanan</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Filter Chips */}
+        <div className="px-4 pb-3">
+          <div className="mobile-scroll-snap gap-2">
+            {(["waiting_analysis", "waiting_client", "completed"] as Filter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={clsx(
+                  "mobile-chip",
+                  filter === f && "mobile-chip-active"
+                )}
+              >
+                {f === "waiting_analysis" ? "Analiz Hazır" : f === "waiting_client" ? "Bekleyen" : "Tamamlanan"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile List */}
+        <div className="bg-pro-surface rounded-t-2xl min-h-[60vh]">
+          {loading ? (
+            <div className="p-4 space-y-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="mobile-list-item border-none bg-pro-surface-alt rounded-xl">
+                  <Skeleton className="h-11 w-11 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+              ))}
+            </div>
+          ) : tests.length === 0 ? (
+            <div className="mobile-empty-state">
+              <div className="h-16 w-16 rounded-2xl bg-pro-surface-alt flex items-center justify-center mb-4">
+                <FlaskConical className="h-8 w-8 text-pro-text-tertiary" />
+              </div>
+              <p className="text-base font-semibold text-pro-text mb-1">Sonuç Bulunamadı</p>
+              <p className="text-sm text-pro-text-tertiary">Farklı bir filtre deneyin</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-pro-border">
+              {tests.map((test) => {
+                const s = TEST_STATUSES.find((ts) => ts.id === test.status);
+                const canViewResults = test.status === "completed" || test.status === "reviewed";
+                const isPending = test.status === "sent" || test.status === "started";
+                const isCopied = copiedTestId === test.id;
+
+                return (
+                  <div
+                    key={test.id}
+                    onClick={() => canViewResults && router.push(`/tests/${test.id}`)}
+                    className={clsx(
+                      "mobile-list-item touch-manipulation",
+                      canViewResults && "active:bg-pro-surface-alt"
+                    )}
+                  >
+                    <Avatar
+                      firstName={test.client?.first_name || "?"}
+                      lastName={test.client?.last_name || ""}
+                      size="sm"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-pro-text line-clamp-1">
+                        {test.client?.first_name} {test.client?.last_name}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <Badge variant={s?.color as "success" | "warning" | "info" | "danger" | "accent" || "muted"} size="sm" dot>
+                          {s?.label || test.status}
+                        </Badge>
+                        <span className="text-xs text-pro-text-tertiary">
+                          {formatDate(test.created_at)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {isPending && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyTestLinkById(test.token, test.id);
+                          }}
+                          className={clsx(
+                            "p-2 rounded-full touch-target transition-colors",
+                            isCopied
+                              ? "text-pro-success bg-pro-success-light"
+                              : "text-pro-text-tertiary active:bg-pro-surface-alt"
+                          )}
+                        >
+                          {isCopied ? <Check className="h-5 w-5" /> : <Link2 className="h-5 w-5" />}
+                        </button>
+                      )}
+                      {canViewResults && (
+                        <ChevronRight className="h-5 w-5 text-pro-text-tertiary" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Load More Button */}
+              {hasMore && (
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="w-full py-4 text-sm font-medium text-pro-primary flex items-center justify-center gap-2 disabled:opacity-50 touch-manipulation"
+                >
+                  {loadingMore ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Yükleniyor...
+                    </>
+                  ) : (
+                    "Daha Fazla Yükle"
+                  )}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </>
