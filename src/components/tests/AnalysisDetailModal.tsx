@@ -42,9 +42,10 @@ const STATUS_MAP: Record<
   string,
   { label: string; variant: "success" | "warning" | "info" | "danger" }
 > = {
-  sent: { label: "Bekliyor", variant: "warning" },
+  sent: { label: "Danışan Bekleniyor", variant: "warning" },
   started: { label: "Devam Ediyor", variant: "info" },
-  completed: { label: "Tamamlandı", variant: "success" },
+  completed: { label: "Analiz Hazır", variant: "success" },
+  reviewed: { label: "Tamamlandı", variant: "success" },
   expired: { label: "Süresi Doldu", variant: "danger" },
 };
 
@@ -121,7 +122,7 @@ export function AnalysisDetailModal({
   const completedDate = test.completed_at ? new Date(test.completed_at) : null;
 
   const statusInfo = STATUS_MAP[test.status] || STATUS_MAP.sent;
-  const isCompleted = test.status === "completed";
+  const isCompleted = test.status === "completed" || test.status === "reviewed";
   const isPending = test.status === "sent" || test.status === "started";
 
 
@@ -321,11 +322,12 @@ export function AnalysisDetailModal({
             />
 
             <motion.div
-              className="relative w-full max-w-md bg-pro-surface rounded-2xl shadow-2xl border border-pro-border overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative z-10 w-full max-w-md bg-pro-surface rounded-2xl shadow-2xl border border-pro-border overflow-hidden flex flex-col max-h-[90vh]"
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
+              style={{ transformOrigin: "center center" }}
             >
               {renderHeader()}
               {renderBody()}
