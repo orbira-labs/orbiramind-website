@@ -173,7 +173,7 @@ export function ClinicianInsights({
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <h4 className="text-[15px] font-semibold text-gray-900">{item.title}</h4>
                   <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700">
-                    {SEVERITY_LABELS[item.severity] ?? "Izlenmeli"}
+                    {SEVERITY_LABELS[item.severity] ?? "İzlenmeli"}
                   </span>
                 </div>
                 <p className="text-[14px] leading-relaxed text-gray-700">{item.insight}</p>
