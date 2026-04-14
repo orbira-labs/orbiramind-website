@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { onboardingSchema, type OnboardingInput } from "@/lib/validations";
 import { SPECIALIZATIONS, WORK_TYPES } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -27,38 +24,116 @@ const CITIES = [
   "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak",
 ];
 
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  city?: string;
+  district?: string;
+  companyName?: string;
+  specializations?: string;
+  kvkk?: string;
+  terms?: string;
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<OnboardingInput>({
-    resolver: zodResolver(onboardingSchema),
-    defaultValues: {
-      work_type: "individual",
-      specializations: [],
-      kvkk_accepted: false,
-      terms_accepted: false,
-    },
-  });
-
-  const workType = watch("work_type");
-  const selectedSpecs = watch("specializations");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [district, setDistrict] = useState("");
+  const [workType, setWorkType] = useState<"individual" | "company">("individual");
+  const [companyName, setCompanyName] = useState("");
+  const [specializations, setSpecializations] = useState<string[]>([]);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   function toggleSpec(specId: string) {
-    const current = selectedSpecs || [];
-    const next = current.includes(specId)
-      ? current.filter((s) => s !== specId)
-      : [...current, specId];
-    setValue("specializations", next, { shouldValidate: true });
+    setSpecializations((prev) =>
+      prev.includes(specId)
+        ? prev.filter((s) => s !== specId)
+        : [...prev, specId]
+    );
+    clearError("specializations");
   }
 
-  async function onSubmit(data: OnboardingInput) {
+  function clearError(field: keyof FormErrors) {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  }
+
+  function validateForm(): boolean {
+    const newErrors: FormErrors = {};
+
+    const trimmedFirstName = firstName.trim();
+    if (!trimmedFirstName) {
+      newErrors.firstName = "Ad gerekli";
+    } else if (trimmedFirstName.length < 2) {
+      newErrors.firstName = "Ad en az 2 karakter olmalı";
+    }
+
+    const trimmedLastName = lastName.trim();
+    if (!trimmedLastName) {
+      newErrors.lastName = "Soyad gerekli";
+    } else if (trimmedLastName.length < 2) {
+      newErrors.lastName = "Soyad en az 2 karakter olmalı";
+    }
+
+    const trimmedPhone = phone.trim();
+    if (trimmedPhone && !/^0\d{3} \d{3} \d{2} \d{2}$/.test(trimmedPhone)) {
+      newErrors.phone = "Telefon numarasını 05XX XXX XX XX formatında girin";
+    }
+
+    if (!city.trim()) {
+      newErrors.city = "İl seçin";
+    }
+
+    const trimmedDistrict = district.trim();
+    if (!trimmedDistrict) {
+      newErrors.district = "İlçe gerekli";
+    } else if (trimmedDistrict.length < 2) {
+      newErrors.district = "İlçe en az 2 karakter olmalı";
+    }
+
+    if (workType === "company") {
+      const trimmedCompanyName = companyName.trim();
+      if (!trimmedCompanyName) {
+        newErrors.companyName = "İşyeri / Klinik Adı zorunludur";
+      }
+    }
+
+    if (specializations.length === 0) {
+      newErrors.specializations = "En az bir uzmanlık alanı seçin";
+    }
+
+    if (!kvkkAccepted) {
+      newErrors.kvkk = "KVKK Aydınlatma Metni'ni kabul etmelisiniz";
+    }
+
+    if (!termsAccepted) {
+      newErrors.terms = "Kullanım Koşulları'nı kabul etmelisiniz";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     try {
       const supabase = createClient();
@@ -74,14 +149,14 @@ export default function OnboardingPage() {
       const { error } = await supabase.from("professionals").upsert({
         id: user.id,
         email: user.email!,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        phone: data.phone || null,
-        city: data.city,
-        district: data.district,
-        work_type: data.work_type,
-        company_name: data.work_type === "company" ? data.company_name : null,
-        specializations: data.specializations,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        phone: phone.trim() || null,
+        city: city.trim(),
+        district: district.trim(),
+        work_type: workType,
+        company_name: workType === "company" ? companyName.trim() : null,
+        specializations,
         onboarding_completed: true,
         kvkk_accepted: true,
         kvkk_accepted_at: new Date().toISOString(),
@@ -94,7 +169,6 @@ export default function OnboardingPage() {
         return;
       }
 
-      // Ücretsiz ilk test kredisi: yalnızca daha önce hiç bonus verilmemişse ekle
       const { data: existingBonus } = await supabase
         .from("credit_transactions")
         .select("id")
@@ -136,19 +210,27 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-pro-surface rounded-2xl border border-pro-border p-6 sm:p-8 shadow-[var(--pro-shadow-md)]">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Ad"
                 placeholder="Adınız"
-                error={errors.first_name?.message}
-                {...register("first_name")}
+                value={firstName}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                  clearError("firstName");
+                }}
+                error={errors.firstName}
               />
               <Input
                 label="Soyad"
                 placeholder="Soyadınız"
-                error={errors.last_name?.message}
-                {...register("last_name")}
+                value={lastName}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                  clearError("lastName");
+                }}
+                error={errors.lastName}
               />
             </div>
 
@@ -160,12 +242,12 @@ export default function OnboardingPage() {
               maxLength={14}
               placeholder="0511 111 11 11"
               hint="Opsiyonel"
-              error={errors.phone?.message}
-              {...register("phone", {
-                onChange: (event) => {
-                  event.target.value = formatTurkeyPhoneInput(event.target.value);
-                },
-              })}
+              value={phone}
+              onChange={(e) => {
+                setPhone(formatTurkeyPhoneInput(e.target.value));
+                clearError("phone");
+              }}
+              error={errors.phone}
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -173,15 +255,23 @@ export default function OnboardingPage() {
                 label="İl"
                 placeholder="İl seçin"
                 options={CITIES.map((c) => ({ value: c, label: c }))}
-                error={errors.city?.message}
-                {...register("city")}
+                value={city}
+                onChange={(e) => {
+                  setCity(e.target.value);
+                  clearError("city");
+                }}
+                error={errors.city}
               />
               <Input
                 label="İlçe"
                 placeholder="İlçe adı"
                 maxLength={60}
-                error={errors.district?.message}
-                {...register("district")}
+                value={district}
+                onChange={(e) => {
+                  setDistrict(e.target.value);
+                  clearError("district");
+                }}
+                error={errors.district}
               />
             </div>
 
@@ -202,9 +292,11 @@ export default function OnboardingPage() {
                   >
                     <input
                       type="radio"
+                      name="workType"
                       value={wt.id}
+                      checked={workType === wt.id}
+                      onChange={() => setWorkType(wt.id as "individual" | "company")}
                       className="sr-only"
-                      {...register("work_type")}
                     />
                     {wt.label}
                   </label>
@@ -217,8 +309,12 @@ export default function OnboardingPage() {
                 label="İşyeri / Klinik Adı"
                 placeholder="İşyeri adı"
                 maxLength={100}
-                error={errors.company_name?.message}
-                {...register("company_name")}
+                value={companyName}
+                onChange={(e) => {
+                  setCompanyName(e.target.value);
+                  clearError("companyName");
+                }}
+                error={errors.companyName}
               />
             )}
 
@@ -234,7 +330,7 @@ export default function OnboardingPage() {
                     onClick={() => toggleSpec(spec.id)}
                     className={clsx(
                       "rounded-full px-4 py-2 text-sm transition-colors",
-                      selectedSpecs?.includes(spec.id)
+                      specializations.includes(spec.id)
                         ? "bg-pro-primary text-white"
                         : "bg-pro-surface-alt text-pro-text-secondary hover:bg-pro-border"
                     )}
@@ -243,9 +339,9 @@ export default function OnboardingPage() {
                   </button>
                 ))}
               </div>
-              {errors.specializations?.message && (
+              {errors.specializations && (
                 <p className="text-xs text-pro-danger">
-                  {errors.specializations.message}
+                  {errors.specializations}
                 </p>
               )}
             </div>
@@ -254,8 +350,12 @@ export default function OnboardingPage() {
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={kvkkAccepted}
+                  onChange={(e) => {
+                    setKvkkAccepted(e.target.checked);
+                    clearError("kvkk");
+                  }}
                   className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
-                  {...register("kvkk_accepted")}
                 />
                 <span className="text-sm text-pro-text-secondary">
                   <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-pro-primary underline">
@@ -264,17 +364,21 @@ export default function OnboardingPage() {
                   &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.
                 </span>
               </label>
-              {errors.kvkk_accepted?.message && (
+              {errors.kvkk && (
                 <p className="text-xs text-pro-danger pl-7">
-                  {errors.kvkk_accepted.message}
+                  {errors.kvkk}
                 </p>
               )}
 
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => {
+                    setTermsAccepted(e.target.checked);
+                    clearError("terms");
+                  }}
                   className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
-                  {...register("terms_accepted")}
                 />
                 <span className="text-sm text-pro-text-secondary">
                   <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-pro-primary underline">
@@ -283,9 +387,9 @@ export default function OnboardingPage() {
                   &apos;nı okudum ve kabul ediyorum.
                 </span>
               </label>
-              {errors.terms_accepted?.message && (
+              {errors.terms && (
                 <p className="text-xs text-pro-danger pl-7">
-                  {errors.terms_accepted.message}
+                  {errors.terms}
                 </p>
               )}
             </div>

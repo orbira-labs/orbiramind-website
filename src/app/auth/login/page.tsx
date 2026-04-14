@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { LogIn, Loader2, ClipboardList, ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { loginSchema, type LoginInput } from "@/lib/validations";
 import { normalizeTestCodeInput } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -23,28 +20,57 @@ export default function LoginPage() {
   const [redirecting, setRedirecting] = useState(false);
   const [testCode, setTestCode] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  async function onSubmit(data: LoginInput) {
+  function validateForm(): boolean {
+    let valid = true;
+    setEmailError(null);
+    setPasswordError(null);
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setEmailError("Email adresi gerekli");
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setEmailError("Geçerli bir email adresi girin");
+      valid = false;
+    }
+
+    if (!password) {
+      setPasswordError("Şifre gerekli");
+      valid = false;
+    } else if (password.length < 8) {
+      setPasswordError("Şifre en az 8 karakter olmalı");
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
-    const email = data.email.trim().toLowerCase();
+    const trimmedEmail = email.trim().toLowerCase();
+
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password: data.password,
+        email: trimmedEmail,
+        password,
       });
 
       if (error) {
         if (error.message.includes("Email not confirmed")) {
           toast.error("Email adresiniz henüz doğrulanmamış");
-          router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`);
+          router.push(`/auth/verify?email=${encodeURIComponent(trimmedEmail)}`);
           return;
         }
         if (error.message.includes("Invalid login credentials")) {
@@ -229,7 +255,7 @@ export default function LoginPage() {
             </div>
 
             <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4">
                 <div className="mobile-form-group md:block">
                   <Input
                     label="Email"
@@ -237,9 +263,13 @@ export default function LoginPage() {
                     placeholder="ornek@email.com"
                     autoComplete="email"
                     maxLength={254}
-                    error={errors.email?.message}
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (emailError) setEmailError(null);
+                    }}
+                    error={emailError ?? undefined}
                     className="mobile-input md:w-full md:min-h-0"
-                    {...register("email")}
                   />
                 </div>
                 <div className="mobile-form-group md:block">
@@ -249,9 +279,13 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     autoComplete="current-password"
                     maxLength={72}
-                    error={errors.password?.message}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (passwordError) setPasswordError(null);
+                    }}
+                    error={passwordError ?? undefined}
                     className="mobile-input md:w-full md:min-h-0"
-                    {...register("password")}
                   />
                 </div>
 

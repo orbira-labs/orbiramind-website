@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { APPOINTMENT_DURATIONS } from "@/lib/constants";
-import { appointmentSchema, type AppointmentInput } from "@/lib/validations";
 import { formatDateForInput, formatTimeForInput, parseDateTimeToISO } from "@/lib/utils";
 import { X, CalendarClock } from "lucide-react";
 import { clsx } from "clsx";
@@ -23,43 +19,77 @@ interface EditAppointmentModalProps {
   onUpdated?: () => void;
 }
 
+interface FormErrors {
+  date?: string;
+  time?: string;
+  note?: string;
+}
+
 export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAppointmentModalProps) {
   const [saving, setSaving] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<AppointmentInput>({
-    resolver: zodResolver(appointmentSchema),
-  });
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState(60);
+  const [note, setNote] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (appointment) {
       const d = new Date(appointment.starts_at);
-      reset({
-        date: formatDateForInput(d),
-        time: formatTimeForInput(d),
-        duration_minutes: appointment.duration_minutes,
-        note: appointment.note ?? "",
+      setDate(formatDateForInput(d));
+      setTime(formatTimeForInput(d));
+      setDurationMinutes(appointment.duration_minutes);
+      setNote(appointment.note ?? "");
+      setErrors({});
+    }
+  }, [appointment]);
+
+  function clearError(field: keyof FormErrors) {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
       });
     }
-  }, [appointment, reset]);
+  }
 
-  async function onSubmit(data: AppointmentInput) {
+  function validateForm(): boolean {
+    const newErrors: FormErrors = {};
+
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      newErrors.date = "Geçerli bir tarih seçin";
+    }
+
+    if (!time || !/^([01]\d|2[0-3]):([0-5]\d)$/.test(time)) {
+      newErrors.time = "Geçerli bir saat seçin";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
     if (!appointment) return;
+
+    if (!validateForm()) {
+      return;
+    }
+
     setSaving(true);
     try {
       const supabase = createSupabase();
-      const startsAt = parseDateTimeToISO(data.date, data.time);
+      const startsAt = parseDateTimeToISO(date, time);
       const { error } = await supabase
         .from("appointments")
         .update({
           starts_at: startsAt,
-          duration_minutes: data.duration_minutes,
-          note: data.note?.trim() || null,
+          duration_minutes: durationMinutes,
+          note: note.trim() || null,
         })
         .eq("id", appointment.id);
 
@@ -80,7 +110,7 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
   if (!appointment) return null;
 
   const formContent = (
-    <form onSubmit={handleSubmit(onSubmit)} className={clsx(isMobile ? "space-y-4" : "space-y-5")}>
+    <form onSubmit={handleSubmit} className={clsx(isMobile ? "space-y-4" : "space-y-5")}>
       {/* Date + Time */}
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-pro-text">Tarih ve Saat</label>
@@ -89,6 +119,11 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
             <p className="text-xs text-pro-text-tertiary">Tarih</p>
             <input
               type="date"
+              value={date}
+              onChange={(e) => {
+                setDate(e.target.value);
+                clearError("date");
+              }}
               className={clsx(
                 "w-full rounded-lg border text-sm text-pro-text",
                 "bg-pro-surface transition-colors duration-150",
@@ -96,13 +131,17 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
                 isMobile ? "px-4 py-3 min-h-[48px]" : "px-3.5 py-2.5",
                 errors.date ? "border-pro-danger" : "border-pro-border hover:border-pro-border-strong"
               )}
-              {...register("date")}
             />
           </div>
           <div className="space-y-1">
             <p className="text-xs text-pro-text-tertiary">Saat</p>
             <input
               type="time"
+              value={time}
+              onChange={(e) => {
+                setTime(e.target.value);
+                clearError("time");
+              }}
               className={clsx(
                 "w-full rounded-lg border text-sm text-pro-text",
                 "bg-pro-surface transition-colors duration-150",
@@ -110,13 +149,12 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
                 isMobile ? "px-4 py-3 min-h-[48px]" : "px-3.5 py-2.5",
                 errors.time ? "border-pro-danger" : "border-pro-border hover:border-pro-border-strong"
               )}
-              {...register("time")}
             />
           </div>
         </div>
         {(errors.date || errors.time) && (
           <p className="text-xs text-pro-danger">
-            {errors.date?.message || errors.time?.message}
+            {errors.date || errors.time}
           </p>
         )}
       </div>
@@ -128,7 +166,8 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
           value: d.value.toString(),
           label: d.label,
         }))}
-        {...register("duration_minutes", { valueAsNumber: true })}
+        value={durationMinutes.toString()}
+        onChange={(e) => setDurationMinutes(Number(e.target.value))}
       />
 
       {/* Note */}
@@ -141,6 +180,8 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
           rows={isMobile ? 3 : 4}
           maxLength={1000}
           placeholder="Randevuya dair not..."
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
           className={clsx(
             "w-full rounded-lg border text-sm text-pro-text",
             "bg-pro-surface placeholder:text-pro-text-tertiary",
@@ -149,11 +190,8 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
             "border-pro-border hover:border-pro-border-strong",
             isMobile ? "px-4 py-3" : "px-3.5 py-2.5"
           )}
-          {...register("note")}
         />
-        <p className={clsx("text-xs", errors.note ? "text-pro-danger" : "text-pro-text-tertiary")}>
-          {errors.note?.message || "Opsiyonel"}
-        </p>
+        <p className="text-xs text-pro-text-tertiary">Opsiyonel</p>
       </div>
 
       {/* Actions - Mobile: fixed at bottom */}

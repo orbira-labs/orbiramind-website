@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -13,13 +11,20 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ClientCard } from "@/components/clients";
 import { Users, Plus, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { createClient as createSupabase } from "@/lib/supabase/client";
-import { clientSchema, type ClientInput } from "@/lib/validations";
 import { useClientsList } from "@/lib/hooks/useClientsList";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import type { Client } from "@/lib/types";
 import { formatTurkeyPhoneInput } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
+
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  birthDate?: string;
+}
 
 function getVisiblePages(current: number, total: number): (number | "dots")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -38,6 +43,13 @@ export default function ClientsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+
   const { clients, counts, totalMatching, loading, listLoading, refresh, debouncedSearch } =
     useClientsList({ page, pageSize: PAGE_SIZE, statusFilter, search });
 
@@ -53,22 +65,76 @@ export default function ClientsPage() {
     }
   }, [clients.length, page, loading, listLoading]);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ClientInput>({
-    resolver: zodResolver(clientSchema),
-  });
+  function resetForm() {
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPhone("");
+    setBirthDate("");
+    setFormErrors({});
+  }
 
-  const phoneField = register("phone", {
-    onChange: (event) => {
-      event.target.value = formatTurkeyPhoneInput(event.target.value);
-    },
-  });
+  function clearError(field: keyof FormErrors) {
+    if (formErrors[field]) {
+      setFormErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  }
 
-  async function onSubmit(data: ClientInput) {
+  function validateForm(): boolean {
+    const newErrors: FormErrors = {};
+
+    const trimmedFirstName = firstName.trim();
+    if (!trimmedFirstName) {
+      newErrors.firstName = "Ad gerekli";
+    } else if (trimmedFirstName.length < 2) {
+      newErrors.firstName = "Ad en az 2 karakter olmalı";
+    }
+
+    const trimmedLastName = lastName.trim();
+    if (!trimmedLastName) {
+      newErrors.lastName = "Soyad gerekli";
+    } else if (trimmedLastName.length < 2) {
+      newErrors.lastName = "Soyad en az 2 karakter olmalı";
+    }
+
+    const trimmedEmail = email.trim();
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      newErrors.email = "Geçerli bir email adresi girin";
+    }
+
+    const trimmedPhone = phone.trim();
+    if (trimmedPhone && !/^0\d{3} \d{3} \d{2} \d{2}$/.test(trimmedPhone)) {
+      newErrors.phone = "Telefon numarasını 05XX XXX XX XX formatında girin";
+    }
+
+    if (birthDate) {
+      const dateObj = new Date(birthDate);
+      if (isNaN(dateObj.getTime())) {
+        newErrors.birthDate = "Geçerli bir doğum tarihi girin";
+      } else {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (dateObj > today) {
+          newErrors.birthDate = "Doğum tarihi gelecekte olamaz";
+        }
+      }
+    }
+
+    setFormErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setSaving(true);
     try {
       const supabase = createSupabase();
@@ -78,12 +144,12 @@ export default function ClientsPage() {
 
       const { error } = await supabase.from("clients").insert({
         professional_id: user!.id,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email || null,
-        phone: data.phone || null,
-        birth_date: data.birth_date || null,
-        gender: data.gender || null,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        email: email.trim() || null,
+        phone: phone.trim() || null,
+        birth_date: birthDate || null,
+        gender: null,
       });
 
       if (error) {
@@ -92,7 +158,7 @@ export default function ClientsPage() {
       }
 
       setShowModal(false);
-      reset();
+      resetForm();
       toast.success("Danışan eklendi");
       await refresh();
     } catch {
@@ -143,19 +209,27 @@ export default function ClientsPage() {
   const visiblePages = getVisiblePages(page, totalPages);
 
   const formContent = (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <Input
           label="Ad"
           placeholder="Adı"
-          error={errors.first_name?.message}
-          {...register("first_name")}
+          value={firstName}
+          onChange={(e) => {
+            setFirstName(e.target.value);
+            clearError("firstName");
+          }}
+          error={formErrors.firstName}
         />
         <Input
           label="Soyad"
           placeholder="Soyadı"
-          error={errors.last_name?.message}
-          {...register("last_name")}
+          value={lastName}
+          onChange={(e) => {
+            setLastName(e.target.value);
+            clearError("lastName");
+          }}
+          error={formErrors.lastName}
         />
       </div>
       <Input
@@ -164,8 +238,12 @@ export default function ClientsPage() {
         placeholder="ornek@email.com"
         maxLength={254}
         hint="Analiz linki göndermek için"
-        error={errors.email?.message}
-        {...register("email")}
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          clearError("email");
+        }}
+        error={formErrors.email}
       />
       <Input
         label="Telefon"
@@ -174,15 +252,23 @@ export default function ClientsPage() {
         maxLength={14}
         placeholder="0511 111 11 11"
         hint="WhatsApp ile göndermek için"
-        error={errors.phone?.message}
-        {...phoneField}
+        value={phone}
+        onChange={(e) => {
+          setPhone(formatTurkeyPhoneInput(e.target.value));
+          clearError("phone");
+        }}
+        error={formErrors.phone}
       />
       <Input
         label="Doğum Tarihi"
         type="date"
         hint="Opsiyonel"
-        error={errors.birth_date?.message}
-        {...register("birth_date")}
+        value={birthDate}
+        onChange={(e) => {
+          setBirthDate(e.target.value);
+          clearError("birthDate");
+        }}
+        error={formErrors.birthDate}
       />
 
       <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800 leading-relaxed">
@@ -197,7 +283,7 @@ export default function ClientsPage() {
           variant="secondary"
           onClick={() => {
             setShowModal(false);
-            reset();
+            resetForm();
           }}
           className="flex-1"
         >
@@ -407,7 +493,7 @@ export default function ClientsPage() {
             open={showModal}
             onClose={() => {
               setShowModal(false);
-              reset();
+              resetForm();
             }}
             title="Yeni Danışan"
           >
@@ -561,7 +647,7 @@ export default function ClientsPage() {
               <button
                 onClick={() => {
                   setShowModal(false);
-                  reset();
+                  resetForm();
                 }}
                 className="p-2 -mr-2 text-pro-text-secondary"
               >

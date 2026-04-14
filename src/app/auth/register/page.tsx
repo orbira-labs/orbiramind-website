@@ -3,36 +3,83 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { registerSchema, type RegisterInput } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/auth/AuthLayout";
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  kvkk?: string;
+  terms?: string;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const {
-    register: reg,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  async function onSubmit(data: RegisterInput) {
+  function validateForm(): boolean {
+    const newErrors: FormErrors = {};
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      newErrors.email = "Email adresi gerekli";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      newErrors.email = "Geçerli bir email adresi girin";
+    }
+
+    if (!password) {
+      newErrors.password = "Şifre gerekli";
+    } else if (password.length < 8) {
+      newErrors.password = "Şifre en az 8 karakter olmalı";
+    } else if (password.length > 72) {
+      newErrors.password = "Şifre en fazla 72 karakter olabilir";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Şifre tekrarı gerekli";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Şifreler eşleşmiyor";
+    }
+
+    if (!kvkkAccepted) {
+      newErrors.kvkk = "KVKK Aydınlatma Metni'ni kabul etmelisiniz";
+    }
+
+    if (!termsAccepted) {
+      newErrors.terms = "Kullanım Koşulları'nı kabul etmelisiniz";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
-    const email = data.email.trim().toLowerCase();
+    const trimmedEmail = email.trim().toLowerCase();
+
     try {
       const supabase = createClient();
       const { data: signUpData, error } = await supabase.auth.signUp({
-        email,
-        password: data.password,
+        email: trimmedEmail,
+        password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -52,11 +99,21 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
+      router.push(`/auth/verify?email=${encodeURIComponent(trimmedEmail)}`);
     } catch {
       toast.error("Bir hata oluştu");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function clearError(field: keyof FormErrors) {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
     }
   }
 
@@ -74,7 +131,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
             <div className="mobile-form-group md:block">
               <Input
                 label="Email"
@@ -82,9 +139,13 @@ export default function RegisterPage() {
                 placeholder="ornek@email.com"
                 autoComplete="email"
                 maxLength={254}
-                error={errors.email?.message}
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  clearError("email");
+                }}
+                error={errors.email}
                 className="mobile-input md:w-full md:min-h-0"
-                {...reg("email")}
               />
             </div>
             <div className="mobile-form-group md:block">
@@ -94,9 +155,13 @@ export default function RegisterPage() {
                 placeholder="En az 8 karakter"
                 autoComplete="new-password"
                 maxLength={72}
-                error={errors.password?.message}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearError("password");
+                }}
+                error={errors.password}
                 className="mobile-input md:w-full md:min-h-0"
-                {...reg("password")}
               />
             </div>
             <div className="mobile-form-group md:block">
@@ -106,9 +171,13 @@ export default function RegisterPage() {
                 placeholder="Şifrenizi tekrar girin"
                 autoComplete="new-password"
                 maxLength={72}
-                error={errors.confirmPassword?.message}
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  clearError("confirmPassword");
+                }}
+                error={errors.confirmPassword}
                 className="mobile-input md:w-full md:min-h-0"
-                {...reg("confirmPassword")}
               />
             </div>
 
@@ -116,8 +185,12 @@ export default function RegisterPage() {
               <label className="flex items-start gap-3 cursor-pointer touch-manipulation">
                 <input
                   type="checkbox"
+                  checked={kvkkAccepted}
+                  onChange={(e) => {
+                    setKvkkAccepted(e.target.checked);
+                    clearError("kvkk");
+                  }}
                   className="mt-0.5 h-5 w-5 md:h-4 md:w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
-                  {...reg("kvkk_accepted")}
                 />
                 <span className="text-xs text-pro-text-secondary leading-relaxed">
                   <Link
@@ -131,17 +204,21 @@ export default function RegisterPage() {
                   &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.
                 </span>
               </label>
-              {errors.kvkk_accepted?.message && (
+              {errors.kvkk && (
                 <p className="text-xs text-pro-danger pl-8 md:pl-7">
-                  {errors.kvkk_accepted.message}
+                  {errors.kvkk}
                 </p>
               )}
 
               <label className="flex items-start gap-3 cursor-pointer touch-manipulation">
                 <input
                   type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => {
+                    setTermsAccepted(e.target.checked);
+                    clearError("terms");
+                  }}
                   className="mt-0.5 h-5 w-5 md:h-4 md:w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
-                  {...reg("terms_accepted")}
                 />
                 <span className="text-xs text-pro-text-secondary leading-relaxed">
                   <Link
@@ -155,9 +232,9 @@ export default function RegisterPage() {
                   &apos;nı okudum ve kabul ediyorum.
                 </span>
               </label>
-              {errors.terms_accepted?.message && (
+              {errors.terms && (
                 <p className="text-xs text-pro-danger pl-8 md:pl-7">
-                  {errors.terms_accepted.message}
+                  {errors.terms}
                 </p>
               )}
             </div>
