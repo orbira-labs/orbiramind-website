@@ -25,7 +25,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { WellnessGauge } from "@/components/results/WellnessGauge";
 import { ProfileCard } from "@/components/results/ProfileCard";
-import { DimensionRadar } from "@/components/results/DimensionRadar";
 import { StrengthWeaknessGrid } from "@/components/results/StrengthWeaknessGrid";
 import { BlindSpotCard } from "@/components/results/BlindSpotCard";
 import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
@@ -375,19 +374,17 @@ export default function TestResultPage() {
                   )}
 
                   <Card padding="lg" variant="elevated">
-                    <div className="flex justify-center mb-6">
-                      <WellnessGauge score={analysis.wellness_score} size="sm" />
-                    </div>
-                    {analysis.dimension_scores && analysis.dimension_scores.length > 0 && (
-                      <DimensionRadar
-                        scores={Object.fromEntries(
-                          analysis.dimension_scores
-                            .filter((d) => d.has_data !== false)
-                            .map((d) => [d.dimension, d.score])
-                        )}
-                      />
-                    )}
+                    <CharacterAnalysis
+                      text={report.character_analysis}
+                      scoreWidget={<WellnessGauge score={analysis.wellness_score} size="sm" />}
+                    />
                   </Card>
+
+                  {analysis.inferences && analysis.inferences.length > 0 && (
+                    <Card padding="lg" variant="elevated">
+                      <InferenceCards inferences={analysis.inferences} />
+                    </Card>
+                  )}
                 </div>
               )}
 
@@ -410,10 +407,6 @@ export default function TestResultPage() {
 
               {activeTab === "deep" && (
                 <div className="space-y-6">
-                  <Card padding="lg" variant="elevated">
-                    <CharacterAnalysis text={report.character_analysis} />
-                  </Card>
-
                   {analysis.inferences && analysis.inferences.length > 0 && (
                     <Card padding="lg" variant="elevated">
                       <InferenceCards inferences={analysis.inferences} />

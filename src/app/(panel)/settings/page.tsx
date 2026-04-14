@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Modal } from "@/components/ui/Modal";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { SPECIALIZATIONS } from "@/lib/constants";
+import { profileSettingsSchema } from "@/lib/validations";
+import { formatTurkeyPhoneInput } from "@/lib/utils";
 import {
   User,
   Shield,
@@ -41,6 +43,7 @@ export default function SettingsPage() {
   const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0);
   const [deleteEmail, setDeleteEmail] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<"first_name" | "last_name" | "phone" | "city" | "district" | "specializations", string>>>({});
 
   useEffect(() => {
     if (professional) {
@@ -50,6 +53,7 @@ export default function SettingsPage() {
       setCity(professional.city || "");
       setDistrict(professional.district || "");
       setSpecs(professional.specializations || []);
+      setErrors({});
     }
   }, [professional]);
 
@@ -65,18 +69,49 @@ export default function SettingsPage() {
 
   async function handleSave() {
     if (!professional) return;
+
+    const parsed = profileSettingsSchema.safeParse({
+      first_name: firstName,
+      last_name: lastName,
+      phone,
+      city,
+      district,
+      specializations: specs,
+    });
+
+    if (!parsed.success) {
+      const nextErrors: typeof errors = {};
+      for (const issue of parsed.error.issues) {
+        const path = issue.path[0];
+        if (
+          path === "first_name" ||
+          path === "last_name" ||
+          path === "phone" ||
+          path === "city" ||
+          path === "district" ||
+          path === "specializations"
+        ) {
+          nextErrors[path] = issue.message;
+        }
+      }
+      setErrors(nextErrors);
+      toast.error("Lütfen formdaki hataları düzeltin");
+      return;
+    }
+
+    setErrors({});
     setSaving(true);
     try {
       const supabase = createSupabase();
       const { error } = await supabase
         .from("professionals")
         .update({
-          first_name: firstName,
-          last_name: lastName,
-          phone: phone || null,
-          city,
-          district,
-          specializations: specs,
+          first_name: parsed.data.first_name,
+          last_name: parsed.data.last_name,
+          phone: parsed.data.phone || null,
+          city: parsed.data.city,
+          district: parsed.data.district,
+          specializations: parsed.data.specializations,
         })
         .eq("id", professional.id);
 
@@ -146,12 +181,22 @@ export default function SettingsPage() {
                     <Input
                       label="Ad"
                       value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      maxLength={50}
+                      error={errors.first_name}
+                      onChange={(e) => {
+                        setFirstName(e.target.value);
+                        setErrors((current) => ({ ...current, first_name: undefined }));
+                      }}
                     />
                     <Input
                       label="Soyad"
                       value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                      maxLength={50}
+                      error={errors.last_name}
+                      onChange={(e) => {
+                        setLastName(e.target.value);
+                        setErrors((current) => ({ ...current, last_name: undefined }));
+                      }}
                     />
                   </div>
 
@@ -161,7 +206,13 @@ export default function SettingsPage() {
                       label="Telefon"
                       type="tel"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      inputMode="numeric"
+                      maxLength={14}
+                      error={errors.phone}
+                      onChange={(e) => {
+                        setPhone(formatTurkeyPhoneInput(e.target.value));
+                        setErrors((current) => ({ ...current, phone: undefined }));
+                      }}
                       hint="WhatsApp için"
                     />
                     <Input
@@ -177,12 +228,22 @@ export default function SettingsPage() {
                     <Input
                       label="İl"
                       value={city}
-                      onChange={(e) => setCity(e.target.value)}
+                      maxLength={50}
+                      error={errors.city}
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        setErrors((current) => ({ ...current, city: undefined }));
+                      }}
                     />
                     <Input
                       label="İlçe"
                       value={district}
-                      onChange={(e) => setDistrict(e.target.value)}
+                      maxLength={60}
+                      error={errors.district}
+                      onChange={(e) => {
+                        setDistrict(e.target.value);
+                        setErrors((current) => ({ ...current, district: undefined }));
+                      }}
                     />
                   </div>
 
@@ -244,6 +305,9 @@ export default function SettingsPage() {
                         </div>
                       )}
                     </div>
+                    {errors.specializations && (
+                      <p className="text-xs text-pro-danger">{errors.specializations}</p>
+                    )}
                   </div>
 
                   <Button onClick={handleSave} loading={saving} className="mt-2">

@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Sadece public sayfalar (panel sayfaları hariç)
   const publicPages = [
     '',
+    '/how-it-works',
     '/auth/login',
     '/auth/register',
     '/privacy',

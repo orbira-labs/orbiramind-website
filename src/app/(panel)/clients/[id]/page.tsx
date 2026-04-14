@@ -389,11 +389,16 @@ export default function ClientDetailPage() {
           {activeTab === "notes" && (
             <div className="space-y-4">
               <Card padding="md">
+                <label htmlFor="client-note" className="sr-only">
+                  Danışan notu
+                </label>
                 <textarea
+                  id="client-note"
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   placeholder="Not ekle..."
                   rows={3}
+                  maxLength={1000}
                   className="w-full bg-transparent text-sm text-pro-text placeholder:text-pro-text-tertiary resize-none focus:outline-none"
                 />
                 <div className="flex justify-end mt-2">

@@ -78,6 +78,22 @@ export function generateWhatsAppLink(phone: string, message: string): string {
   return `https://wa.me/${cleaned}?text=${encoded}`;
 }
 
+export function formatTurkeyPhoneInput(phone: string): string {
+  const digits = phone.replace(/\D/g, "").slice(0, 11);
+  const parts = [
+    digits.slice(0, 4),
+    digits.slice(4, 7),
+    digits.slice(7, 9),
+    digits.slice(9, 11),
+  ].filter(Boolean);
+
+  return parts.join(" ");
+}
+
+export function normalizeTestCodeInput(value: string): string {
+  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+}
+
 export function buildTestMessage(
   clientName: string,
   professionalName: string,

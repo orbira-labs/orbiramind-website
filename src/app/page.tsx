@@ -618,6 +618,357 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================
+          TRUST & COMPLIANCE SECTION
+          ============================================================ */}
+
+      {/* Desktop Trust & Compliance */}
+      <section className="desktop-only py-28 px-8 lg:px-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#5B7B6A]/10 rounded-full mb-6">
+              <Shield className="h-4 w-4 text-[#5B7B6A]" />
+              <span className="text-sm font-semibold text-[#5B7B6A]">Güven & Uyum</span>
+            </div>
+            <h2 className="text-5xl font-bold text-[#1a1a1a] tracking-tight mb-4">
+              Verileriniz <span className="text-[#5B7B6A]">güvende</span>
+            </h2>
+            <p className="text-lg text-[#666] max-w-2xl mx-auto">
+              Danışan mahremiyeti ve veri güvenliği, platformumuzun temel taşıdır.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6 mb-12">
+            <div className="p-8 bg-white rounded-[32px] border-2 border-[#eee] hover:border-[#5B7B6A]/30 transition-colors">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/10 flex items-center justify-center mb-6">
+                <Shield className="h-7 w-7 text-[#5B7B6A]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#1a1a1a] mb-3">KVKK Tam Uyum</h3>
+              <p className="text-[#666] leading-relaxed">6698 sayılı KVKK kapsamında aydınlatma metni, açık rıza yönetimi ve veri işleme süreçleri eksiksiz uygulanır.</p>
+            </div>
+
+            <div className="p-8 bg-white rounded-[32px] border-2 border-[#eee] hover:border-[#5B7B6A]/30 transition-colors">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/10 flex items-center justify-center mb-6">
+                <Lock className="h-7 w-7 text-[#5B7B6A]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#1a1a1a] mb-3">Uçtan Uca Şifreleme</h3>
+              <p className="text-[#666] leading-relaxed">Tüm danışan verileri şifreli aktarılır ve saklanır. Veriler Türkiye veya AB bölgesinde tutulur, üçüncü taraflarla paylaşılmaz.</p>
+            </div>
+
+            <div className="p-8 bg-white rounded-[32px] border-2 border-[#eee] hover:border-[#5B7B6A]/30 transition-colors">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/10 flex items-center justify-center mb-6">
+                <CheckCircle2 className="h-7 w-7 text-[#5B7B6A]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#1a1a1a] mb-3">Etik Kullanım Çerçevesi</h3>
+              <p className="text-[#666] leading-relaxed">Analiz sonuçları yalnızca bilgilendirme amaçlıdır, klinik tanı yerine geçmez. TKD, BİP ve ICF etik kurallarına uyumlu kullanım desteklenir.</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-[#5B7B6A]/5 to-[#5B7B6A]/10 rounded-[32px] p-10 border border-[#5B7B6A]/20">
+            <h3 className="text-xl font-bold text-[#1a1a1a] mb-6 text-center">Danışan Veri Akışı</h3>
+            <div className="flex items-center justify-center gap-4">
+              <div className="text-center">
+                <div className="h-16 w-16 rounded-2xl bg-white border-2 border-[#5B7B6A]/30 flex items-center justify-center mx-auto mb-3">
+                  <Users className="h-8 w-8 text-[#5B7B6A]" />
+                </div>
+                <p className="text-sm font-semibold text-[#1a1a1a]">Danışan</p>
+                <p className="text-xs text-[#666]">Test linkini tıklar</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-[#5B7B6A]" />
+              <div className="text-center">
+                <div className="h-16 w-16 rounded-2xl bg-white border-2 border-[#D4856A]/30 flex items-center justify-center mx-auto mb-3">
+                  <Lock className="h-8 w-8 text-[#D4856A]" />
+                </div>
+                <p className="text-sm font-semibold text-[#1a1a1a]">Şifreli Aktarım</p>
+                <p className="text-xs text-[#666]">TLS + veritabanı şifreleme</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-[#5B7B6A]" />
+              <div className="text-center">
+                <div className="h-16 w-16 rounded-2xl bg-white border-2 border-[#5B7B6A]/30 flex items-center justify-center mx-auto mb-3">
+                  <Brain className="h-8 w-8 text-[#5B7B6A]" />
+                </div>
+                <p className="text-sm font-semibold text-[#1a1a1a]">HAE & AQE</p>
+                <p className="text-xs text-[#666]">Algoritmik analiz</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-[#5B7B6A]" />
+              <div className="text-center">
+                <div className="h-16 w-16 rounded-2xl bg-white border-2 border-[#5B7B6A]/30 flex items-center justify-center mx-auto mb-3">
+                  <BarChart3 className="h-8 w-8 text-[#5B7B6A]" />
+                </div>
+                <p className="text-sm font-semibold text-[#1a1a1a]">Profesyonel</p>
+                <p className="text-xs text-[#666]">Yalnızca siz görürsünüz</p>
+              </div>
+            </div>
+            <p className="text-center text-sm text-[#666] mt-6">
+              Danışan verilerine yalnızca ilgili profesyonel erişebilir. Ham veriler AI servislerine gönderilmez.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile Trust & Compliance */}
+      <section className="mobile-only py-14 px-5">
+        <div className="max-w-lg mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#5B7B6A]/10 rounded-full mb-4">
+              <Shield className="h-3.5 w-3.5 text-[#5B7B6A]" />
+              <span className="text-xs font-semibold text-[#5B7B6A]">Güven & Uyum</span>
+            </div>
+            <h2 className="text-2xl font-bold text-[#1a1a1a] tracking-tight mb-2">
+              Verileriniz <span className="text-[#5B7B6A]">güvende</span>
+            </h2>
+            <p className="text-sm text-[#666]">
+              Danışan mahremiyeti temel önceliğimizdir.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#5B7B6A]/30 flex items-center justify-center">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-[#1a1a1a] mb-1">KVKK Tam Uyum</h3>
+                <p className="text-xs text-[#666]">Aydınlatma metni, açık rıza ve veri işleme süreçleri eksiksiz uygulanır.</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#5B7B6A]/30 flex items-center justify-center">
+                <Lock className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-[#1a1a1a] mb-1">Şifreli Veri Saklama</h3>
+                <p className="text-xs text-[#666]">Veriler Türkiye/AB bölgesinde, şifreli tutulur. Üçüncü tarafla paylaşılmaz.</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white rounded-2xl border border-[#eee] flex items-start gap-4">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#5B7B6A]/30 flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-[#1a1a1a] mb-1">Etik Kullanım</h3>
+                <p className="text-xs text-[#666]">Sonuçlar bilgilendirme amaçlıdır. TKD, BİP, ICF etik kurallarına uyumlu.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 bg-gradient-to-br from-[#5B7B6A]/5 to-[#5B7B6A]/10 rounded-2xl p-5 border border-[#5B7B6A]/20">
+            <h3 className="text-sm font-bold text-[#1a1a1a] mb-4 text-center">Veri Akışı</h3>
+            <div className="flex items-center justify-between gap-1">
+              {[
+                { icon: Users, label: "Danışan" },
+                { icon: Lock, label: "Şifreleme" },
+                { icon: Brain, label: "Analiz" },
+                { icon: BarChart3, label: "Siz" },
+              ].map((step, i) => (
+                <div key={i} className="flex items-center gap-1">
+                  <div className="text-center">
+                    <div className="h-10 w-10 rounded-xl bg-white border border-[#5B7B6A]/30 flex items-center justify-center mx-auto mb-1">
+                      <step.icon className="h-5 w-5 text-[#5B7B6A]" />
+                    </div>
+                    <p className="text-[10px] font-medium text-[#1a1a1a]">{step.label}</p>
+                  </div>
+                  {i < 3 && <ArrowRight className="h-3 w-3 text-[#5B7B6A] shrink-0 mb-3" />}
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-[10px] text-[#666] mt-3">
+              Ham veriler AI servislerine gönderilmez.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          USE CASE SCENARIOS SECTION
+          ============================================================ */}
+
+      {/* Desktop Use Cases */}
+      <section className="desktop-only py-28 px-8 lg:px-12 bg-gradient-to-b from-[#FAFAF8] to-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4856A]/10 rounded-full mb-6">
+              <Sparkles className="h-4 w-4 text-[#D4856A]" />
+              <span className="text-sm font-semibold text-[#D4856A]">Pratikte Nasıl?</span>
+            </div>
+            <h2 className="text-5xl font-bold text-[#1a1a1a] tracking-tight mb-4">
+              Seanstan <span className="text-[#D4856A]">sonuca</span>
+            </h2>
+            <p className="text-lg text-[#666] max-w-2xl mx-auto">
+              Terapist ve yaşam koçları OrbiraMind&apos;ı pratikte nasıl kullanıyor?
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Terapist Senaryosu */}
+            <div className="relative p-10 bg-gradient-to-br from-[#5B7B6A]/5 to-white rounded-[32px] border-2 border-[#5B7B6A]/20 overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-[#5B7B6A]/10 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#5B7B6A]/10 rounded-full mb-6">
+                  <PsychologyIcon className="h-4 w-4 text-[#5B7B6A]" />
+                  <span className="text-xs font-semibold text-[#5B7B6A]">Terapist Senaryosu</span>
+                </div>
+                <h3 className="text-2xl font-bold text-[#1a1a1a] mb-6">Seans Öncesi Hazırlık</h3>
+                <div className="space-y-5">
+                  <div className="flex items-start gap-4">
+                    <div className="h-9 w-9 rounded-xl bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a1a] mb-1">Danışana test linki gönderin</p>
+                      <p className="text-sm text-[#666]">Danışanınız kendi cihazından, rahat ortamda testi tamamlar. Uygulama indirmesi gerekmez.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="h-9 w-9 rounded-xl bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a1a] mb-1">Derinlemesine karakter haritasını inceleyin</p>
+                      <p className="text-sm text-[#666]">Kör noktalar, savunma mekanizmaları ve tutarsızlıklar seans öncesi elinizde. Daha bilinçli bir görüşme planlayın.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="h-9 w-9 rounded-xl bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a1a] mb-1">Terapi sürecini zenginleştirin</p>
+                      <p className="text-sm text-[#666]">Raporun önerdiği müdahale adımlarını kendi klinik değerlendirmenizle birleştirin. Danışan notlarınızla ilerleyin.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-8 p-4 bg-[#5B7B6A]/10 rounded-2xl">
+                  <p className="text-sm text-[#5B7B6A] font-medium text-center">
+                    &ldquo;Danışanımın farkında olmadığı kalıpları görebilmek, seans planlamada büyük fark yaratıyor.&rdquo;
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Koç Senaryosu */}
+            <div className="relative p-10 bg-gradient-to-br from-[#D4856A]/5 to-white rounded-[32px] border-2 border-[#D4856A]/20 overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4856A]/10 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#D4856A]/10 rounded-full mb-6">
+                  <GrowthIcon className="h-4 w-4 text-[#D4856A]" />
+                  <span className="text-xs font-semibold text-[#D4856A]">Yaşam Koçu Senaryosu</span>
+                </div>
+                <h3 className="text-2xl font-bold text-[#1a1a1a] mb-6">Hedefe Giden Yol</h3>
+                <div className="space-y-5">
+                  <div className="flex items-start gap-4">
+                    <div className="h-9 w-9 rounded-xl bg-[#D4856A] flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a1a] mb-1">Danışanın güçlü ve zayıf yanlarını keşfedin</p>
+                      <p className="text-sm text-[#666]">Kişilik analizi ile danışanınızın doğal eğilimlerini, motivasyon kaynaklarını ve engellerini netleştirin.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="h-9 w-9 rounded-xl bg-[#D4856A] flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a1a] mb-1">Kişiye özel aksiyon planı oluşturun</p>
+                      <p className="text-sm text-[#666]">Raporun sunduğu koçluk yol haritası ile acil, kısa ve orta vadeli adımlar belirleyin. Hedef takibini yapılandırın.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="h-9 w-9 rounded-xl bg-[#D4856A] flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a1a] mb-1">İlerlemeyi somut olarak takip edin</p>
+                      <p className="text-sm text-[#666]">Seans notları ve danışan portföyü ile her görüşmedeki değişimi kaydedin. Gelişim yolculuğunu görünür kılın.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-8 p-4 bg-[#D4856A]/10 rounded-2xl">
+                  <p className="text-sm text-[#D4856A] font-medium text-center">
+                    &ldquo;Hedef belirleme sürecinde veriye dayalı bir başlangıç noktası sunabilmek, koçluk etkisini katlıyor.&rdquo;
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile Use Cases */}
+      <section className="mobile-only py-14 px-5 bg-gradient-to-b from-[#FAFAF8] to-white">
+        <div className="max-w-lg mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#D4856A]/10 rounded-full mb-4">
+              <Sparkles className="h-3.5 w-3.5 text-[#D4856A]" />
+              <span className="text-xs font-semibold text-[#D4856A]">Pratikte Nasıl?</span>
+            </div>
+            <h2 className="text-2xl font-bold text-[#1a1a1a] tracking-tight mb-2">
+              Seanstan <span className="text-[#D4856A]">sonuca</span>
+            </h2>
+            <p className="text-sm text-[#666]">
+              Profesyoneller OrbiraMind&apos;ı pratikte nasıl kullanıyor?
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Terapist Card */}
+            <div className="p-5 bg-gradient-to-br from-[#5B7B6A]/5 to-white rounded-2xl border border-[#5B7B6A]/20">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#5B7B6A]/10 rounded-full mb-4">
+                <PsychologyIcon className="h-3.5 w-3.5 text-[#5B7B6A]" />
+                <span className="text-[10px] font-semibold text-[#5B7B6A]">Terapist</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#1a1a1a] mb-4">Seans Öncesi Hazırlık</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="h-7 w-7 rounded-lg bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-xs shrink-0">1</div>
+                  <div>
+                    <p className="font-semibold text-[#1a1a1a] text-sm">Test linki gönderin</p>
+                    <p className="text-xs text-[#666]">Danışan rahat ortamda testi tamamlar.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-7 w-7 rounded-lg bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-xs shrink-0">2</div>
+                  <div>
+                    <p className="font-semibold text-[#1a1a1a] text-sm">Karakter haritasını inceleyin</p>
+                    <p className="text-xs text-[#666]">Kör noktalar ve tutarsızlıklar seans öncesi elinizde.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-7 w-7 rounded-lg bg-[#5B7B6A] flex items-center justify-center text-white font-bold text-xs shrink-0">3</div>
+                  <div>
+                    <p className="font-semibold text-[#1a1a1a] text-sm">Süreci zenginleştirin</p>
+                    <p className="text-xs text-[#666]">Müdahale adımlarını klinik değerlendirmenizle birleştirin.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Koç Card */}
+            <div className="p-5 bg-gradient-to-br from-[#D4856A]/5 to-white rounded-2xl border border-[#D4856A]/20">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4856A]/10 rounded-full mb-4">
+                <GrowthIcon className="h-3.5 w-3.5 text-[#D4856A]" />
+                <span className="text-[10px] font-semibold text-[#D4856A]">Yaşam Koçu</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#1a1a1a] mb-4">Hedefe Giden Yol</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="h-7 w-7 rounded-lg bg-[#D4856A] flex items-center justify-center text-white font-bold text-xs shrink-0">1</div>
+                  <div>
+                    <p className="font-semibold text-[#1a1a1a] text-sm">Güçlü ve zayıf yanları keşfedin</p>
+                    <p className="text-xs text-[#666]">Doğal eğilimler, motivasyon ve engelleri netleştirin.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-7 w-7 rounded-lg bg-[#D4856A] flex items-center justify-center text-white font-bold text-xs shrink-0">2</div>
+                  <div>
+                    <p className="font-semibold text-[#1a1a1a] text-sm">Aksiyon planı oluşturun</p>
+                    <p className="text-xs text-[#666]">Koçluk yol haritası ile somut adımlar belirleyin.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-7 w-7 rounded-lg bg-[#D4856A] flex items-center justify-center text-white font-bold text-xs shrink-0">3</div>
+                  <div>
+                    <p className="font-semibold text-[#1a1a1a] text-sm">İlerlemeyi takip edin</p>
+                    <p className="text-xs text-[#666]">Seans notları ile gelişim yolculuğunu görünür kılın.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
           CTA SECTION
           ============================================================ */}
 

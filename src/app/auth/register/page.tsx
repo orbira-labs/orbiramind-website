@@ -27,10 +27,11 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterInput) {
     setLoading(true);
+    const email = data.email.trim().toLowerCase();
     try {
       const supabase = createClient();
       const { data: signUpData, error } = await supabase.auth.signUp({
-        email: data.email,
+        email,
         password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -51,7 +52,7 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`);
+      router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch {
       toast.error("Bir hata oluştu");
     } finally {
@@ -80,6 +81,7 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="ornek@email.com"
                 autoComplete="email"
+                maxLength={254}
                 error={errors.email?.message}
                 className="mobile-input md:w-full md:min-h-0"
                 {...reg("email")}
@@ -91,6 +93,7 @@ export default function RegisterPage() {
                 type="password"
                 placeholder="En az 8 karakter"
                 autoComplete="new-password"
+                maxLength={72}
                 error={errors.password?.message}
                 className="mobile-input md:w-full md:min-h-0"
                 {...reg("password")}
@@ -102,6 +105,7 @@ export default function RegisterPage() {
                 type="password"
                 placeholder="Şifrenizi tekrar girin"
                 autoComplete="new-password"
+                maxLength={72}
                 error={errors.confirmPassword?.message}
                 className="mobile-input md:w-full md:min-h-0"
                 {...reg("confirmPassword")}

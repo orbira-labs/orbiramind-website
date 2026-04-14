@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -10,20 +11,11 @@ import { Select } from "@/components/ui/Select";
 import { useClients } from "@/lib/hooks/useClients";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { APPOINTMENT_DURATIONS } from "@/lib/constants";
+import { createAppointmentSchema, type CreateAppointmentInput } from "@/lib/validations";
 import { formatDateForInput, getTodayDateString, toTurkeyTime, parseDateTimeToISO } from "@/lib/utils";
 import { UserPlus, Users, X, Calendar } from "lucide-react";
 import { clsx } from "clsx";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
-
-interface AppointmentInput {
-  client_id?: string;
-  new_first_name?: string;
-  new_last_name?: string;
-  date: string;
-  time: string;
-  duration_minutes: number;
-  note?: string;
-}
 
 interface CreateAppointmentModalProps {
   open: boolean;
@@ -52,7 +44,11 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<AppointmentInput>({
+    setValue,
+    clearErrors,
+    setError,
+  } = useForm<CreateAppointmentInput>({
+    resolver: zodResolver(createAppointmentSchema),
     defaultValues: {
       duration_minutes: 60,
       date: getTodayDateString(),
@@ -70,13 +66,30 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
         time: getDefaultTime(),
       });
       setClientMode("existing");
+      clearErrors();
     }
-  }, [open, reset, preselectedDateStr]);
+  }, [open, reset, preselectedDateStr, clearErrors]);
 
-  async function onSubmit(data: AppointmentInput) {
-    if (!data.date || !data.time) {
-      toast.error("Tarih ve saat gerekli");
+  async function onSubmit(data: CreateAppointmentInput) {
+    if (clientMode === "existing" && !data.client_id) {
+      setError("client_id", { message: "Danışan seçin" });
       return;
+    }
+
+    if (clientMode === "new") {
+      let hasNewClientErrors = false;
+
+      if (!data.new_first_name || data.new_first_name.length < 2) {
+        setError("new_first_name", { message: "Ad en az 2 karakter olmalı" });
+        hasNewClientErrors = true;
+      }
+
+      if (!data.new_last_name || data.new_last_name.length < 2) {
+        setError("new_last_name", { message: "Soyad en az 2 karakter olmalı" });
+        hasNewClientErrors = true;
+      }
+
+      if (hasNewClientErrors) return;
     }
 
     setSaving(true);
@@ -94,18 +107,12 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
       let clientId = data.client_id;
 
       if (clientMode === "new") {
-        if (!data.new_first_name?.trim() || !data.new_last_name?.trim()) {
-          toast.error("Ad ve soyad gerekli");
-          setSaving(false);
-          return;
-        }
-
         const { data: newClient, error: clientError } = await supabase
           .from("clients")
           .insert({
             professional_id: user.id,
-            first_name: data.new_first_name.trim(),
-            last_name: data.new_last_name.trim(),
+            first_name: data.new_first_name!,
+            last_name: data.new_last_name!,
           })
           .select()
           .single();
@@ -118,12 +125,6 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
 
         clientId = newClient.id;
         refreshClients();
-      }
-
-      if (!clientId) {
-        toast.error("Danışan seçin");
-        setSaving(false);
-        return;
       }
 
       const startsAt = parseDateTimeToISO(data.date, data.time);
@@ -159,7 +160,10 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
       <div className={clsx("flex gap-1.5 p-1 bg-pro-surface-alt rounded-xl", isMobile && "p-1.5")}>
         <button
           type="button"
-          onClick={() => setClientMode("existing")}
+          onClick={() => {
+            setClientMode("existing");
+            clearErrors(["new_first_name", "new_last_name"]);
+          }}
           className={clsx(
             "flex-1 flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all touch-manipulation",
             isMobile ? "px-3 py-2.5" : "px-3 py-2",
@@ -173,7 +177,11 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
         </button>
         <button
           type="button"
-          onClick={() => setClientMode("new")}
+          onClick={() => {
+            setClientMode("new");
+            setValue("client_id", undefined, { shouldValidate: false });
+            clearErrors("client_id");
+          }}
           className={clsx(
             "flex-1 flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all touch-manipulation",
             isMobile ? "px-3 py-2.5" : "px-3 py-2",
@@ -197,12 +205,28 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
             label: `${c.first_name} ${c.last_name}`,
           }))}
           error={errors.client_id?.message}
-          {...register("client_id")}
+          {...register("client_id", {
+            onChange: () => {
+              clearErrors("client_id");
+            },
+          })}
         />
       ) : (
         <div className={clsx(isMobile ? "space-y-3" : "grid grid-cols-2 gap-3")}>
-          <Input label="Ad" placeholder="Danışan adı" {...register("new_first_name")} />
-          <Input label="Soyad" placeholder="Danışan soyadı" {...register("new_last_name")} />
+          <Input
+            label="Ad"
+            placeholder="Danışan adı"
+            maxLength={50}
+            error={errors.new_first_name?.message}
+            {...register("new_first_name")}
+          />
+          <Input
+            label="Soyad"
+            placeholder="Danışan soyadı"
+            maxLength={50}
+            error={errors.new_last_name?.message}
+            {...register("new_last_name")}
+          />
         </div>
       )}
 
@@ -224,7 +248,7 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
                   ? "border-pro-danger"
                   : "border-pro-border hover:border-pro-border-strong"
               )}
-              {...register("date", { required: true })}
+              {...register("date")}
             />
           </div>
           <div className="space-y-1">
@@ -241,12 +265,14 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
                   ? "border-pro-danger"
                   : "border-pro-border hover:border-pro-border-strong"
               )}
-              {...register("time", { required: true })}
+              {...register("time")}
             />
           </div>
         </div>
         {(errors.date || errors.time) && (
-          <p className="text-xs text-pro-danger">Tarih ve saat gerekli</p>
+          <p className="text-xs text-pro-danger">
+            {errors.date?.message || errors.time?.message}
+          </p>
         )}
       </div>
 
@@ -268,6 +294,7 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
         <textarea
           id="apt-note"
           rows={isMobile ? 3 : 4}
+          maxLength={1000}
           placeholder="Randevuya dair eklemek istediğiniz not..."
           className={clsx(
             "w-full rounded-lg border text-sm text-pro-text",
@@ -279,7 +306,9 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
           )}
           {...register("note")}
         />
-        <p className="text-xs text-pro-text-tertiary">Opsiyonel</p>
+        <p className={clsx("text-xs", errors.note ? "text-pro-danger" : "text-pro-text-tertiary")}>
+          {errors.note?.message || "Opsiyonel"}
+        </p>
       </div>
 
       {/* Actions - Mobile: fixed at bottom */}

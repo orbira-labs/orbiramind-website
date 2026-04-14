@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { User, Mail, Phone, Calendar, Users, X } from "lucide-react";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { CLIENT_STATUSES } from "@/lib/constants";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import { clientSchema } from "@/lib/validations";
 import type { Client } from "@/lib/types";
+import { formatTurkeyPhoneInput } from "@/lib/utils";
 import { clsx } from "clsx";
 
 const GENDERS = [
@@ -30,6 +33,7 @@ export function EditClientModal({
   onClose,
   onUpdated,
 }: EditClientModalProps) {
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     first_name: "",
@@ -40,6 +44,7 @@ export function EditClientModal({
     gender: "" as Client["gender"] | "",
     status: "active" as Client["status"],
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
 
   useEffect(() => {
     if (open && client) {
@@ -47,33 +52,48 @@ export function EditClientModal({
         first_name: client.first_name || "",
         last_name: client.last_name || "",
         email: client.email || "",
-        phone: client.phone || "",
+        phone: formatTurkeyPhoneInput(client.phone || ""),
         birth_date: client.birth_date || "",
         gender: client.gender || "",
         status: client.status,
       });
+      setErrors({});
     }
   }, [open, client]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!form.first_name.trim() || !form.last_name.trim()) {
-      toast.error("Ad ve soyad zorunludur");
+    const parsed = clientSchema.safeParse({
+      ...form,
+      gender: form.gender || undefined,
+    });
+
+    if (!parsed.success) {
+      const nextErrors: Partial<Record<keyof typeof form, string>> = {};
+      for (const issue of parsed.error.issues) {
+        const path = issue.path[0];
+        if (typeof path === "string" && !(path in nextErrors)) {
+          nextErrors[path as keyof typeof form] = issue.message;
+        }
+      }
+      setErrors(nextErrors);
+      toast.error("Lütfen formdaki hataları düzeltin");
       return;
     }
 
+    setErrors({});
     setSaving(true);
     try {
       const supabase = createSupabase();
 
       const updateData: Partial<Client> = {
-        first_name: form.first_name.trim(),
-        last_name: form.last_name.trim(),
-        email: form.email.trim() || null,
-        phone: form.phone.trim() || null,
-        birth_date: form.birth_date || null,
-        gender: form.gender || null,
+        first_name: parsed.data.first_name,
+        last_name: parsed.data.last_name,
+        email: parsed.data.email || null,
+        phone: parsed.data.phone || null,
+        birth_date: parsed.data.birth_date || null,
+        gender: parsed.data.gender || null,
         status: form.status,
       };
 
@@ -116,10 +136,12 @@ export function EditClientModal({
               value={form.first_name}
               onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
               placeholder="Ad"
-              className={clsx(inputClasses, "pl-9")}
+              maxLength={50}
+              className={clsx(inputClasses, errors.first_name && "border-pro-danger", "pl-9")}
               required
             />
           </div>
+          {errors.first_name && <p className="mt-1 text-xs text-pro-danger">{errors.first_name}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-pro-text mb-1.5">
@@ -130,9 +152,11 @@ export function EditClientModal({
             value={form.last_name}
             onChange={(e) => setForm((f) => ({ ...f, last_name: e.target.value }))}
             placeholder="Soyad"
-            className={inputClasses}
+            maxLength={50}
+            className={clsx(inputClasses, errors.last_name && "border-pro-danger")}
             required
           />
+          {errors.last_name && <p className="mt-1 text-xs text-pro-danger">{errors.last_name}</p>}
         </div>
       </div>
 
@@ -147,9 +171,11 @@ export function EditClientModal({
             value={form.email}
             onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             placeholder="ornek@email.com"
-            className={clsx(inputClasses, "pl-9")}
+            maxLength={254}
+            className={clsx(inputClasses, errors.email && "border-pro-danger", "pl-9")}
           />
         </div>
+        {errors.email && <p className="mt-1 text-xs text-pro-danger">{errors.email}</p>}
       </div>
 
       <div>
@@ -161,11 +187,16 @@ export function EditClientModal({
           <input
             type="tel"
             value={form.phone}
-            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-            placeholder="+90 555 123 4567"
-            className={clsx(inputClasses, "pl-9")}
+            inputMode="numeric"
+            maxLength={14}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, phone: formatTurkeyPhoneInput(e.target.value) }))
+            }
+            placeholder="0511 111 11 11"
+            className={clsx(inputClasses, errors.phone && "border-pro-danger", "pl-9")}
           />
         </div>
+        {errors.phone && <p className="mt-1 text-xs text-pro-danger">{errors.phone}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -179,9 +210,10 @@ export function EditClientModal({
               type="date"
               value={form.birth_date}
               onChange={(e) => setForm((f) => ({ ...f, birth_date: e.target.value }))}
-              className={clsx(inputClasses, "pl-9")}
+              className={clsx(inputClasses, errors.birth_date && "border-pro-danger", "pl-9")}
             />
           </div>
+          {errors.birth_date && <p className="mt-1 text-xs text-pro-danger">{errors.birth_date}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-pro-text mb-1.5">
@@ -257,10 +289,12 @@ export function EditClientModal({
             value={form.first_name}
             onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
             placeholder="Ad"
-            className={clsx(mobileInputClasses, "pl-11")}
+            maxLength={50}
+            className={clsx(mobileInputClasses, errors.first_name && "border-pro-danger", "pl-11")}
             required
           />
         </div>
+        {errors.first_name && <p className="mt-1 text-xs text-pro-danger">{errors.first_name}</p>}
       </div>
 
       <div className="mobile-form-group">
@@ -272,10 +306,12 @@ export function EditClientModal({
             value={form.last_name}
             onChange={(e) => setForm((f) => ({ ...f, last_name: e.target.value }))}
             placeholder="Soyad"
-            className={clsx(mobileInputClasses, "pl-11")}
+            maxLength={50}
+            className={clsx(mobileInputClasses, errors.last_name && "border-pro-danger", "pl-11")}
             required
           />
         </div>
+        {errors.last_name && <p className="mt-1 text-xs text-pro-danger">{errors.last_name}</p>}
       </div>
 
       <div className="mobile-form-group">
@@ -287,9 +323,11 @@ export function EditClientModal({
             value={form.email}
             onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             placeholder="ornek@email.com"
-            className={clsx(mobileInputClasses, "pl-11")}
+            maxLength={254}
+            className={clsx(mobileInputClasses, errors.email && "border-pro-danger", "pl-11")}
           />
         </div>
+        {errors.email && <p className="mt-1 text-xs text-pro-danger">{errors.email}</p>}
       </div>
 
       <div className="mobile-form-group">
@@ -299,11 +337,16 @@ export function EditClientModal({
           <input
             type="tel"
             value={form.phone}
-            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-            placeholder="+90 555 123 4567"
-            className={clsx(mobileInputClasses, "pl-11")}
+            inputMode="numeric"
+            maxLength={14}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, phone: formatTurkeyPhoneInput(e.target.value) }))
+            }
+            placeholder="0511 111 11 11"
+            className={clsx(mobileInputClasses, errors.phone && "border-pro-danger", "pl-11")}
           />
         </div>
+        {errors.phone && <p className="mt-1 text-xs text-pro-danger">{errors.phone}</p>}
       </div>
 
       <div className="mobile-form-group">
@@ -314,9 +357,10 @@ export function EditClientModal({
             type="date"
             value={form.birth_date}
             onChange={(e) => setForm((f) => ({ ...f, birth_date: e.target.value }))}
-            className={clsx(mobileInputClasses, "pl-11")}
+            className={clsx(mobileInputClasses, errors.birth_date && "border-pro-danger", "pl-11")}
           />
         </div>
+        {errors.birth_date && <p className="mt-1 text-xs text-pro-danger">{errors.birth_date}</p>}
       </div>
 
       <div className="mobile-form-group">
@@ -375,54 +419,58 @@ export function EditClientModal({
       {/* ============================================================
           DESKTOP VIEW - Centered modal (mevcut tasarım korundu)
           ============================================================ */}
-      <div className="desktop-only">
-        <Modal open={open} onClose={onClose} title="Danışan Bilgilerini Düzenle" size="md">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {formContent}
-          </form>
-        </Modal>
-      </div>
+      {!isMobile && (
+        <div className="desktop-only">
+          <Modal open={open} onClose={onClose} title="Danışan Bilgilerini Düzenle" size="md">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {formContent}
+            </form>
+          </Modal>
+        </div>
+      )}
 
       {/* ============================================================
           MOBILE VIEW - Full screen modal
           ============================================================ */}
-      <div className="mobile-only">
-        <div className="mobile-modal">
-          <div className="mobile-modal-header">
-            <h2 className="text-lg font-semibold text-pro-text">Danışan Bilgilerini Düzenle</h2>
-            <button
-              onClick={onClose}
-              className="p-2 -mr-2 text-pro-text-secondary touch-manipulation"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="p-4 pb-24">
-            {mobileFormContent}
-          </form>
+      {isMobile && (
+        <div className="mobile-only">
+          <div className="mobile-modal">
+            <div className="mobile-modal-header">
+              <h2 className="text-lg font-semibold text-pro-text">Danışan Bilgilerini Düzenle</h2>
+              <button
+                onClick={onClose}
+                className="p-2 -mr-2 text-pro-text-secondary touch-manipulation"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-          {/* Mobile: Fixed bottom action bar */}
-          <div className="mobile-action-bar">
-            <Button 
-              type="button" 
-              variant="secondary" 
-              onClick={onClose}
-              className="flex-1 mobile-btn"
-            >
-              İptal
-            </Button>
-            <Button 
-              type="submit" 
-              loading={saving}
-              onClick={handleSubmit}
-              className="flex-1 mobile-btn"
-            >
-              Kaydet
-            </Button>
+            <form onSubmit={handleSubmit} className="p-4 pb-24">
+              {mobileFormContent}
+            </form>
+
+            {/* Mobile: Fixed bottom action bar */}
+            <div className="mobile-action-bar">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onClose}
+                className="flex-1 mobile-btn"
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                loading={saving}
+                onClick={handleSubmit}
+                className="flex-1 mobile-btn"
+              >
+                Kaydet
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

@@ -16,6 +16,9 @@ import {
   TrendingUp,
   BrainCircuit,
   FlaskConical,
+  X,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -54,8 +57,23 @@ const PACKAGE_FEATURES = [
   "Tam kapsamlı Hibrit Rapor",
 ];
 
+const COMPARISON_ROWS = [
+  { feature: "Karaktere özel adaptif sorular (AQE)", starter: true, pro: true, subscription: true },
+  { feature: "HAE + AQE hibrit analiz", starter: true, pro: true, subscription: true },
+  { feature: "Tam kapsamlı hibrit rapor", starter: true, pro: true, subscription: true },
+  { feature: "Karakter haritası (350+ özellik)", starter: true, pro: true, subscription: true },
+  { feature: "Kör nokta & tutarsızlık tespiti", starter: true, pro: true, subscription: true },
+  { feature: "Koçluk yol haritası", starter: true, pro: true, subscription: true },
+  { feature: "Analiz başına maliyet", starter: "₺32,99", pro: "₺27,00", subscription: "~₺19,93" },
+  { feature: "Danışana özel ödevler", starter: false, pro: false, subscription: true },
+  { feature: "İlerleme analizi", starter: false, pro: false, subscription: true },
+  { feature: "AI seans asistanı", starter: false, pro: false, subscription: true },
+  { feature: "Aylık otomatik kredi", starter: false, pro: false, subscription: true },
+];
+
 export default function BillingPage() {
   const [showProModal, setShowProModal] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   return (
     <>
@@ -294,6 +312,63 @@ export default function BillingPage() {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Package Comparison Toggle */}
+            <div className="flex flex-col items-center gap-3">
+              <button
+                onClick={() => setShowComparison(!showComparison)}
+                className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-pro-border bg-white hover:border-pro-primary/50 hover:shadow-sm transition-all text-sm text-pro-text-secondary hover:text-pro-primary"
+              >
+                {showComparison ? (
+                  <ChevronUp className="h-4 w-4 text-pro-primary" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-pro-primary" />
+                )}
+                Paketleri Karşılaştır
+              </button>
+            </div>
+
+            {/* Comparison Table */}
+            {showComparison && (
+              <Card padding="none" variant="elevated">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-pro-border">
+                        <th className="text-left px-4 py-3 text-pro-text-tertiary font-medium">Özellik</th>
+                        <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
+                          <span className="inline-block px-2 py-0.5 bg-pro-primary-light rounded-md text-pro-primary text-xs">Başlangıç</span>
+                        </th>
+                        <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
+                          <span className="inline-block px-2 py-0.5 bg-[#E8C963]/20 rounded-md text-[#8B6914] text-xs">Profesyonel</span>
+                        </th>
+                        <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
+                          <span className="inline-block px-2 py-0.5 bg-[#8B5CF6]/10 rounded-md text-[#7C3AED] text-xs">Pro Üyelik</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {COMPARISON_ROWS.map((row, i) => (
+                        <tr key={i} className={i % 2 === 0 ? "bg-pro-primary-light/30" : ""}>
+                          <td className="px-4 py-2.5 text-pro-text-secondary">{row.feature}</td>
+                          {(["starter", "pro", "subscription"] as const).map((plan) => (
+                            <td key={plan} className="text-center px-3 py-2.5">
+                              {row[plan] === true ? (
+                                <Check className="h-4 w-4 text-pro-success mx-auto" />
+                              ) : row[plan] === false ? (
+                                <X className="h-4 w-4 text-pro-text-tertiary/40 mx-auto" />
+                              ) : (
+                                <span className="text-xs font-semibold text-pro-text">{row[plan]}</span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
             )}
 
             {/* How we analyze — subtle link */}

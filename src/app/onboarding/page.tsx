@@ -11,6 +11,7 @@ import { SPECIALIZATIONS, WORK_TYPES } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { formatTurkeyPhoneInput } from "@/lib/utils";
 import { clsx } from "clsx";
 
 const CITIES = [
@@ -41,8 +42,8 @@ export default function OnboardingPage() {
     defaultValues: {
       work_type: "individual",
       specializations: [],
-      kvkk_accepted: false as unknown as true,
-      terms_accepted: false as unknown as true,
+      kvkk_accepted: false,
+      terms_accepted: false,
     },
   });
 
@@ -154,9 +155,17 @@ export default function OnboardingPage() {
             <Input
               label="Telefon"
               type="tel"
-              placeholder="0532 XXX XX XX"
+              inputMode="numeric"
+              autoComplete="tel-national"
+              maxLength={14}
+              placeholder="0511 111 11 11"
               hint="Opsiyonel"
-              {...register("phone")}
+              error={errors.phone?.message}
+              {...register("phone", {
+                onChange: (event) => {
+                  event.target.value = formatTurkeyPhoneInput(event.target.value);
+                },
+              })}
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -170,6 +179,7 @@ export default function OnboardingPage() {
               <Input
                 label="İlçe"
                 placeholder="İlçe adı"
+                maxLength={60}
                 error={errors.district?.message}
                 {...register("district")}
               />
@@ -206,7 +216,8 @@ export default function OnboardingPage() {
               <Input
                 label="İşyeri / Klinik Adı"
                 placeholder="İşyeri adı"
-                hint="Opsiyonel"
+                maxLength={100}
+                error={errors.company_name?.message}
                 {...register("company_name")}
               />
             )}

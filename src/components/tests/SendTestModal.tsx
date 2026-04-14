@@ -10,6 +10,7 @@ import { useClients } from "@/lib/hooks/useClients";
 import { Modal } from "@/components/ui/Modal";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import { sendTestNewClientSchema } from "@/lib/validations";
 import { Send, Search, UserPlus, Users, Check } from "lucide-react";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { PRO_CONFIG } from "@/lib/constants";
@@ -54,6 +55,11 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   const [idCopied, setIdCopied] = useState(false);
+  const [newClientErrors, setNewClientErrors] = useState<{
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+  }>({});
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
 
@@ -85,23 +91,32 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
     setGeneratedToken(null);
     setLinkCopied(false);
     setIdCopied(false);
+    setNewClientErrors({});
     onClose();
   }
 
   async function copyLink() {
     if (!generatedTestLink) return;
-    await navigator.clipboard.writeText(generatedTestLink);
-    setLinkCopied(true);
-    toast.success("Link kopyalandı!");
-    setTimeout(() => setLinkCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(generatedTestLink);
+      setLinkCopied(true);
+      toast.success("Link kopyalandı!");
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      toast.error("Link kopyalanamadı");
+    }
   }
 
   async function copyId() {
     if (!generatedToken) return;
-    await navigator.clipboard.writeText(generatedToken);
-    setIdCopied(true);
-    toast.success("Test ID kopyalandı!");
-    setTimeout(() => setIdCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(generatedToken);
+      setIdCopied(true);
+      toast.success("Test ID kopyalandı!");
+      setTimeout(() => setIdCopied(false), 2000);
+    } catch {
+      toast.error("Test ID kopyalanamadı");
+    }
   }
 
   async function handleSend() {
@@ -111,7 +126,33 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
       clientMode === "existing"
         ? !!selectedClient
         : newFirstName.trim() && newLastName.trim();
-    if (!hasClient) return;
+    if (!hasClient) {
+      toast.error("Lütfen bir danışan seçin veya yeni danışan bilgilerini doldurun");
+      return;
+    }
+
+    if (clientMode === "new") {
+      const parsed = sendTestNewClientSchema.safeParse({
+        first_name: newFirstName,
+        last_name: newLastName,
+        email: newEmail,
+      });
+
+      if (!parsed.success) {
+        const nextErrors: typeof newClientErrors = {};
+        for (const issue of parsed.error.issues) {
+          const path = issue.path[0];
+          if (path === "first_name" || path === "last_name" || path === "email") {
+            nextErrors[path] = issue.message;
+          }
+        }
+        setNewClientErrors(nextErrors);
+        toast.error("Lütfen danışan bilgilerini kontrol edin");
+        return;
+      }
+
+      setNewClientErrors({});
+    }
 
     if (creditBalance <= 0) {
       toast.error("Yeterli test krediniz yok");
@@ -209,7 +250,10 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
     <div className="space-y-4">
       <div className="flex gap-2 p-1 bg-pro-surface-alt rounded-lg">
         <button
-          onClick={() => setClientMode("existing")}
+          onClick={() => {
+            setClientMode("existing");
+            setNewClientErrors({});
+          }}
           className={clsx(
             "flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors",
             clientMode === "existing"
@@ -287,20 +331,40 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
               <input
                 type="text"
                 value={newFirstName}
-                onChange={(e) => setNewFirstName(e.target.value)}
+                maxLength={50}
+                onChange={(e) => {
+                  setNewFirstName(e.target.value);
+                  setNewClientErrors((current) => ({ ...current, first_name: undefined }));
+                }}
                 placeholder="Danışan adı"
-                className="w-full px-4 py-2.5 rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary"
+                className={clsx(
+                  "w-full px-4 py-2.5 rounded-lg border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary",
+                  newClientErrors.first_name ? "border-pro-danger" : "border-pro-border"
+                )}
               />
+              {newClientErrors.first_name && (
+                <p className="mt-1 text-xs text-pro-danger">{newClientErrors.first_name}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-pro-text mb-1.5">Soyad</label>
               <input
                 type="text"
                 value={newLastName}
-                onChange={(e) => setNewLastName(e.target.value)}
+                maxLength={50}
+                onChange={(e) => {
+                  setNewLastName(e.target.value);
+                  setNewClientErrors((current) => ({ ...current, last_name: undefined }));
+                }}
                 placeholder="Danışan soyadı"
-                className="w-full px-4 py-2.5 rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary"
+                className={clsx(
+                  "w-full px-4 py-2.5 rounded-lg border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary",
+                  newClientErrors.last_name ? "border-pro-danger" : "border-pro-border"
+                )}
               />
+              {newClientErrors.last_name && (
+                <p className="mt-1 text-xs text-pro-danger">{newClientErrors.last_name}</p>
+              )}
             </div>
           </div>
           <div>
@@ -311,10 +375,20 @@ export function SendTestModal({ open, onClose, onSent }: SendTestModalProps) {
             <input
               type="email"
               value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
+              maxLength={254}
+              onChange={(e) => {
+                setNewEmail(e.target.value);
+                setNewClientErrors((current) => ({ ...current, email: undefined }));
+              }}
               placeholder="danisan@email.com"
-              className="w-full px-4 py-2.5 rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary"
+              className={clsx(
+                "w-full px-4 py-2.5 rounded-lg border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary",
+                newClientErrors.email ? "border-pro-danger" : "border-pro-border"
+              )}
             />
+            {newClientErrors.email && (
+              <p className="mt-1 text-xs text-pro-danger">{newClientErrors.email}</p>
+            )}
           </div>
           <Button
             className="w-full mt-2"

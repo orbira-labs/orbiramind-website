@@ -15,7 +15,9 @@ import { Users, Plus, Search, ChevronLeft, ChevronRight, X } from "lucide-react"
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { clientSchema, type ClientInput } from "@/lib/validations";
 import { useClientsList } from "@/lib/hooks/useClientsList";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import type { Client } from "@/lib/types";
+import { formatTurkeyPhoneInput } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
 
@@ -27,6 +29,7 @@ function getVisiblePages(current: number, total: number): (number | "dots")[] {
 }
 
 export default function ClientsPage() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "passive">("active");
@@ -57,6 +60,12 @@ export default function ClientsPage() {
     formState: { errors },
   } = useForm<ClientInput>({
     resolver: zodResolver(clientSchema),
+  });
+
+  const phoneField = register("phone", {
+    onChange: (event) => {
+      event.target.value = formatTurkeyPhoneInput(event.target.value);
+    },
   });
 
   async function onSubmit(data: ClientInput) {
@@ -153,6 +162,7 @@ export default function ClientsPage() {
         label="Email"
         type="email"
         placeholder="ornek@email.com"
+        maxLength={254}
         hint="Analiz linki göndermek için"
         error={errors.email?.message}
         {...register("email")}
@@ -160,14 +170,18 @@ export default function ClientsPage() {
       <Input
         label="Telefon"
         type="tel"
-        placeholder="0532 XXX XX XX"
+        inputMode="numeric"
+        maxLength={14}
+        placeholder="0511 111 11 11"
         hint="WhatsApp ile göndermek için"
-        {...register("phone")}
+        error={errors.phone?.message}
+        {...phoneField}
       />
       <Input
         label="Doğum Tarihi"
         type="date"
         hint="Opsiyonel"
+        error={errors.birth_date?.message}
         {...register("birth_date")}
       />
 
@@ -388,16 +402,18 @@ export default function ClientsPage() {
         </div>
 
         {/* Desktop: New Client Modal */}
-        <Modal
-          open={showModal}
-          onClose={() => {
-            setShowModal(false);
-            reset();
-          }}
-          title="Yeni Danışan"
-        >
-          {formContent}
-        </Modal>
+        {!isMobile && (
+          <Modal
+            open={showModal}
+            onClose={() => {
+              setShowModal(false);
+              reset();
+            }}
+            title="Yeni Danışan"
+          >
+            {formContent}
+          </Modal>
+        )}
 
         {/* Desktop: Delete Confirmation Modal */}
         <Modal
@@ -538,7 +554,7 @@ export default function ClientsPage() {
         </button>
 
         {/* Mobile: Full Screen New Client Modal */}
-        {showModal && (
+        {isMobile && showModal && (
           <div className="mobile-modal">
             <div className="mobile-modal-header">
               <h2 className="text-lg font-semibold text-pro-text">Yeni Danışan</h2>

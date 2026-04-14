@@ -13,6 +13,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, hint, touchFriendly = false, className, id, ...props }, ref) => {
     const inputId = id || props.name;
+    const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined;
+    const autoCapitalize =
+      props.autoCapitalize ??
+      (props.type === "email" || props.type === "password" ? "none" : undefined);
+    const spellCheck = props.spellCheck ?? (props.type === "email" ? false : undefined);
 
     return (
       <div className="space-y-1.5">
@@ -30,6 +35,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={describedBy}
+          autoCapitalize={autoCapitalize}
+          spellCheck={spellCheck}
           className={clsx(
             "w-full rounded-lg border text-pro-text",
             "bg-pro-surface",
@@ -50,9 +59,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           {...props}
         />
-        {error && <p className="text-xs text-pro-danger">{error}</p>}
+        {error && (
+          <p id={`${inputId}-error`} className="text-xs text-pro-danger">
+            {error}
+          </p>
+        )}
         {hint && !error && (
-          <p className="text-xs text-pro-text-tertiary">{hint}</p>
+          <p id={`${inputId}-hint`} className="text-xs text-pro-text-tertiary">
+            {hint}
+          </p>
         )}
       </div>
     );

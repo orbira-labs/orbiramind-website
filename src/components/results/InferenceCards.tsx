@@ -57,7 +57,14 @@ const TYPE_LABELS: Record<string, string> = {
 export function InferenceCards({ inferences }: InferenceCardsProps) {
   if (!inferences || inferences.length === 0) return null;
 
-  const sorted = [...inferences].sort((a, b) => {
+  // Filter out hidden_strength and absence_signal as they belong in BlindSpotCard
+  const filtered = inferences.filter(
+    (inf) => (inf as any).type !== "hidden_strength" && (inf as any).type !== "absence_signal"
+  );
+
+  if (filtered.length === 0) return null;
+
+  const sorted = [...filtered].sort((a, b) => {
     const order = { critical: 0, warning: 1, info: 2 };
     return (order[a.severity as keyof typeof order] ?? 2) - (order[b.severity as keyof typeof order] ?? 2);
   });
@@ -74,7 +81,7 @@ export function InferenceCards({ inferences }: InferenceCardsProps) {
         </div>
         <div>
           <h3 className="text-lg font-bold text-gray-900">Tespit Edilen Döngüler</h3>
-          <p className="text-xs text-gray-500">{inferences.length} çapraz çıkarım</p>
+          <p className="text-xs text-gray-500">{filtered.length} çapraz çıkarım</p>
         </div>
       </div>
 

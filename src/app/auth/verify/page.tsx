@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { otpSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 
@@ -65,14 +66,18 @@ function VerifyForm() {
 
   async function handleVerify() {
     const otp = code.join("");
-    if (otp.length !== 6) return;
+    const parsed = otpSchema.safeParse({ code: otp });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message || "Geçersiz kod");
+      return;
+    }
 
     setLoading(true);
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
+        email: email.trim().toLowerCase(),
+        token: parsed.data.code,
         type: "signup",
       });
 
@@ -100,7 +105,7 @@ function VerifyForm() {
     const supabase = createClient();
     const { error } = await supabase.auth.resend({
       type: "signup",
-      email,
+      email: email.trim().toLowerCase(),
     });
     if (error) {
       if (error.message.includes("already confirmed")) {
@@ -136,49 +141,61 @@ function VerifyForm() {
         </div>
 
         <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 md:p-7 shadow-[var(--pro-shadow-md)]">
-          <div className="flex justify-center gap-2 md:gap-3" onPaste={handlePaste}>
-            {code.map((digit, i) => (
-              <input
-                key={i}
-                ref={(el) => { inputRefs.current[i] = el; }}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleChange(i, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(i, e)}
-                className="w-12 h-14 md:w-13 md:h-16 text-center text-2xl font-bold rounded-xl border-2 border-pro-border bg-[var(--pro-surface-alt)] text-pro-text focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary transition-all touch-manipulation"
-              />
-            ))}
-          </div>
-
-          <div className="mt-5 text-center">
-            {resendTimer > 0 ? (
-              <p className="text-sm text-pro-text-tertiary">
-                Kod gelmedi mi?{" "}
-                <span className="text-pro-text-secondary font-medium">{resendTimer}s</span>
-              </p>
-            ) : (
-              <button
-                onClick={handleResend}
-                className="text-sm text-pro-primary font-medium hover:underline touch-manipulation min-h-[44px] flex items-center justify-center mx-auto"
-              >
-                Kodu tekrar gönder
-              </button>
-            )}
-          </div>
-
-          <Button
-            fullWidth
-            size="lg"
-            className="mt-6 mobile-btn md:w-full"
-            loading={loading}
-            disabled={code.some((d) => !d)}
-            onClick={handleVerify}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleVerify();
+            }}
           >
-            <ShieldCheck className="h-4 w-4" />
-            Doğrula ve Devam Et
-          </Button>
+            <div className="flex justify-center gap-2 md:gap-3" onPaste={handlePaste}>
+              {code.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={(el) => {
+                    inputRefs.current[i] = el;
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete={i === 0 ? "one-time-code" : "off"}
+                  maxLength={1}
+                  value={digit}
+                  aria-label={`${i + 1}. doğrulama kodu hanesi`}
+                  onChange={(e) => handleChange(i, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(i, e)}
+                  className="w-12 h-14 md:w-13 md:h-16 text-center text-2xl font-bold rounded-xl border-2 border-pro-border bg-[var(--pro-surface-alt)] text-pro-text focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary transition-all touch-manipulation"
+                />
+              ))}
+            </div>
+
+            <div className="mt-5 text-center">
+              {resendTimer > 0 ? (
+                <p className="text-sm text-pro-text-tertiary">
+                  Kod gelmedi mi?{" "}
+                  <span className="text-pro-text-secondary font-medium">{resendTimer}s</span>
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  className="text-sm text-pro-primary font-medium hover:underline touch-manipulation min-h-[44px] flex items-center justify-center mx-auto"
+                >
+                  Kodu tekrar gönder
+                </button>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              fullWidth
+              size="lg"
+              className="mt-6 mobile-btn md:w-full"
+              loading={loading}
+              disabled={code.some((d) => !d)}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Doğrula ve Devam Et
+            </Button>
+          </form>
         </div>
 
         <p className="text-center text-sm text-pro-text-tertiary">

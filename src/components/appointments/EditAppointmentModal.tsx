@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
@@ -9,18 +10,12 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { APPOINTMENT_DURATIONS } from "@/lib/constants";
+import { appointmentSchema, type AppointmentInput } from "@/lib/validations";
 import { formatDateForInput, formatTimeForInput, parseDateTimeToISO } from "@/lib/utils";
 import { X, CalendarClock } from "lucide-react";
 import { clsx } from "clsx";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import type { AppointmentSlim } from "./AppointmentDetailModal";
-
-interface EditFormInput {
-  date: string;
-  time: string;
-  duration_minutes: number;
-  note: string;
-}
 
 interface EditAppointmentModalProps {
   appointment: AppointmentSlim | null;
@@ -37,7 +32,9 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<EditFormInput>();
+  } = useForm<AppointmentInput>({
+    resolver: zodResolver(appointmentSchema),
+  });
 
   useEffect(() => {
     if (appointment) {
@@ -51,7 +48,7 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
     }
   }, [appointment, reset]);
 
-  async function onSubmit(data: EditFormInput) {
+  async function onSubmit(data: AppointmentInput) {
     if (!appointment) return;
     setSaving(true);
     try {
@@ -99,7 +96,7 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
                 isMobile ? "px-4 py-3 min-h-[48px]" : "px-3.5 py-2.5",
                 errors.date ? "border-pro-danger" : "border-pro-border hover:border-pro-border-strong"
               )}
-              {...register("date", { required: true })}
+              {...register("date")}
             />
           </div>
           <div className="space-y-1">
@@ -113,12 +110,14 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
                 isMobile ? "px-4 py-3 min-h-[48px]" : "px-3.5 py-2.5",
                 errors.time ? "border-pro-danger" : "border-pro-border hover:border-pro-border-strong"
               )}
-              {...register("time", { required: true })}
+              {...register("time")}
             />
           </div>
         </div>
         {(errors.date || errors.time) && (
-          <p className="text-xs text-pro-danger">Tarih ve saat gerekli</p>
+          <p className="text-xs text-pro-danger">
+            {errors.date?.message || errors.time?.message}
+          </p>
         )}
       </div>
 
@@ -140,6 +139,7 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
         <textarea
           id="edit-apt-note"
           rows={isMobile ? 3 : 4}
+          maxLength={1000}
           placeholder="Randevuya dair not..."
           className={clsx(
             "w-full rounded-lg border text-sm text-pro-text",
@@ -151,7 +151,9 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
           )}
           {...register("note")}
         />
-        <p className="text-xs text-pro-text-tertiary">Opsiyonel</p>
+        <p className={clsx("text-xs", errors.note ? "text-pro-danger" : "text-pro-text-tertiary")}>
+          {errors.note?.message || "Opsiyonel"}
+        </p>
       </div>
 
       {/* Actions - Mobile: fixed at bottom */}

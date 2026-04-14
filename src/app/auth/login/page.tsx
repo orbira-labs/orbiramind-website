@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { LogIn, Loader2, ClipboardList, ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginInput } from "@/lib/validations";
+import { normalizeTestCodeInput } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -32,10 +33,11 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginInput) {
     setLoading(true);
+    const email = data.email.trim().toLowerCase();
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
+        email,
         password: data.password,
       });
 
@@ -65,9 +67,13 @@ export default function LoginPage() {
 
   function handleTestCodeSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const code = testCode.trim().toUpperCase();
+    const code = normalizeTestCodeInput(testCode);
     if (!code) {
       toast.error("Lütfen test kodunuzu girin");
+      return;
+    }
+    if (code.length !== 8) {
+      toast.error("Test kodu 8 karakter olmalıdır");
       return;
     }
     router.push(`/t/${code}`);
@@ -177,14 +183,24 @@ export default function LoginPage() {
                   <input
                     type="text"
                     value={testCode}
-                    onChange={(e) => setTestCode(e.target.value.toUpperCase())}
+                    onChange={(e) => setTestCode(normalizeTestCodeInput(e.target.value))}
                     placeholder="Örn: abc123def456"
                     autoComplete="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    maxLength={8}
+                    aria-label="Test Kodu"
                     autoFocus
                     className="mobile-input md:w-full md:min-h-0 md:px-4 md:py-2.5 md:rounded-lg border border-pro-border bg-pro-surface text-sm text-pro-text placeholder:text-pro-text-tertiary focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary font-mono tracking-wide"
                   />
                 </div>
-                <Button type="submit" fullWidth size="lg" disabled={!testCode.trim()} className="mobile-btn md:w-full">
+                <Button
+                  type="submit"
+                  fullWidth
+                  size="lg"
+                  disabled={normalizeTestCodeInput(testCode).length !== 8}
+                  className="mobile-btn md:w-full"
+                >
                   <ClipboardList className="h-4 w-4" />
                   Teste Başla
                 </Button>
@@ -220,6 +236,7 @@ export default function LoginPage() {
                     type="email"
                     placeholder="ornek@email.com"
                     autoComplete="email"
+                    maxLength={254}
                     error={errors.email?.message}
                     className="mobile-input md:w-full md:min-h-0"
                     {...register("email")}
@@ -231,6 +248,7 @@ export default function LoginPage() {
                     type="password"
                     placeholder="••••••••"
                     autoComplete="current-password"
+                    maxLength={72}
                     error={errors.password?.message}
                     className="mobile-input md:w-full md:min-h-0"
                     {...register("password")}
