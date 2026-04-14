@@ -111,6 +111,17 @@ export function CreateAppointmentModal({ open, onClose, onCreated, preselectedDa
       newErrors.time = "Geçerli bir saat seçin";
     }
 
+    if (date && time && !newErrors.date && !newErrors.time) {
+      const nowTurkey = toTurkeyTime(new Date());
+      const [year, month, day] = date.split("-").map(Number);
+      const [hours, minutes] = time.split(":").map(Number);
+      const selectedDateTime = new Date(year, month - 1, day, hours, minutes);
+      
+      if (selectedDateTime < nowTurkey) {
+        newErrors.date = "Geçmiş bir tarih/saat için randevu oluşturulamaz";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }

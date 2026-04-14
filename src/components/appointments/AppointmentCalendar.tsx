@@ -14,7 +14,9 @@ import {
   addMonths,
   subMonths,
   addDays,
-  isWeekend
+  isWeekend,
+  isBefore,
+  startOfDay
 } from "date-fns";
 import { tr } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Plus, Clock, Calendar } from "lucide-react";
@@ -161,6 +163,7 @@ export function AppointmentCalendar({
               const isWeekendDay = isWeekend(day);
               const rowIndex = Math.floor(index / 7);
               const isLastRow = rowIndex === numWeeks - 1;
+              const isPastDay = isBefore(startOfDay(day), startOfDay(new Date()));
 
               return (
                 <div
@@ -188,8 +191,8 @@ export function AppointmentCalendar({
                       {format(day, "d")}
                     </span>
                     
-                    {/* Quick Add - hover'da görünür */}
-                    {isCurrentMonth && (
+                    {/* Quick Add - hover'da görünür, geçmiş günlerde gizli */}
+                    {isCurrentMonth && !isPastDay && (
                       <button
                         onClick={() => onCreateAppointment(day)}
                         className="opacity-0 group-hover:opacity-100 p-1 rounded text-[#9CAAAF] hover:text-[#D4856A] hover:bg-[#D4856A]/10 transition-all"
@@ -342,13 +345,15 @@ export function AppointmentCalendar({
               {selectedDayAppointments.length} randevu
             </p>
           </div>
-          <button
-            onClick={() => onCreateAppointment(selectedDate)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-pro-primary text-white text-sm font-medium touch-manipulation active:scale-95 transition-transform"
-          >
-            <Plus className="h-4 w-4" />
-            Ekle
-          </button>
+          {!isBefore(startOfDay(selectedDate), startOfDay(new Date())) && (
+            <button
+              onClick={() => onCreateAppointment(selectedDate)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-pro-primary text-white text-sm font-medium touch-manipulation active:scale-95 transition-transform"
+            >
+              <Plus className="h-4 w-4" />
+              Ekle
+            </button>
+          )}
         </div>
 
         {/* Mobile Day Appointments List */}
@@ -359,14 +364,20 @@ export function AppointmentCalendar({
                 <Calendar className="h-7 w-7 text-pro-text-tertiary" />
               </div>
               <p className="text-sm font-medium text-pro-text mb-1">Bu günde randevu yok</p>
-              <p className="text-xs text-pro-text-tertiary mb-4">Yeni bir randevu ekleyebilirsiniz</p>
-              <button
-                onClick={() => onCreateAppointment(selectedDate)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pro-primary text-white text-sm font-medium touch-manipulation"
-              >
-                <Plus className="h-4 w-4" />
-                Randevu Ekle
-              </button>
+              {!isBefore(startOfDay(selectedDate), startOfDay(new Date())) ? (
+                <>
+                  <p className="text-xs text-pro-text-tertiary mb-4">Yeni bir randevu ekleyebilirsiniz</p>
+                  <button
+                    onClick={() => onCreateAppointment(selectedDate)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pro-primary text-white text-sm font-medium touch-manipulation"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Randevu Ekle
+                  </button>
+                </>
+              ) : (
+                <p className="text-xs text-pro-text-tertiary">Geçmiş günlere randevu eklenemez</p>
+              )}
             </div>
           ) : (
             <div className="p-4 space-y-2">

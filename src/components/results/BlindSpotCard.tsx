@@ -6,6 +6,7 @@ import type { BlindSpotItem } from "@/lib/types";
 
 interface BlindSpotCardProps {
   blindSpots: BlindSpotItem[];
+  title?: string;
 }
 
 const TYPE_CONFIG: Record<string, { icon: typeof Eye; gradient: string; dotColor: string }> = {
@@ -34,7 +35,7 @@ const spotVariant = {
   }),
 };
 
-export function BlindSpotCard({ blindSpots }: BlindSpotCardProps) {
+export function BlindSpotCard({ blindSpots, title = "Gizli Dinamikler" }: BlindSpotCardProps) {
   if (!blindSpots || blindSpots.length === 0) return null;
 
   return (
@@ -47,7 +48,7 @@ export function BlindSpotCard({ blindSpots }: BlindSpotCardProps) {
           <div className="absolute -inset-1 bg-violet-400/20 rounded-xl blur-md -z-10" />
         </div>
         <div>
-          <h3 className="text-xl font-bold text-gray-900">Kör Noktalar</h3>
+          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
           <p className="text-xs text-gray-500">Danışanın farkında olmadığı {blindSpots.length} dinamik</p>
         </div>
       </div>

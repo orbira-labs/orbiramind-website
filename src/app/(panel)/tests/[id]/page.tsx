@@ -13,7 +13,6 @@ import {
   BarChart3,
   ArrowUpDown,
   MapIcon,
-  Search,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -34,7 +33,7 @@ import { CoachingTimeline } from "@/components/results/CoachingTimeline";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
 
-type Tab = "overview" | "strengths" | "deep" | "roadmap";
+type Tab = "overview" | "strengths" | "roadmap";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -47,13 +46,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode; description: string
     id: "strengths",
     label: "Güçlü & Gelişim",
     icon: <ArrowUpDown className="h-4 w-4" />,
-    description: "Yönler & kör noktalar",
-  },
-  {
-    id: "deep",
-    label: "Derinlemesine",
-    icon: <Search className="h-4 w-4" />,
-    description: "Analiz & döngüler",
+    description: "Yönler & gizli dinamikler",
   },
   {
     id: "roadmap",
@@ -379,12 +372,6 @@ export default function TestResultPage() {
                       scoreWidget={<WellnessGauge score={analysis.wellness_score} size="sm" />}
                     />
                   </Card>
-
-                  {analysis.inferences && analysis.inferences.length > 0 && (
-                    <Card padding="lg" variant="elevated">
-                      <InferenceCards inferences={analysis.inferences} />
-                    </Card>
-                  )}
                 </div>
               )}
 
@@ -399,14 +386,10 @@ export default function TestResultPage() {
 
                   {analysis.blind_spots && analysis.blind_spots.length > 0 && (
                     <Card padding="lg" variant="elevated">
-                      <BlindSpotCard blindSpots={analysis.blind_spots} />
+                      <BlindSpotCard blindSpots={analysis.blind_spots} title="Gizli Dinamikler" />
                     </Card>
                   )}
-                </div>
-              )}
 
-              {activeTab === "deep" && (
-                <div className="space-y-6">
                   {analysis.inferences && analysis.inferences.length > 0 && (
                     <Card padding="lg" variant="elevated">
                       <InferenceCards inferences={analysis.inferences} />
@@ -432,7 +415,7 @@ export default function TestResultPage() {
           >
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-gray-200" />
             <p className="text-xs text-gray-400">
-              Rapor oluşturma: {report.generated_at ? formatDateTime(report.generated_at) : "—"} · Model: {report.model || "GPT-4o"}
+              Rapor oluşturma: {report.generated_at ? formatDateTime(report.generated_at) : "—"}
             </p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-gray-200" />
           </motion.div>

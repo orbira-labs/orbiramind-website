@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { createClient as createSupabase } from "@/lib/supabase/client";
 import { APPOINTMENT_DURATIONS } from "@/lib/constants";
-import { formatDateForInput, formatTimeForInput, parseDateTimeToISO } from "@/lib/utils";
+import { formatDateForInput, formatTimeForInput, parseDateTimeToISO, toTurkeyTime } from "@/lib/utils";
 import { X, CalendarClock } from "lucide-react";
 import { clsx } from "clsx";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
@@ -65,6 +65,17 @@ export function EditAppointmentModal({ appointment, onClose, onUpdated }: EditAp
 
     if (!time || !/^([01]\d|2[0-3]):([0-5]\d)$/.test(time)) {
       newErrors.time = "Geçerli bir saat seçin";
+    }
+
+    if (date && time && !newErrors.date && !newErrors.time) {
+      const nowTurkey = toTurkeyTime(new Date());
+      const [year, month, day] = date.split("-").map(Number);
+      const [hours, minutes] = time.split(":").map(Number);
+      const selectedDateTime = new Date(year, month - 1, day, hours, minutes);
+      
+      if (selectedDateTime < nowTurkey) {
+        newErrors.date = "Geçmiş bir tarih/saat için randevu ayarlanamaz";
+      }
     }
 
     setErrors(newErrors);
