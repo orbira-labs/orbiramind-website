@@ -2,6 +2,7 @@ import { after, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
+export const maxDuration = 300;
 
 const ENGINE_API_URL = process.env.ENGINE_API_URL;
 const ENGINE_API_KEY = process.env.ENGINE_API_KEY;
@@ -72,6 +73,63 @@ async function updateInvitationStatus(
   }
 }
 
+const REPORT_POLL_INTERVAL_MS = 4_000;
+const REPORT_POLL_MAX_ATTEMPTS = 45; // ~3 min max wait
+
+function getReportStatus(payload: unknown): string | undefined {
+  if (!isRecord(payload)) return undefined;
+  if (typeof payload.report_status === "string") return payload.report_status;
+  const results = payload.results;
+  if (isRecord(results) && isRecord(results.metadata)) {
+    return typeof results.metadata.report_status === "string"
+      ? results.metadata.report_status
+      : undefined;
+  }
+  return undefined;
+}
+
+async function pollForReport(sessionId: string): Promise<Record<string, unknown> | undefined> {
+  for (let attempt = 0; attempt < REPORT_POLL_MAX_ATTEMPTS; attempt++) {
+    await new Promise((r) => setTimeout(r, REPORT_POLL_INTERVAL_MS));
+
+    const res = await fetch(`${ENGINE_API_URL}/v1/sessions/${sessionId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "x-api-key": ENGINE_API_KEY!,
+      },
+    });
+
+    if (!res.ok) {
+      console.warn(`[report-poll] GET session ${sessionId} returned ${res.status}, attempt ${attempt + 1}`);
+      continue;
+    }
+
+    const body: unknown = await res.json().catch(() => null);
+    const data = isRecord(body) && isRecord((body as Record<string, unknown>).data)
+      ? (body as Record<string, unknown>).data as Record<string, unknown>
+      : body;
+
+    const status = getReportStatus(data);
+
+    if (status === "ready") {
+      const results = isRecord(data) && isRecord(data.results)
+        ? data.results as Record<string, unknown>
+        : undefined;
+      console.log(`[report-poll] Report ready for session ${sessionId} after ${attempt + 1} polls`);
+      return results;
+    }
+
+    if (status === "failed") {
+      console.error(`[report-poll] Report failed for session ${sessionId} after ${attempt + 1} polls`);
+      return undefined;
+    }
+  }
+
+  console.error(`[report-poll] Timed out waiting for report on session ${sessionId}`);
+  return undefined;
+}
+
 async function runBackgroundCompletion({
   token,
   sessionId,
@@ -113,15 +171,25 @@ async function runBackgroundCompletion({
       throw new Error(message);
     }
 
-    const payload =
+    let payload =
       isRecord(rawData) && isRecord(rawData.data)
         ? rawData.data
         : rawData;
 
-    const resultsSnapshot =
+    let resultsSnapshot =
       isRecord(payload) && isRecord(payload.results)
-        ? payload.results
+        ? (payload.results as Record<string, unknown>)
         : undefined;
+
+    const reportStatus = getReportStatus(payload);
+
+    if (reportStatus === "pending") {
+      console.log(`[test-complete] Report pending for session ${sessionId}, starting poll...`);
+      const polledResults = await pollForReport(sessionId);
+      if (polledResults) {
+        resultsSnapshot = polledResults;
+      }
+    }
 
     if (
       !resultsSnapshot ||

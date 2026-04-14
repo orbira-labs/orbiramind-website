@@ -310,7 +310,8 @@ export default function TestResultPage() {
     );
   }
 
-  const { analysis, report } = results;
+  const { analysis, report: reportOrNull } = results;
+  const report = reportOrNull!;
 
   return (
     <>

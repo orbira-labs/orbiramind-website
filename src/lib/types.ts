@@ -202,7 +202,6 @@ export interface Insight {
   insight: string;
   severity: string;
   suggestion?: string;
-  type?: string;
 }
 
 export interface ProfileSummary {
@@ -273,13 +272,15 @@ export interface Report {
   };
   blind_spots?: BlindSpot[];
   coaching_roadmap: CoachingRoadmap;
-  coaching_roadmap_meta?: Record<string, Array<{ text: string; candidate_ids: string[]; evidence_refs: string[] }>>;
   generated_at: string;
   model: string;
-  qc?: Record<string, unknown>;
 }
 
 export interface TestResults {
   analysis: AnalysisResults;
-  report: Report;
+  report: Report | null;
+  metadata?: {
+    report_status?: "pending" | "ready" | "failed";
+    [key: string]: unknown;
+  };
 }

@@ -140,6 +140,18 @@ export interface Report {
   model: string;
 }
 
+export interface CompleteSessionResponse {
+  results: {
+    analysis: AnalysisResults;
+    report: Report | null;
+    metadata?: {
+      report_status?: "pending" | "ready" | "failed";
+      [key: string]: unknown;
+    };
+  };
+  report_status?: "pending" | "ready" | "failed";
+}
+
 class EngineAPIError extends Error {
   code: string;
   status: number;
@@ -241,6 +253,17 @@ export async function submitAnswers(
     profile,
     core_answers: coreAnswers,
     measurements,
+  }, testToken);
+}
+
+export async function completeSession(
+  sessionId: string,
+  deepDiveAnswers: Record<string, number>,
+  testToken?: string
+): Promise<CompleteSessionResponse> {
+  return secureApiFetch<CompleteSessionResponse>("complete", {
+    session_id: sessionId,
+    deep_dive_answers: deepDiveAnswers,
   }, testToken);
 }
 
