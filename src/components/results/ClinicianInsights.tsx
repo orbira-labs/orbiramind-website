@@ -1,8 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { motion } from "framer-motion";
-import { Lightbulb, Search, AlertTriangle, ShieldCheck } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lightbulb, Eye, RefreshCw, ChevronDown } from "lucide-react";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 import type { BlindSpot, BlindSpotItem, Insight } from "@/lib/types";
 
@@ -12,38 +12,114 @@ interface ClinicianInsightsProps {
   inferences?: Insight[];
 }
 
-const SEVERITY_LABELS: Record<string, string> = {
-  critical: "Öncelikli",
-  warning: "İzlenmeli",
-  info: "Destekleyici",
+const SEVERITY_CONFIG: Record<string, { label: string; dot: string }> = {
+  critical: { label: "Öncelikli", dot: "bg-red-400" },
+  warning: { label: "İzlenmeli", dot: "bg-amber-400" },
+  info: { label: "Bilgilendirme", dot: "bg-blue-400" },
 };
 
-const BLIND_SPOT_TYPE_LABELS: Record<string, string> = {
-  hidden_strength: "Koruyucu Dinamik",
-  absence_signal: "Daha Az Görünür Alan",
-  inconsistency: "Tutarsızlık",
-};
+function ExpandableCard({
+  title,
+  description,
+  actionLabel,
+  actionContent,
+  severity,
+  index,
+}: {
+  title: string;
+  description: string;
+  actionLabel?: string;
+  actionContent?: string;
+  severity?: { label: string; dot: string };
+  index: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const hasAction = actionLabel && actionContent;
 
-function ClinicianSection({
+  return (
+    <motion.div
+      variants={staggerItem}
+      className="group rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
+    >
+      <button
+        type="button"
+        onClick={() => hasAction && setExpanded((prev) => !prev)}
+        className={`w-full text-left p-4 ${hasAction ? "cursor-pointer" : "cursor-default"}`}
+      >
+        <div className="flex items-start gap-3">
+          <span className="mt-1.5 flex-shrink-0 text-sm font-medium text-gray-300 tabular-nums w-5 text-right">
+            {index}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <h4 className="text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
+              {severity && (
+                <span className="inline-flex items-center gap-1.5 flex-shrink-0">
+                  <span className={`h-1.5 w-1.5 rounded-full ${severity.dot}`} />
+                  <span className="text-[11px] text-gray-400 font-medium">{severity.label}</span>
+                </span>
+              )}
+            </div>
+            <p className="text-[13px] leading-relaxed text-gray-500">{description}</p>
+          </div>
+          {hasAction && (
+            <ChevronDown
+              className={`h-4 w-4 mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            />
+          )}
+        </div>
+      </button>
+
+      {hasAction && (
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="px-4 pb-4 pl-12">
+                <div className="rounded-lg bg-gray-50 px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
+                    {actionLabel}
+                  </p>
+                  <p className="text-[13px] leading-relaxed text-gray-600">{actionContent}</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </motion.div>
+  );
+}
+
+function SectionBlock({
+  number,
   title,
   subtitle,
   icon,
+  accentColor,
   children,
 }: {
+  number: number;
   title: string;
   subtitle: string;
   icon: ReactNode;
+  accentColor: string;
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4A] flex items-center justify-center shadow-sm text-white">
+    <section>
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`h-8 w-8 rounded-lg ${accentColor} flex items-center justify-center`}>
           {icon}
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-          <p className="text-xs text-gray-500">{subtitle}</p>
+          <h3 className="text-[15px] font-semibold text-gray-900">{title}</h3>
+          <p className="text-[12px] text-gray-400 leading-snug">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -57,8 +133,7 @@ export function ClinicianInsights({
   inferences = [],
 }: ClinicianInsightsProps) {
   const filteredInferences = inferences.filter(
-    (item) => (item as Insight & { type?: string }).type !== "hidden_strength" &&
-      (item as Insight & { type?: string }).type !== "absence_signal",
+    (item) => item.type !== "hidden_strength" && item.type !== "absence_signal",
   );
 
   if (
@@ -75,120 +150,101 @@ export function ClinicianInsights({
       (order[right.severity as keyof typeof order] ?? 2);
   });
 
+  const totalItems = reportBlindSpots.length + analysisBlindSpots.length + sortedInferences.length;
+  let sectionNumber = 0;
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-3">
-        <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4A] flex items-center justify-center shadow-md">
-          <Search className="h-5 w-5 text-white" />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-gray-900">Terapist Görünümü</h2>
-          <p className="text-sm text-gray-500">
-            Klinik hipotezler, sürdürücü örüntüler ve seansta ele alınabilecek odaklar.
-          </p>
-        </div>
+      <div className="pb-4 border-b border-gray-100">
+        <p className="text-[13px] text-gray-400">
+          Bu bölüm, testin sayısal verileri ve yapay zeka analizleri birleştirilerek oluşturulmuştur.
+          Seanslarda araştırılabilecek <span className="font-medium text-gray-600">{totalItems} klinik bulgu</span> içerir.
+        </p>
       </div>
 
       {reportBlindSpots.length > 0 && (
-        <ClinicianSection
+        <SectionBlock
+          number={++sectionNumber}
           title="Klinik Hipotezler"
-          subtitle="Seans içinde test edilmeye değer formülasyon başlıkları"
-          icon={<Lightbulb className="h-5 w-5" />}
+          subtitle="Seansta test edilebilecek formülasyonlar"
+          icon={<Lightbulb className="h-4 w-4 text-[#5B7B6A]" />}
+          accentColor="bg-[#EEF4F0]"
         >
           <motion.div
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="space-y-4"
+            className="space-y-2"
           >
             {reportBlindSpots.map((spot, index) => (
-              <motion.div
-                key={`${spot.title}-${index}`}
-                variants={staggerItem}
-                className="rounded-2xl border border-[#E8ECE9] bg-white p-5 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h4 className="text-[15px] font-semibold text-gray-900">{spot.title}</h4>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#EEF4F0] text-[#456454]">
-                    Hipotez
-                  </span>
-                </div>
-                <p className="text-[14px] leading-relaxed text-gray-700">{spot.insight}</p>
-                {spot.coach_tip && (
-                  <div className="mt-4 rounded-xl bg-[#F7FAF8] border border-[#E7EFEA] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5B7B6A]">
-                      Seansta nasıl ele alınabilir?
-                    </p>
-                    <p className="mt-1 text-[13px] leading-relaxed text-gray-700">{spot.coach_tip}</p>
-                  </div>
-                )}
-              </motion.div>
+              <ExpandableCard
+                key={`hyp-${index}`}
+                index={index + 1}
+                title={spot.title}
+                description={spot.insight}
+                actionLabel="Seansta nasıl ele alınabilir?"
+                actionContent={spot.coach_tip}
+              />
             ))}
           </motion.div>
-        </ClinicianSection>
+        </SectionBlock>
       )}
 
       {analysisBlindSpots.length > 0 && (
-        <ClinicianSection
-          title="Daha Az Görünür Dinamikler"
-          subtitle="Sistemin dikkat çektiği ama danışanın anlatımında geri planda kalabilecek alanlar"
-          icon={<ShieldCheck className="h-5 w-5" />}
+        <SectionBlock
+          number={++sectionNumber}
+          title="Gizli Kalan Dinamikler"
+          subtitle="Danışanın farkında olmayabileceği ama verinin işaret ettiği alanlar"
+          icon={<Eye className="h-4 w-4 text-gray-500" />}
+          accentColor="bg-gray-100"
         >
-          <div className="space-y-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="space-y-2"
+          >
             {analysisBlindSpots.map((spot, index) => (
-              <div
-                key={`${spot.title}-${index}`}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h4 className="text-[15px] font-semibold text-gray-900">{spot.title}</h4>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">
-                    {BLIND_SPOT_TYPE_LABELS[spot.type] ?? "Klinik işaret"}
-                  </span>
-                </div>
-                <p className="text-[14px] leading-relaxed text-gray-700">{spot.insight}</p>
-                {spot.suggestion && (
-                  <p className="mt-3 text-[13px] leading-relaxed text-[#5B7B6A]">
-                    Seans İpucu: {spot.suggestion}
-                  </p>
-                )}
-              </div>
+              <ExpandableCard
+                key={`bs-${index}`}
+                index={index + 1}
+                title={spot.title}
+                description={spot.insight}
+                actionLabel="Seans ipucu"
+                actionContent={spot.suggestion ?? undefined}
+              />
             ))}
-          </div>
-        </ClinicianSection>
+          </motion.div>
+        </SectionBlock>
       )}
 
       {sortedInferences.length > 0 && (
-        <ClinicianSection
+        <SectionBlock
+          number={++sectionNumber}
           title="Sürdürücü Örüntüler"
-          subtitle="Danışanın zorlanmasını devam ettiriyor olabilecek ilişkili mekanizmalar"
-          icon={<AlertTriangle className="h-5 w-5" />}
+          subtitle="Zorlanmayı devam ettirebilecek ilişkili mekanizmalar"
+          icon={<RefreshCw className="h-4 w-4 text-amber-600" />}
+          accentColor="bg-amber-50"
         >
-          <div className="space-y-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="space-y-2"
+          >
             {sortedInferences.map((item, index) => (
-              <div
-                key={`${item.title}-${index}`}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h4 className="text-[15px] font-semibold text-gray-900">{item.title}</h4>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700">
-                    {SEVERITY_LABELS[item.severity] ?? "İzlenmeli"}
-                  </span>
-                </div>
-                <p className="text-[14px] leading-relaxed text-gray-700">{item.insight}</p>
-                {item.suggestion && (
-                  <div className="mt-4 rounded-xl bg-[#FFF9ED] border border-[#F4E6BC] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700">
-                      Terapötik Yönelim
-                    </p>
-                    <p className="mt-1 text-[13px] leading-relaxed text-gray-700">{item.suggestion}</p>
-                  </div>
-                )}
-              </div>
+              <ExpandableCard
+                key={`inf-${index}`}
+                index={index + 1}
+                title={item.title}
+                description={item.insight}
+                severity={SEVERITY_CONFIG[item.severity] ?? SEVERITY_CONFIG.warning}
+                actionLabel="Terapötik yönelim"
+                actionContent={item.suggestion}
+              />
             ))}
-          </div>
-        </ClinicianSection>
+          </motion.div>
+        </SectionBlock>
       )}
     </div>
   );

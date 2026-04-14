@@ -18,6 +18,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function isValidReport(report: unknown): boolean {
+  if (!isRecord(report)) return false;
+  if ("error" in report) return false;
+  return (
+    typeof report.character_analysis === "string" &&
+    isRecord(report.top5_and_weak5) &&
+    isRecord(report.coaching_roadmap)
+  );
+}
+
 async function updateInvitationStatus(
   supabase: SupabaseClient,
   {
@@ -47,6 +57,9 @@ async function updateInvitationStatus(
 
   if (status === "error") {
     updateData.completed_at = new Date().toISOString();
+    if (resultsSnapshot) {
+      updateData.results_snapshot = resultsSnapshot;
+    }
   }
 
   const { error } = await supabase
@@ -109,6 +122,28 @@ async function runBackgroundCompletion({
       isRecord(payload) && isRecord(payload.results)
         ? payload.results
         : undefined;
+
+    if (
+      !resultsSnapshot ||
+      !isValidReport(
+        isRecord(resultsSnapshot) ? resultsSnapshot.report : undefined
+      )
+    ) {
+      const reportError =
+        isRecord(resultsSnapshot) &&
+        isRecord(resultsSnapshot.report) &&
+        typeof resultsSnapshot.report.error === "string"
+          ? resultsSnapshot.report.error
+          : "Report generation returned incomplete data";
+      console.error("Invalid report in engine response:", reportError);
+
+      await updateInvitationStatus(supabase, {
+        token,
+        status: "error",
+        resultsSnapshot,
+      });
+      return;
+    }
 
     await updateInvitationStatus(supabase, {
       token,

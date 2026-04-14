@@ -180,6 +180,67 @@ export default function TestResultPage() {
     );
   }
 
+  const results = test.results_snapshot as unknown as TestResults | null;
+  const hasValidReport =
+    results?.report &&
+    typeof results.report.character_analysis === "string" &&
+    results.report.top5_and_weak5 &&
+    results.report.coaching_roadmap;
+  const isReportError =
+    results?.report && "error" in results.report && !hasValidReport;
+
+  if (test.status === "error" || isReportError) {
+    return (
+      <>
+        <TopBar title="Analiz Hatası" />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-5xl">
+            <Link
+              href="/tests"
+              className="inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors mb-6"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Analizlere Dön
+            </Link>
+
+            <Card padding="lg">
+              <div className="flex items-center gap-4 mb-6">
+                <Avatar
+                  firstName={test.client?.first_name || "?"}
+                  lastName={test.client?.last_name || ""}
+                  size="lg"
+                />
+                <div>
+                  <h2 className="text-xl font-semibold text-pro-text">
+                    {test.client?.first_name} {test.client?.last_name}
+                  </h2>
+                  <p className="text-sm text-pro-text-secondary">
+                    {formatDate(test.created_at)}
+                  </p>
+                </div>
+                <Badge variant="danger" className="ml-auto">
+                  Hata
+                </Badge>
+              </div>
+
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Rapor Oluşturulamadı</h3>
+                <p className="text-gray-600">
+                  Analiz sırasında bir hata oluştu. Lütfen testi tekrar göndermeyi deneyin.
+                </p>
+              </div>
+            </Card>
+          </div>
+        </main>
+      </>
+    );
+  }
+
   if ((test.status !== "completed" && test.status !== "reviewed") || !test.results_snapshot) {
     return (
       <>
@@ -230,7 +291,25 @@ export default function TestResultPage() {
     );
   }
 
-  const results = test.results_snapshot as unknown as TestResults;
+  if (!hasValidReport) {
+    return (
+      <>
+        <TopBar title="Analiz Sonucu" />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-5xl">
+            <EmptyState
+              icon={Calendar}
+              title="Rapor verileri eksik"
+              description="Analiz tamamlandı ancak rapor verileri beklenen formatta değil"
+              actionLabel="Analizlere Dön"
+              onAction={() => router.push("/tests")}
+            />
+          </div>
+        </main>
+      </>
+    );
+  }
+
   const { analysis, report } = results;
 
   return (
