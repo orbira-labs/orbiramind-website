@@ -4,13 +4,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   createSession,
   submitAnswers,
-  completeSession,
   type SessionData,
   type DeepDiveQuestion,
   type ProfileField,
 } from "@/lib/engine-api";
 import { getDimensionTheme, getPoolTheme, getDimensionLabel, getPoolLabel } from "@/lib/dimension-colors";
-import { AnalysisLoading } from "@/components/test/AnalysisLoading";
+import { AnalysisSubmitted } from "@/components/test/AnalysisSubmitted";
 import { PreparationScreen } from "@/components/test/PreparationScreen";
 import { JourneyMap } from "@/components/test/JourneyMap";
 import { StageIntro } from "@/components/test/StageIntro";
@@ -40,7 +39,8 @@ type Phase =
   | "core"
   | "core_midway"
   | "deep_dive"
-  | "analyzing"
+  | "submitting"
+  | "submitted"
   | "done"
   | "error";
 
@@ -407,61 +407,38 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   async function handleFinalAnalysis() {
     if (!sessionId) return;
 
-    // Analiz ekranını göster
-    setPhase("analyzing");
+    setPhase("submitting");
+    setError(null);
 
     try {
-      // Önce "processing" statüsünü kaydet
-      const statusRes = await fetch("/api/test/update-status", {
+      const response = await fetch("/api/test/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        keepalive: true,
         body: JSON.stringify({
           token,
-          status: "processing",
           session_id: sessionId,
+          deep_dive_answers: deepDiveAnswers,
         }),
       });
 
-      if (!statusRes.ok) {
-        console.error("Processing status kaydedilemedi");
+      const responseData = (await response.json().catch(() => null)) as
+        | { error?: string; status?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(responseData?.error ?? "Yanıtlarınız gönderilemedi.");
       }
 
-      // Analizi tamamla ve sonuçları al
-      const data = await completeSession(sessionId, deepDiveAnswers, token);
-
-      // Sonuçları kaydet
-      const completeRes = await fetch("/api/test/update-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          status: "completed",
-          results_snapshot: data.results,
-        }),
-      });
-
-      if (!completeRes.ok) {
-        console.error("Completed status kaydedilemedi");
+      if (responseData?.status === "completed") {
+        setPhase("done");
+        return;
       }
 
-      // Tamamlandı ekranını göster
-      setPhase("done");
+      setPhase("submitted");
     } catch (e) {
-      console.error("Analiz hatası:", e);
-      // Hata durumunda status'u güncelle
-      try {
-        await fetch("/api/test/update-status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token,
-            status: "error",
-          }),
-        });
-      } catch {
-        // ignore
-      }
-      setError("Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+      console.error("Final submission error:", e);
+      setError("Yanıtlarınız gönderilemedi. Lütfen tekrar deneyin.");
       setPhase("error");
     }
   }
@@ -541,7 +518,13 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     );
   }
 
-  if (phase === "analyzing") return <AnalysisLoading />;
+  if (phase === "submitting") {
+    return <AnalysisSubmitted state="submitting" />;
+  }
+
+  if (phase === "submitted") {
+    return <AnalysisSubmitted state="processing" />;
+  }
 
   if (phase === "preparation") {
     return (

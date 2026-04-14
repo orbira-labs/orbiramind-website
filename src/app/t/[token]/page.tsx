@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { AnalysisSubmitted } from "@/components/test/AnalysisSubmitted";
 import { TestFlow } from "./TestFlow";
 
 export const dynamic = "force-dynamic";
@@ -103,7 +104,11 @@ export default async function TestPage({ params }: TestPageProps) {
     );
   }
 
-  if (invitation.status === "completed") {
+  if (invitation.status === "processing") {
+    return <AnalysisSubmitted state="processing" />;
+  }
+
+  if (invitation.status === "completed" || invitation.status === "reviewed") {
     return (
       <ErrorCard
         iconBg="bg-green-100"
@@ -118,6 +123,25 @@ export default async function TestPage({ params }: TestPageProps) {
         }
         title="Test Tamamlandı"
         description="Bu test zaten tamamlandı. Sonuçlarınız uzmanınızla paylaşıldı."
+      />
+    );
+  }
+
+  if (invitation.status === "error") {
+    return (
+      <ErrorCard
+        iconBg="bg-amber-100"
+        iconColor="text-amber-600"
+        icon={
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4m0 4h.01m-7.938 4h15.876c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L2.34 17c-.77 1.333.192 3 1.732 3z"
+          />
+        }
+        title="Rapor Hazırlanamadı"
+        description="Yanıtlarınız alındı ancak rapor hazırlanırken bir sorun oluştu. Uzmanınız sizinle iletişime geçecektir."
       />
     );
   }
