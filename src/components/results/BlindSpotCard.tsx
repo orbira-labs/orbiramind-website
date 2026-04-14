@@ -35,7 +35,7 @@ const spotVariant = {
   }),
 };
 
-export function BlindSpotCard({ blindSpots, title = "Gizli Dinamikler" }: BlindSpotCardProps) {
+export function BlindSpotCard({ blindSpots, title = "Daha Az Görünür Dinamikler" }: BlindSpotCardProps) {
   if (!blindSpots || blindSpots.length === 0) return null;
 
   return (
@@ -49,7 +49,7 @@ export function BlindSpotCard({ blindSpots, title = "Gizli Dinamikler" }: BlindS
         </div>
         <div>
           <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-          <p className="text-xs text-gray-500">Danışanın farkında olmadığı {blindSpots.length} dinamik</p>
+          <p className="text-xs text-gray-500">Seansta dikkatle ele alınabilecek {blindSpots.length} dinamik</p>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ export function BlindSpotCard({ blindSpots, title = "Gizli Dinamikler" }: BlindS
                           </div>
                           <div className="flex-1">
                             <span className="text-[10px] font-bold text-amber-700 uppercase tracking-[0.1em]">
-                              Koç İçin İpucu
+                              Seansta Nasıl Ele Alınabilir?
                             </span>
                             <p className="text-sm text-amber-900/80 mt-1 leading-relaxed">{spot.suggestion}</p>
                           </div>

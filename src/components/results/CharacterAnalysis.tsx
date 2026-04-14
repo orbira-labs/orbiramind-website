@@ -23,8 +23,8 @@ export function CharacterAnalysis({ text, scoreWidget }: CharacterAnalysisProps)
             </svg>
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900">Derinlemesine Analiz</h3>
-            <p className="text-xs text-gray-500">Karakter profili & çıkarımlar</p>
+            <h3 className="text-lg font-bold text-gray-900">Klinik Özet</h3>
+            <p className="text-xs text-gray-500">Formülasyon, koruyucu etkenler ve seans odağı</p>
           </div>
         </div>
 

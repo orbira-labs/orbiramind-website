@@ -13,6 +13,7 @@ import {
   BarChart3,
   ArrowUpDown,
   MapIcon,
+  Search,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -25,15 +26,14 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { WellnessGauge } from "@/components/results/WellnessGauge";
 import { ProfileCard } from "@/components/results/ProfileCard";
 import { StrengthWeaknessGrid } from "@/components/results/StrengthWeaknessGrid";
-import { BlindSpotCard } from "@/components/results/BlindSpotCard";
 import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
-import { InferenceCards } from "@/components/results/InferenceCards";
+import { ClinicianInsights } from "@/components/results/ClinicianInsights";
 import { CoachingTimeline } from "@/components/results/CoachingTimeline";
 
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
 
-type Tab = "overview" | "strengths" | "roadmap";
+type Tab = "overview" | "strengths" | "clinician" | "roadmap";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -46,7 +46,13 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode; description: string
     id: "strengths",
     label: "Güçlü & Gelişim",
     icon: <ArrowUpDown className="h-4 w-4" />,
-    description: "Yönler & gizli dinamikler",
+    description: "Yönler & gelişim alanları",
+  },
+  {
+    id: "clinician",
+    label: "Terapist Görünümü",
+    icon: <Search className="h-4 w-4" />,
+    description: "Hipotezler & örüntüler",
   },
   {
     id: "roadmap",
@@ -383,19 +389,17 @@ export default function TestResultPage() {
                       weaknesses={report.top5_and_weak5.weak5}
                     />
                   </Card>
-
-                  {analysis.blind_spots && analysis.blind_spots.length > 0 && (
-                    <Card padding="lg" variant="elevated">
-                      <BlindSpotCard blindSpots={analysis.blind_spots} title="Gizli Dinamikler" />
-                    </Card>
-                  )}
-
-                  {analysis.inferences && analysis.inferences.length > 0 && (
-                    <Card padding="lg" variant="elevated">
-                      <InferenceCards inferences={analysis.inferences} />
-                    </Card>
-                  )}
                 </div>
+              )}
+
+              {activeTab === "clinician" && (
+                <Card padding="lg" variant="elevated">
+                  <ClinicianInsights
+                    reportBlindSpots={report.blind_spots}
+                    analysisBlindSpots={analysis.blind_spots}
+                    inferences={analysis.inferences}
+                  />
+                </Card>
               )}
 
               {activeTab === "roadmap" && (

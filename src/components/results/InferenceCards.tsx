@@ -80,8 +80,8 @@ export function InferenceCards({ inferences }: InferenceCardsProps) {
           </div>
         </div>
         <div>
-          <h3 className="text-lg font-bold text-gray-900">Tespit Edilen Döngüler</h3>
-          <p className="text-xs text-gray-500">{filtered.length} çapraz çıkarım</p>
+          <h3 className="text-lg font-bold text-gray-900">Sürdürücü Örüntüler</h3>
+          <p className="text-xs text-gray-500">{filtered.length} klinik çıkarım</p>
         </div>
       </div>
 
