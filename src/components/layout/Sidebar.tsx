@@ -14,6 +14,7 @@ import {
   LogOut,
   ChevronLeft,
   ClipboardList,
+  Banknote,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useProContext } from "@/lib/context";
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard, accent: false, comingSoon: false },
   { href: "/clients", label: "Danışanlar", icon: Users, accent: false, comingSoon: false },
   { href: "/appointments", label: "Randevular", icon: Calendar, accent: false, comingSoon: false },
+  { href: "/sessions", label: "Seans Paketleri", icon: Banknote, accent: false, comingSoon: false },
   { href: "/tests", label: "Analizler", icon: FlaskConical, accent: true, comingSoon: false },
   { href: "#", label: "Ödevler", icon: ClipboardList, accent: false, comingSoon: true },
 ];

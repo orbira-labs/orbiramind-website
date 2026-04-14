@@ -42,3 +42,18 @@ export const TEST_STATUSES = [
 ] as const;
 
 export const ANALYSIS_STATUSES = TEST_STATUSES;
+
+export const SESSION_PACKAGE_STATUSES = [
+  { id: "active", label: "Aktif", color: "success" },
+  { id: "completed", label: "Tamamlandı", color: "muted" },
+  { id: "cancelled", label: "İptal", color: "danger" },
+] as const;
+
+export const PAYMENT_METHODS = [
+  { id: "cash", label: "Nakit" },
+  { id: "card", label: "Kart" },
+  { id: "transfer", label: "Havale/EFT" },
+  { id: "other", label: "Diğer" },
+] as const;
+
+export const PRESET_SESSION_COUNTS = [4, 5, 8, 10, 12, 16, 20] as const;

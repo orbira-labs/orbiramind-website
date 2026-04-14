@@ -28,6 +28,7 @@ import { tr } from "date-fns/locale";
 import type { Client } from "@/lib/types";
 import { clsx } from "clsx";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import { toast } from "sonner";
 
 export interface AppointmentSlim {
   id: string;
@@ -78,6 +79,7 @@ export function AppointmentDetailModal({
   const [loadingData, setLoadingData] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [completing, setCompleting] = useState(false);
   const [showSendTest, setShowSendTest] = useState(false);
 
   const open = !!appointment;
@@ -133,11 +135,74 @@ export function AppointmentDetailModal({
       .from("appointments")
       .update({ status: "cancelled" })
       .eq("id", appointment.id);
-    setCancelling(false);
+
     if (!error) {
+      try {
+        const { data: { user } } = await supabase.current.auth.getUser();
+        if (user) {
+          const { data: remaining } = await supabase.current.rpc("refund_session", {
+            p_appointment_id: appointment.id,
+            p_professional_id: user.id,
+          });
+
+          if (remaining !== null && typeof remaining === "number" && remaining >= 0) {
+            toast.info(`Seans iade edildi. Kalan: ${remaining}`);
+          }
+        }
+      } catch {
+        // refund silently fails if no session was deducted
+      }
+
       onUpdated?.();
       onClose();
     }
+    setCancelling(false);
+  };
+
+  const handleComplete = async () => {
+    if (!appointment) return;
+    setCompleting(true);
+
+    const { error } = await supabase.current
+      .from("appointments")
+      .update({ status: "completed" })
+      .eq("id", appointment.id);
+
+    if (!error) {
+      const { data: activePkg } = await supabase.current
+        .from("session_packages")
+        .select("id")
+        .eq("client_id", appointment.client_id)
+        .eq("status", "active")
+        .gt("remaining_sessions", 0)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (activePkg) {
+        const { data: { user } } = await supabase.current.auth.getUser();
+        if (user) {
+          const { data: remaining } = await supabase.current.rpc("deduct_session", {
+            p_package_id: activePkg.id,
+            p_appointment_id: appointment.id,
+            p_professional_id: user.id,
+            p_client_id: appointment.client_id,
+          });
+
+          if (remaining !== null && remaining >= 0) {
+            toast.success(`Seans düşüldü. Kalan: ${remaining}`);
+          } else {
+            toast.info("Randevu tamamlandı");
+          }
+        }
+      } else {
+        toast.info("Randevu tamamlandı. (Aktif seans paketi yok)");
+      }
+
+      onUpdated?.();
+      onClose();
+    }
+    setCompleting(false);
   };
 
   if (!appointment) return null;
@@ -379,6 +444,15 @@ export function AppointmentDetailModal({
               {/* Mobile Action Bar */}
               {apt.status === "scheduled" && !confirmCancel && (
                 <div className="mobile-action-bar">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    loading={completing}
+                    onClick={handleComplete}
+                    className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
+                  >
+                    Tamamla
+                  </Button>
                   <Button
                     type="button"
                     variant="orange"
@@ -664,6 +738,16 @@ export function AppointmentDetailModal({
               {apt.status === "scheduled" && !confirmCancel && (
                 <div className="border-t border-pro-border px-5 py-3 bg-pro-surface-alt/50">
                   <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      loading={completing}
+                      onClick={handleComplete}
+                      className="flex items-center gap-1.5"
+                    >
+                      Tamamla
+                    </Button>
                     <Button
                       type="button"
                       variant="orange"

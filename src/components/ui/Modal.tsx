@@ -8,6 +8,7 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   title?: string;
+  subtitle?: string;
   children: ReactNode;
   size?: "sm" | "md" | "lg";
   fullScreen?: boolean;
@@ -17,6 +18,7 @@ export function Modal({
   open,
   onClose,
   title,
+  subtitle,
   children,
   size = "md",
   fullScreen = false,
@@ -76,17 +78,22 @@ export function Modal({
       >
         {title && (
           <div className={clsx(
-            "flex items-center justify-between border-b border-pro-border",
-            fullScreen ? "px-4 py-3 sm:px-5 sm:py-4" : "px-5 py-4"
+            "flex items-start justify-between border-b border-pro-border",
+            fullScreen ? "px-4 py-3 sm:px-5 sm:py-4" : "px-6 py-5"
           )}>
-            <h2 className={clsx(
-              "font-semibold text-pro-text",
-              fullScreen ? "text-base sm:text-lg" : "text-lg"
-            )}>{title}</h2>
+            <div className="flex-1 min-w-0">
+              <h2 className={clsx(
+                "font-semibold text-pro-text",
+                fullScreen ? "text-base sm:text-lg" : "text-lg"
+              )}>{title}</h2>
+              {subtitle && (
+                <p className="text-sm text-pro-text-tertiary mt-0.5">{subtitle}</p>
+              )}
+            </div>
             <button
               onClick={onClose}
               className={clsx(
-                "rounded-lg text-pro-text-tertiary hover:text-pro-text hover:bg-pro-surface-alt transition-colors",
+                "rounded-lg text-pro-text-tertiary hover:text-pro-text hover:bg-pro-surface-alt transition-colors shrink-0 ml-3",
                 "min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-1.5",
                 "flex items-center justify-center"
               )}
@@ -97,7 +104,7 @@ export function Modal({
         )}
         <div className={clsx(
           "overflow-y-auto flex-1",
-          fullScreen ? "p-4 sm:p-5" : "p-5"
+          fullScreen ? "p-4 sm:p-5" : "px-6 py-5"
         )}>{children}</div>
       </div>
     </div>

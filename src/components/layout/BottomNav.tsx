@@ -8,7 +8,7 @@ import {
   Users,
   Calendar,
   FlaskConical,
-  CreditCard,
+  Banknote,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -16,8 +16,8 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Ofisim", icon: LayoutDashboard, accent: false },
   { href: "/clients", label: "Danışan", icon: Users, accent: false },
   { href: "/appointments", label: "Randevu", icon: Calendar, accent: false },
+  { href: "/sessions", label: "Paketler", icon: Banknote, accent: false },
   { href: "/tests", label: "Analiz", icon: FlaskConical, accent: false },
-  { href: "/billing", label: "Abonelik", icon: CreditCard, accent: true },
 ];
 
 export function BottomNav() {

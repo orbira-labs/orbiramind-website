@@ -11,6 +11,7 @@ export interface Professional {
   specializations: string[];
   avatar_url: string | null;
   onboarding_completed: boolean;
+  session_price_cents: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +46,7 @@ export interface Appointment {
   duration_minutes: number;
   note: string | null;
   status: "scheduled" | "completed" | "cancelled";
+  session_transaction_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -97,6 +99,59 @@ export interface ProNotification {
   body: string | null;
   data: Record<string, unknown>;
   is_read: boolean;
+  created_at: string;
+}
+
+export interface SessionPriceTemplate {
+  id: string;
+  professional_id: string;
+  name: string;
+  type: "single" | "package";
+  session_count: number;
+  price_per_session_cents: number;
+  total_price_cents: number;
+  discount_percent: number;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SessionPackage {
+  id: string;
+  professional_id: string;
+  client_id: string;
+  template_id: string | null;
+  name: string;
+  total_sessions: number;
+  remaining_sessions: number;
+  total_price_cents: number;
+  currency: string;
+  status: "active" | "completed" | "cancelled";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SessionTransaction {
+  id: string;
+  package_id: string;
+  professional_id: string;
+  client_id: string;
+  appointment_id: string | null;
+  type: "usage" | "refund" | "manual_deduct";
+  amount: number;
+  remaining_after: number;
+  note: string | null;
+  created_at: string;
+}
+
+export interface SessionPayment {
+  id: string;
+  package_id: string;
+  professional_id: string;
+  amount_cents: number;
+  method: "cash" | "card" | "transfer" | "other" | null;
+  note: string | null;
   created_at: string;
 }
 

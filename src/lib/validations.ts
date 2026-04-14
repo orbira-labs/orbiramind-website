@@ -198,6 +198,39 @@ export const sendTestNewClientSchema = z.object({
   email: optionalEmailField,
 });
 
+export const sessionTemplateSchema = z.object({
+  name: requiredText("Şablon adı", 100),
+  session_count: z
+    .number()
+    .int("Tam sayı girin")
+    .min(1, "En az 1 seans")
+    .max(200, "En fazla 200 seans"),
+  discount_percent: z.number().min(0).max(100).optional(),
+});
+
+export const assignSessionPackageSchema = z.object({
+  template_id: z.string().uuid().optional(),
+  name: requiredText("Paket adı", 100),
+  total_sessions: z
+    .number()
+    .int("Tam sayı girin")
+    .min(1, "En az 1 seans")
+    .max(200, "En fazla 200 seans"),
+  total_price: z.number().min(0, "Toplam tutar 0 veya üstü olmalı"),
+  initial_payment: z.number().min(0).optional(),
+  payment_method: z.enum(["cash", "card", "transfer", "other"]).optional(),
+});
+
+export const sessionPaymentSchema = z.object({
+  amount: z.number().min(0.01, "Tutar 0'dan büyük olmalı"),
+  method: z.enum(["cash", "card", "transfer", "other"]).optional(),
+  note: optionalText(200),
+});
+
+export type SessionTemplateInput = z.infer<typeof sessionTemplateSchema>;
+export type AssignSessionPackageInput = z.infer<typeof assignSessionPackageSchema>;
+export type SessionPaymentInput = z.infer<typeof sessionPaymentSchema>;
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type OtpInput = z.infer<typeof otpSchema>;
