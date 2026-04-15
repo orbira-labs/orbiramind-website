@@ -3,6 +3,10 @@
 
 export type ProfileCategory = "demographic" | "physical" | "lifestyle" | "health" | "habit" | "nutrition" | "identity";
 
+export interface ProfileFieldConditions {
+  profile?: Record<string, string | string[] | boolean>;
+}
+
 export interface ProfileField {
   id: string;
   answer_type: "single_choice" | "boolean" | "text" | "multi_select" | "numeric";
@@ -12,6 +16,70 @@ export interface ProfileField {
   numeric_range?: { min: number; max: number } | null;
   required?: boolean;
   stage?: number;
+  conditions?: ProfileFieldConditions;
+  skip_conditions?: Record<string, string[]>;
+  skip_default_value?: string | null;
+}
+
+/**
+ * Evaluates if a profile field should be shown based on conditions and current profile values.
+ * Returns true if the field should be shown, false if it should be skipped.
+ */
+export function shouldShowProfileField(
+  field: ProfileField,
+  profile: Record<string, unknown>
+): boolean {
+  // Check skip_conditions first (format: {age_range_in: ["13_18"]})
+  if (field.skip_conditions && Object.keys(field.skip_conditions).length > 0) {
+    for (const [key, values] of Object.entries(field.skip_conditions)) {
+      if (key.endsWith("_in")) {
+        const fieldId = key.replace("_in", "");
+        const currentValue = profile[fieldId];
+        if (currentValue && values.includes(String(currentValue))) {
+          return false; // Skip this field
+        }
+      } else if (key.endsWith("_not")) {
+        const fieldId = key.replace("_not", "");
+        const currentValue = profile[fieldId];
+        if (currentValue && !values.includes(String(currentValue))) {
+          return false; // Skip this field
+        }
+      }
+    }
+  }
+
+  // Check conditions (format: {profile: {children_status_not: ["no_children"]}})
+  if (!field.conditions || Object.keys(field.conditions).length === 0) {
+    return true; // No conditions = always show
+  }
+
+  const profileConditions = field.conditions.profile;
+  if (!profileConditions || Object.keys(profileConditions).length === 0) {
+    return true; // No profile conditions = always show
+  }
+
+  for (const [key, value] of Object.entries(profileConditions)) {
+    if (key.endsWith("_not")) {
+      const fieldId = key.replace("_not", "");
+      const currentValue = profile[fieldId];
+      if (currentValue && Array.isArray(value) && value.includes(String(currentValue))) {
+        return false; // Condition not met - skip this field
+      }
+    } else if (key.endsWith("_in")) {
+      const fieldId = key.replace("_in", "");
+      const currentValue = profile[fieldId];
+      if (!currentValue || (Array.isArray(value) && !value.includes(String(currentValue)))) {
+        return false; // Condition not met - skip this field
+      }
+    } else {
+      const currentValue = profile[key];
+      if (currentValue !== value) {
+        return false; // Exact match failed - skip this field
+      }
+    }
+  }
+
+  return true; // All conditions met - show this field
 }
 
 export interface ProfileGroup {

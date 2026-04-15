@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   createSession,
   submitAnswers,
+  shouldShowProfileField,
   type SessionData,
   type DeepDiveQuestion,
   type ProfileField,
@@ -162,12 +163,16 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   const [currentStage, setCurrentStage] = useState(0);
   const [midwayShown, setMidwayShown] = useState(false);
 
-  // Build pages based on current phase
+  // Build pages based on current phase - with conditional filtering for profile fields
   const pages: PageItem[] = useMemo(() => {
     if (!sessionData) return [];
 
     if (phase === "profile") {
-      return sessionData.profile_fields.map((field, index) => ({
+      // Filter profile fields based on conditions
+      const visibleFields = sessionData.profile_fields.filter((field) =>
+        shouldShowProfileField(field, profile)
+      );
+      return visibleFields.map((field, index) => ({
         type: "profile" as const,
         field,
         index,
@@ -191,7 +196,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
 
     return [];
-  }, [sessionData, deepDiveQuestions, phase]);
+  }, [sessionData, deepDiveQuestions, phase, profile]);
 
   const currentPage = pages[currentIndex];
   const totalPages = pages.length;
@@ -289,9 +294,29 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
+  // Apply skip default values for fields that should be skipped
+  const applySkipDefaults = useCallback((currentProfile: Record<string, unknown>) => {
+    if (!sessionData) return currentProfile;
+    
+    const updatedProfile = { ...currentProfile };
+    for (const field of sessionData.profile_fields) {
+      // If field should be skipped and has a default value, apply it
+      if (!shouldShowProfileField(field, currentProfile) && field.skip_default_value != null) {
+        if (updatedProfile[field.id] === undefined) {
+          updatedProfile[field.id] = field.skip_default_value;
+        }
+      }
+    }
+    return updatedProfile;
+  }, [sessionData]);
+
   // Answer handlers
   function handleProfileAnswer(fieldId: string, value: unknown) {
-    setProfile((prev) => ({ ...prev, [fieldId]: value }));
+    setProfile((prev) => {
+      const newProfile = { ...prev, [fieldId]: value };
+      // Apply skip defaults after each answer (in case conditions changed)
+      return applySkipDefaults(newProfile);
+    });
   }
 
   function handleProfileAnswerAndNext(fieldId: string, value: unknown) {
