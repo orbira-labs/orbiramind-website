@@ -11,58 +11,7 @@ const PHASES = [
   { message: "Test hazır, son kontroller...", at: 4400 },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  DNA Helix – continuous double-strand flowing across screen        */
-/* ------------------------------------------------------------------ */
-
-function DnaStrand({ y, delay, reverse }: { y: number; delay: number; reverse?: boolean }) {
-  const points = 24;
-  const width = 2400;
-  const amplitude = 18;
-  const wavelength = 200;
-
-  const strand1: string[] = [];
-  const strand2: string[] = [];
-  const rungs: { x: number; y1: number; y2: number }[] = [];
-
-  for (let i = 0; i <= points; i++) {
-    const x = (i / points) * width;
-    const phase = (x / wavelength) * Math.PI * 2;
-    const y1 = y + Math.sin(phase) * amplitude;
-    const y2 = y + Math.sin(phase + Math.PI) * amplitude;
-    strand1.push(`${i === 0 ? "M" : "L"}${x},${y1}`);
-    strand2.push(`${i === 0 ? "M" : "L"}${x},${y2}`);
-    if (i % 3 === 0 && i > 0 && i < points) {
-      rungs.push({ x, y1, y2 });
-    }
-  }
-
-  return (
-    <motion.g
-      initial={{ x: reverse ? -1200 : 0 }}
-      animate={{ x: reverse ? 0 : -1200 }}
-      transition={{ duration: 30 + delay * 5, repeat: Infinity, ease: "linear" }}
-    >
-      <path d={strand1.join(" ")} fill="none" stroke="rgba(91,123,106,0.12)" strokeWidth="1.5" />
-      <path d={strand2.join(" ")} fill="none" stroke="rgba(212,133,106,0.10)" strokeWidth="1.5" />
-      {rungs.map((r, i) => (
-        <line
-          key={i}
-          x1={r.x}
-          y1={r.y1}
-          x2={r.x}
-          y2={r.y2}
-          stroke="rgba(91,123,106,0.07)"
-          strokeWidth="1"
-        />
-      ))}
-    </motion.g>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Breathing Cosmos Atom – green ↔ coral color shift                 */
-/* ------------------------------------------------------------------ */
+const BREATH_DURATION = 4;
 
 function CosmosAtom() {
   const uid = useId();
@@ -89,22 +38,19 @@ function CosmosAtom() {
             </filter>
           </defs>
 
-          {/* Orbit ring with animated stroke color */}
           <ellipse cx="0" cy="0" rx="85" ry="85" fill="none" strokeWidth="1.2">
-            <animate attributeName="stroke" values={`${o.stroke1};${o.stroke2};${o.stroke1}`} dur="4s" repeatCount="indefinite" />
+            <animate attributeName="stroke" values={`${o.stroke1};${o.stroke2};${o.stroke1}`} dur={`${BREATH_DURATION}s`} repeatCount="indefinite" />
           </ellipse>
 
-          {/* Primary electron */}
           <circle r="5.5" filter={`url(#${uid}-g${idx})`}>
-            <animate attributeName="fill" values={`${o.electron};${o.electronAlt};${o.electron}`} dur="4s" repeatCount="indefinite" />
+            <animate attributeName="fill" values={`${o.electron};${o.electronAlt};${o.electron}`} dur={`${BREATH_DURATION}s`} repeatCount="indefinite" />
             <animateMotion dur={`${o.dur}s`} repeatCount="indefinite">
               <mpath href={`#${uid}-p${idx}`} />
             </animateMotion>
           </circle>
 
-          {/* Secondary electron (offset) */}
           <circle r="3.5" opacity="0.7" filter={`url(#${uid}-g${idx})`}>
-            <animate attributeName="fill" values={`${o.electronAlt};${o.electron};${o.electronAlt}`} dur="4s" repeatCount="indefinite" />
+            <animate attributeName="fill" values={`${o.electronAlt};${o.electron};${o.electronAlt}`} dur={`${BREATH_DURATION}s`} repeatCount="indefinite" />
             <animateMotion dur={`${o.dur}s`} repeatCount="indefinite" begin={`-${o.dur / 2}s`}>
               <mpath href={`#${uid}-p${idx}`} />
             </animateMotion>
@@ -124,7 +70,7 @@ function CosmosAtom() {
             "rgba(91,123,106,0.2)",
           ],
         }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: BREATH_DURATION, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Nucleus */}
@@ -142,15 +88,11 @@ function CosmosAtom() {
             "0 0 25px 8px rgba(91,123,106,0.5), 0 0 60px 20px rgba(91,123,106,0.2), inset 0 0 10px rgba(255,255,255,0.3)",
           ],
         }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: BREATH_DURATION, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Overlay                                                            */
-/* ------------------------------------------------------------------ */
 
 interface TestCreatingOverlayProps {
   visible: boolean;
@@ -194,35 +136,30 @@ export function TestCreatingOverlay({ visible }: TestCreatingOverlayProps) {
           exit={{ opacity: 0, transition: { duration: 0.6 } }}
           transition={{ duration: 0.4 }}
         >
-          {/* Clean light background */}
-          <div className="absolute inset-0 bg-[#f6f9f7]" />
-
-          {/* Breathing center glow */}
+          {/* Breathing background */}
           <motion.div
-            className="absolute pointer-events-none"
-            style={{ width: "120vmax", height: "120vmax", borderRadius: "50%" }}
+            className="absolute inset-0"
             animate={{
-              background: [
-                "radial-gradient(circle, rgba(91,123,106,0.09) 0%, rgba(91,123,106,0.03) 35%, transparent 60%)",
-                "radial-gradient(circle, rgba(212,133,106,0.08) 0%, rgba(212,133,106,0.025) 35%, transparent 60%)",
-                "radial-gradient(circle, rgba(91,123,106,0.09) 0%, rgba(91,123,106,0.03) 35%, transparent 60%)",
-              ],
+              backgroundColor: ["#f4f8f5", "#faf6f4", "#f4f8f5"],
             }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: BREATH_DURATION, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          {/* DNA helix strands flowing across */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
-            <DnaStrand y={120} delay={0} />
-            <DnaStrand y={280} delay={1} reverse />
-            <DnaStrand y={440} delay={2} />
-            <DnaStrand y={600} delay={0.5} reverse />
-            <DnaStrand y={760} delay={1.5} />
-          </svg>
+          {/* Breathing radial glow */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            animate={{
+              background: [
+                "radial-gradient(ellipse 70% 70% at 50% 45%, rgba(91,123,106,0.10) 0%, transparent 60%)",
+                "radial-gradient(ellipse 70% 70% at 50% 45%, rgba(212,133,106,0.09) 0%, transparent 60%)",
+                "radial-gradient(ellipse 70% 70% at 50% 45%, rgba(91,123,106,0.10) 0%, transparent 60%)",
+              ],
+            }}
+            transition={{ duration: BREATH_DURATION, repeat: Infinity, ease: "easeInOut" }}
+          />
 
           {/* Content */}
           <div className="relative z-10 flex flex-col items-center gap-10 px-8">
-            {/* Cosmos Atom */}
             <CosmosAtom />
 
             {/* Phase message */}
@@ -256,7 +193,7 @@ export function TestCreatingOverlay({ visible }: TestCreatingOverlayProps) {
                   }}
                   transition={{
                     width: { duration: 0.1, ease: "linear" },
-                    background: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                    background: { duration: BREATH_DURATION, repeat: Infinity, ease: "easeInOut" },
                   }}
                 />
               </div>
