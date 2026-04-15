@@ -33,6 +33,7 @@ function ExpandableCard({
   actionContent,
   severity,
   index,
+  compact = false,
 }: {
   title: string;
   description: string;
@@ -40,6 +41,7 @@ function ExpandableCard({
   actionContent?: string;
   severity?: { label: string; dot: string };
   index: number;
+  compact?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const hasAction = actionLabel && actionContent;
@@ -47,19 +49,26 @@ function ExpandableCard({
   return (
     <motion.div
       variants={staggerItem}
-      className="group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
+      className={`group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm ${compact ? "h-full flex flex-col" : ""}`}
     >
       <button
         type="button"
         onClick={() => hasAction && setExpanded((prev) => !prev)}
-        className={`w-full text-left p-3 sm:p-4 touch-manipulation ${hasAction ? "cursor-pointer" : "cursor-default"}`}
+        className={`w-full text-left p-3 sm:p-4 touch-manipulation ${hasAction ? "cursor-pointer" : "cursor-default"} ${compact ? "flex-1" : ""}`}
       >
-        <div className="flex items-start gap-2.5 sm:gap-3">
-          <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
-            {index}
-          </span>
-          <div className="flex-1 min-w-0">
+        <div className={compact ? "flex flex-col h-full" : "flex items-start gap-2.5 sm:gap-3"}>
+          {!compact && (
+            <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
+              {index}
+            </span>
+          )}
+          <div className={compact ? "flex-1 flex flex-col" : "flex-1 min-w-0"}>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
+              {compact && (
+                <span className="flex-shrink-0 text-xs font-medium text-gray-300 tabular-nums">
+                  {index}.
+                </span>
+              )}
               <h4 className="text-sm sm:text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
               {severity && (
                 <span className="inline-flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
@@ -68,9 +77,15 @@ function ExpandableCard({
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-[13px] leading-relaxed text-gray-500">{description}</p>
+            <p className={`text-xs sm:text-[13px] leading-relaxed text-gray-500 ${compact ? "flex-1" : ""}`}>{description}</p>
+            {compact && hasAction && (
+              <div className="flex items-center gap-1 mt-2 text-[11px] text-[#5B7B6A] font-medium">
+                <span>Detay için tıkla</span>
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+              </div>
+            )}
           </div>
-          {hasAction && (
+          {!compact && hasAction && (
             <ChevronDown
               className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
             />
@@ -88,7 +103,7 @@ function ExpandableCard({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12">
+              <div className={compact ? "px-3 pb-3 sm:px-4 sm:pb-4" : "px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12"}>
                 <div className="rounded-lg bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3">
                   <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
                     {actionLabel}
@@ -111,6 +126,7 @@ function GuidanceCard({
   timing,
   caution,
   index,
+  compact = false,
 }: {
   title: string;
   guidance: string;
@@ -118,6 +134,7 @@ function GuidanceCard({
   timing: string;
   caution: string | null;
   index: number;
+  compact?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const timingInfo = TIMING_CONFIG[timing] ?? TIMING_CONFIG.early_phase;
@@ -125,29 +142,44 @@ function GuidanceCard({
   return (
     <motion.div
       variants={staggerItem}
-      className="group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
+      className={`group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm ${compact ? "h-full flex flex-col" : ""}`}
     >
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full text-left p-3 sm:p-4 touch-manipulation cursor-pointer"
+        className={`w-full text-left p-3 sm:p-4 touch-manipulation cursor-pointer ${compact ? "flex-1" : ""}`}
       >
-        <div className="flex items-start gap-2.5 sm:gap-3">
-          <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
-            {index}
-          </span>
-          <div className="flex-1 min-w-0">
+        <div className={compact ? "flex flex-col h-full" : "flex items-start gap-2.5 sm:gap-3"}>
+          {!compact && (
+            <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
+              {index}
+            </span>
+          )}
+          <div className={compact ? "flex-1 flex flex-col" : "flex-1 min-w-0"}>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
+              {compact && (
+                <span className="flex-shrink-0 text-xs font-medium text-gray-300 tabular-nums">
+                  {index}.
+                </span>
+              )}
               <h4 className="text-sm sm:text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
-              <span className={`text-[10px] sm:text-[11px] font-medium ${timingInfo.color}`}>
+              <span className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded ${compact ? "bg-gray-100" : ""} ${timingInfo.color}`}>
                 {timingInfo.label}
               </span>
             </div>
-            <p className="text-xs sm:text-[13px] leading-relaxed text-gray-500">{guidance}</p>
+            <p className={`text-xs sm:text-[13px] leading-relaxed text-gray-500 ${compact ? "flex-1" : ""}`}>{guidance}</p>
+            {compact && (
+              <div className="flex items-center gap-1 mt-2 text-[11px] text-indigo-500 font-medium">
+                <span>Detay için tıkla</span>
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+              </div>
+            )}
           </div>
-          <ChevronDown
-            className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-          />
+          {!compact && (
+            <ChevronDown
+              className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            />
+          )}
         </div>
       </button>
 
@@ -160,7 +192,7 @@ function GuidanceCard({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12 space-y-2">
+            <div className={compact ? "px-3 pb-3 sm:px-4 sm:pb-4 space-y-2" : "px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12 space-y-2"}>
               <div className="rounded-lg bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3">
                 <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
                   Neden önemli?
@@ -269,7 +301,7 @@ export function ClinicianInsights({
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="space-y-2"
+            className="grid grid-cols-1 md:grid-cols-2 gap-3"
           >
             {reportBlindSpots.map((spot, index) => (
               <ExpandableCard
@@ -279,6 +311,7 @@ export function ClinicianInsights({
                 description={spot.insight}
                 actionLabel="Seansta nasıl ele alınabilir?"
                 actionContent={spot.coach_tip}
+                compact
               />
             ))}
           </motion.div>
@@ -297,7 +330,7 @@ export function ClinicianInsights({
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="space-y-2"
+            className="grid grid-cols-1 md:grid-cols-2 gap-3"
           >
             {sortedGuidance.map((item, index) => (
               <GuidanceCard
@@ -308,6 +341,7 @@ export function ClinicianInsights({
                 rationale={item.rationale}
                 timing={item.timing}
                 caution={item.caution}
+                compact
               />
             ))}
           </motion.div>
