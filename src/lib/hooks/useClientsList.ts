@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useProContext } from "@/lib/context";
 import type { Client } from "@/lib/types";
@@ -50,6 +51,12 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  const channelRef = useRef<ReturnType<ReturnType<typeof createClient>["channel"]> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const userInteractedRef = useRef(false);
+  const knownClientIds = useRef<Set<string>>(new Set());
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
@@ -60,6 +67,38 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
       if (searchTimeout.current) clearTimeout(searchTimeout.current);
     };
   }, [search]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    audioRef.current = new Audio("/sounds/notification.mp3");
+    audioRef.current.volume = 0.5;
+
+    const markInteracted = () => {
+      userInteractedRef.current = true;
+    };
+    document.addEventListener("click", markInteracted, { once: true });
+    document.addEventListener("keydown", markInteracted, { once: true });
+
+    return () => {
+      document.removeEventListener("click", markInteracted);
+      document.removeEventListener("keydown", markInteracted);
+    };
+  }, []);
+
+  const playSound = useCallback(() => {
+    if (!audioRef.current) return;
+
+    audioRef.current.currentTime = 0;
+    audioRef.current.play().catch(() => {
+      if (!userInteractedRef.current) {
+        const retryOnInteraction = () => {
+          audioRef.current?.play().catch(() => {});
+        };
+        document.addEventListener("click", retryOnInteraction, { once: true });
+      }
+    });
+  }, []);
 
   const fetchCounts = useCallback(async () => {
     if (!professional?.id) return;
@@ -224,6 +263,83 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
     fetchCounts();
     fetchList();
   }, [fetchCounts, fetchList]);
+
+  useEffect(() => {
+    if (clients.length > 0 && !initialLoadDone.current) {
+      knownClientIds.current = new Set(clients.map(c => c.id));
+      initialLoadDone.current = true;
+    }
+  }, [clients]);
+
+  useEffect(() => {
+    if (!professional?.id) return;
+
+    if (channelRef.current) {
+      supabase.current.removeChannel(channelRef.current);
+    }
+
+    channelRef.current = supabase.current
+      .channel(`clients-realtime-${professional.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "pro",
+          table: "clients",
+          filter: `professional_id=eq.${professional.id}`,
+        },
+        (payload) => {
+          const newClient = payload.new as Client;
+          if (initialLoadDone.current && !knownClientIds.current.has(newClient.id)) {
+            knownClientIds.current.add(newClient.id);
+            playSound();
+            toast.success("Danışan eklendi", {
+              description: `${newClient.first_name} ${newClient.last_name}`,
+            });
+            fetchCounts();
+            fetchList();
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "pro",
+          table: "clients",
+          filter: `professional_id=eq.${professional.id}`,
+        },
+        () => {
+          fetchCounts();
+          fetchList();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "pro",
+          table: "clients",
+          filter: `professional_id=eq.${professional.id}`,
+        },
+        (payload) => {
+          const deletedId = (payload.old as { id?: string })?.id;
+          if (deletedId) {
+            knownClientIds.current.delete(deletedId);
+          }
+          fetchCounts();
+          fetchList();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.current.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [professional?.id, fetchCounts, fetchList, playSound]);
 
   const refresh = useCallback(async () => {
     await Promise.all([fetchCounts(), fetchList()]);
