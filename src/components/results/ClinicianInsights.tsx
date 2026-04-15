@@ -261,7 +261,7 @@ export function ClinicianInsights({
         <SectionBlock
           number={++sectionNumber}
           title="Klinik Hipotezler"
-          subtitle="Seansta test edilebilecek formülasyonlar"
+          subtitle="Seansta keşfedilmeye değer olası dinamikler"
           icon={<Lightbulb className="h-4 w-4 text-[#5B7B6A]" />}
           accentColor="bg-[#EEF4F0]"
         >
@@ -289,7 +289,7 @@ export function ClinicianInsights({
         <SectionBlock
           number={++sectionNumber}
           title="Terapötik Yönelimler"
-          subtitle="Seans sürecinde dikkat edilmesi gereken yönelimler"
+          subtitle="Terapistin yaklaşımını şekillendirecek öneriler"
           icon={<Compass className="h-4 w-4 text-indigo-500" />}
           accentColor="bg-indigo-50"
         >
@@ -318,7 +318,7 @@ export function ClinicianInsights({
         <SectionBlock
           number={++sectionNumber}
           title="Gizli Kalan Dinamikler"
-          subtitle="Danışanın farkında olmayabileceği ama verinin işaret ettiği alanlar"
+          subtitle="Danışanın farkında olmayabileceği alanlar"
           icon={<Eye className="h-4 w-4 text-gray-500" />}
           accentColor="bg-gray-100"
         >
@@ -346,7 +346,7 @@ export function ClinicianInsights({
         <SectionBlock
           number={++sectionNumber}
           title="Sürdürücü Örüntüler"
-          subtitle="Zorlanmayı devam ettirebilecek ilişkili mekanizmalar"
+          subtitle="Zorluğu besleyen döngüler"
           icon={<RefreshCw className="h-4 w-4 text-amber-600" />}
           accentColor="bg-amber-50"
         >
