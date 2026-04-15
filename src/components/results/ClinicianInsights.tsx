@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, Eye, RefreshCw, ChevronDown, Compass } from "lucide-react";
 import { staggerContainer, staggerItem } from "@/lib/animations";
@@ -33,7 +33,6 @@ function ExpandableCard({
   actionContent,
   severity,
   index,
-  compact = false,
 }: {
   title: string;
   description: string;
@@ -41,7 +40,6 @@ function ExpandableCard({
   actionContent?: string;
   severity?: { label: string; dot: string };
   index: number;
-  compact?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const hasAction = actionLabel && actionContent;
@@ -49,26 +47,19 @@ function ExpandableCard({
   return (
     <motion.div
       variants={staggerItem}
-      className={`group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm ${compact ? "h-full flex flex-col" : ""}`}
+      className="group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
     >
       <button
         type="button"
         onClick={() => hasAction && setExpanded((prev) => !prev)}
-        className={`w-full text-left p-3 sm:p-4 touch-manipulation ${hasAction ? "cursor-pointer" : "cursor-default"} ${compact ? "flex-1" : ""}`}
+        className={`w-full text-left p-3 sm:p-4 touch-manipulation ${hasAction ? "cursor-pointer" : "cursor-default"}`}
       >
-        <div className={compact ? "flex flex-col h-full" : "flex items-start gap-2.5 sm:gap-3"}>
-          {!compact && (
-            <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
-              {index}
-            </span>
-          )}
-          <div className={compact ? "flex-1 flex flex-col" : "flex-1 min-w-0"}>
+        <div className="flex items-start gap-2.5 sm:gap-3">
+          <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
+            {index}
+          </span>
+          <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
-              {compact && (
-                <span className="flex-shrink-0 text-xs font-medium text-gray-300 tabular-nums">
-                  {index}.
-                </span>
-              )}
               <h4 className="text-sm sm:text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
               {severity && (
                 <span className="inline-flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
@@ -77,15 +68,9 @@ function ExpandableCard({
                 </span>
               )}
             </div>
-            <p className={`text-xs sm:text-[13px] leading-relaxed text-gray-500 ${compact ? "flex-1" : ""}`}>{description}</p>
-            {compact && hasAction && (
-              <div className="flex items-center gap-1 mt-2 text-[11px] text-[#5B7B6A] font-medium">
-                <span>Detay için tıkla</span>
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-              </div>
-            )}
+            <p className="text-xs sm:text-[13px] leading-relaxed text-gray-500">{description}</p>
           </div>
-          {!compact && hasAction && (
+          {hasAction && (
             <ChevronDown
               className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
             />
@@ -103,7 +88,7 @@ function ExpandableCard({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className={compact ? "px-3 pb-3 sm:px-4 sm:pb-4" : "px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12"}>
+              <div className="px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12">
                 <div className="rounded-lg bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3">
                   <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
                     {actionLabel}
@@ -126,7 +111,6 @@ function GuidanceCard({
   timing,
   caution,
   index,
-  compact = false,
 }: {
   title: string;
   guidance: string;
@@ -134,7 +118,6 @@ function GuidanceCard({
   timing: string;
   caution: string | null;
   index: number;
-  compact?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const timingInfo = TIMING_CONFIG[timing] ?? TIMING_CONFIG.early_phase;
@@ -142,44 +125,29 @@ function GuidanceCard({
   return (
     <motion.div
       variants={staggerItem}
-      className={`group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm ${compact ? "h-full flex flex-col" : ""}`}
+      className="group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
     >
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
-        className={`w-full text-left p-3 sm:p-4 touch-manipulation cursor-pointer ${compact ? "flex-1" : ""}`}
+        className="w-full text-left p-3 sm:p-4 touch-manipulation cursor-pointer"
       >
-        <div className={compact ? "flex flex-col h-full" : "flex items-start gap-2.5 sm:gap-3"}>
-          {!compact && (
-            <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
-              {index}
-            </span>
-          )}
-          <div className={compact ? "flex-1 flex flex-col" : "flex-1 min-w-0"}>
+        <div className="flex items-start gap-2.5 sm:gap-3">
+          <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
+            {index}
+          </span>
+          <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
-              {compact && (
-                <span className="flex-shrink-0 text-xs font-medium text-gray-300 tabular-nums">
-                  {index}.
-                </span>
-              )}
               <h4 className="text-sm sm:text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
-              <span className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded ${compact ? "bg-gray-100" : ""} ${timingInfo.color}`}>
+              <span className={`text-[10px] sm:text-[11px] font-medium ${timingInfo.color}`}>
                 {timingInfo.label}
               </span>
             </div>
-            <p className={`text-xs sm:text-[13px] leading-relaxed text-gray-500 ${compact ? "flex-1" : ""}`}>{guidance}</p>
-            {compact && (
-              <div className="flex items-center gap-1 mt-2 text-[11px] text-indigo-500 font-medium">
-                <span>Detay için tıkla</span>
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-              </div>
-            )}
+            <p className="text-xs sm:text-[13px] leading-relaxed text-gray-500">{guidance}</p>
           </div>
-          {!compact && (
-            <ChevronDown
-              className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-            />
-          )}
+          <ChevronDown
+            className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+          />
         </div>
       </button>
 
@@ -192,7 +160,7 @@ function GuidanceCard({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className={compact ? "px-3 pb-3 sm:px-4 sm:pb-4 space-y-2" : "px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12 space-y-2"}>
+            <div className="px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12 space-y-2">
               <div className="rounded-lg bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3">
                 <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
                   Neden önemli?
@@ -212,37 +180,6 @@ function GuidanceCard({
         )}
       </AnimatePresence>
     </motion.div>
-  );
-}
-
-function SectionBlock({
-  number,
-  title,
-  subtitle,
-  icon,
-  accentColor,
-  children,
-}: {
-  number: number;
-  title: string;
-  subtitle: string;
-  icon: ReactNode;
-  accentColor: string;
-  children: ReactNode;
-}) {
-  return (
-    <section>
-      <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
-        <div className={`h-7 w-7 sm:h-8 sm:w-8 rounded-lg ${accentColor} flex items-center justify-center flex-shrink-0`}>
-          {icon}
-        </div>
-        <div>
-          <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">{title}</h3>
-          <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">{subtitle}</p>
-        </div>
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -277,31 +214,24 @@ export function ClinicianInsights({
       (timingOrder[right.timing as keyof typeof timingOrder] ?? 1);
   });
 
-  const totalItems = reportBlindSpots.length + analysisBlindSpots.length + sortedInferences.length + therapeuticGuidance.length;
-  let sectionNumber = 0;
-
   return (
-    <div className="space-y-6 sm:space-y-8 p-3 sm:p-5 -m-3 sm:-m-5">
-      <div className="pb-3 sm:pb-4 border-b border-gray-100">
-        <p className="text-xs sm:text-[13px] text-gray-400 leading-relaxed">
-          Bu bölüm, testin sayısal verileri ve yapay zeka analizleri birleştirilerek oluşturulmuştur.
-          Seanslarda araştırılabilecek <span className="font-medium text-gray-600">{totalItems} klinik bulgu</span> içerir.
-        </p>
-      </div>
-
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 sm:p-5 -m-3 sm:-m-5">
       {reportBlindSpots.length > 0 && (
-        <SectionBlock
-          number={++sectionNumber}
-          title="Klinik Hipotezler"
-          subtitle="Seansta keşfedilmeye değer olası dinamikler"
-          icon={<Lightbulb className="h-4 w-4 text-[#5B7B6A]" />}
-          accentColor="bg-[#EEF4F0]"
-        >
+        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#EEF4F0] flex items-center justify-center flex-shrink-0">
+              <Lightbulb className="h-4 w-4 text-[#5B7B6A]" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">Klinik Hipotezler</h3>
+              <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">Seansta keşfedilmeye değer olası dinamikler</p>
+            </div>
+          </div>
           <motion.div
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="grid grid-cols-1 md:grid-cols-2 gap-3"
+            className="space-y-2"
           >
             {reportBlindSpots.map((spot, index) => (
               <ExpandableCard
@@ -311,26 +241,28 @@ export function ClinicianInsights({
                 description={spot.insight}
                 actionLabel="Seansta nasıl ele alınabilir?"
                 actionContent={spot.coach_tip}
-                compact
               />
             ))}
           </motion.div>
-        </SectionBlock>
+        </div>
       )}
 
       {sortedGuidance.length > 0 && (
-        <SectionBlock
-          number={++sectionNumber}
-          title="Terapötik Yönelimler"
-          subtitle="Terapistin yaklaşımını şekillendirecek öneriler"
-          icon={<Compass className="h-4 w-4 text-indigo-500" />}
-          accentColor="bg-indigo-50"
-        >
+        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+              <Compass className="h-4 w-4 text-indigo-500" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">Terapötik Yönelimler</h3>
+              <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">Terapistin yaklaşımını şekillendirecek öneriler</p>
+            </div>
+          </div>
           <motion.div
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="grid grid-cols-1 md:grid-cols-2 gap-3"
+            className="space-y-2"
           >
             {sortedGuidance.map((item, index) => (
               <GuidanceCard
@@ -341,21 +273,23 @@ export function ClinicianInsights({
                 rationale={item.rationale}
                 timing={item.timing}
                 caution={item.caution}
-                compact
               />
             ))}
           </motion.div>
-        </SectionBlock>
+        </div>
       )}
 
       {analysisBlindSpots.length > 0 && (
-        <SectionBlock
-          number={++sectionNumber}
-          title="Gizli Kalan Dinamikler"
-          subtitle="Danışanın farkında olmayabileceği alanlar"
-          icon={<Eye className="h-4 w-4 text-gray-500" />}
-          accentColor="bg-gray-100"
-        >
+        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <Eye className="h-4 w-4 text-gray-500" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">Gizli Kalan Dinamikler</h3>
+              <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">Danışanın farkında olmayabileceği alanlar</p>
+            </div>
+          </div>
           <motion.div
             variants={staggerContainer}
             initial="initial"
@@ -373,17 +307,20 @@ export function ClinicianInsights({
               />
             ))}
           </motion.div>
-        </SectionBlock>
+        </div>
       )}
 
       {sortedInferences.length > 0 && (
-        <SectionBlock
-          number={++sectionNumber}
-          title="Sürdürücü Örüntüler"
-          subtitle="Zorluğu besleyen döngüler"
-          icon={<RefreshCw className="h-4 w-4 text-amber-600" />}
-          accentColor="bg-amber-50"
-        >
+        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <RefreshCw className="h-4 w-4 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">Sürdürücü Örüntüler</h3>
+              <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">Zorluğu besleyen döngüler</p>
+            </div>
+          </div>
           <motion.div
             variants={staggerContainer}
             initial="initial"
@@ -402,7 +339,7 @@ export function ClinicianInsights({
               />
             ))}
           </motion.div>
-        </SectionBlock>
+        </div>
       )}
     </div>
   );
