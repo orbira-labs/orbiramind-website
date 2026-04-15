@@ -264,6 +264,13 @@ export interface TherapeuticGuidance {
   caution: string | null;
 }
 
+export interface SessionGuideItem {
+  title: string;
+  insight: string;
+  action: string;
+  timing: TherapeuticTiming;
+}
+
 export interface CoachingRoadmap {
   immediate: string[];
   short_term: string[];
@@ -281,6 +288,7 @@ export interface Report {
     top5: StrengthWeakness[];
     weak5: StrengthWeakness[];
   };
+  session_guide?: SessionGuideItem[];
   blind_spots?: BlindSpot[];
   therapeutic_guidance?: TherapeuticGuidance[];
   coaching_roadmap: CoachingRoadmap;

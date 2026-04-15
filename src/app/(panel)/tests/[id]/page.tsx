@@ -546,6 +546,7 @@ export default function TestResultPage() {
               {activeTab === "clinician" && (
                 <Card padding="lg" variant="elevated">
                   <ClinicianInsights
+                    sessionGuide={report.session_guide}
                     reportBlindSpots={report.blind_spots}
                     therapeuticGuidance={report.therapeutic_guidance}
                     analysisBlindSpots={analysis.blind_spots}
