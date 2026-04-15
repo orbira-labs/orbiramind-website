@@ -254,6 +254,16 @@ export interface BlindSpot {
   coach_tip: string;
 }
 
+export type TherapeuticTiming = "first_session" | "early_phase" | "mid_therapy" | "throughout";
+
+export interface TherapeuticGuidance {
+  title: string;
+  guidance: string;
+  rationale: string;
+  timing: TherapeuticTiming;
+  caution: string | null;
+}
+
 export interface CoachingRoadmap {
   immediate: string[];
   short_term: string[];
@@ -272,6 +282,7 @@ export interface Report {
     weak5: StrengthWeakness[];
   };
   blind_spots?: BlindSpot[];
+  therapeutic_guidance?: TherapeuticGuidance[];
   coaching_roadmap: CoachingRoadmap;
   generated_at: string;
   model: string;

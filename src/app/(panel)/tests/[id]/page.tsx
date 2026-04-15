@@ -547,6 +547,7 @@ export default function TestResultPage() {
                 <Card padding="lg" variant="elevated">
                   <ClinicianInsights
                     reportBlindSpots={report.blind_spots}
+                    therapeuticGuidance={report.therapeutic_guidance}
                     analysisBlindSpots={analysis.blind_spots}
                     inferences={analysis.inferences}
                   />
