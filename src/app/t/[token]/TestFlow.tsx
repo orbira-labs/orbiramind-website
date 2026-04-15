@@ -847,7 +847,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                   {(currentPage.question.answer_type === "scale" || !currentPage.question.answer_type) && (
                     <ScaleQuestion
                       question={currentPage.question.text}
-                      value={deepDiveAnswers[currentPage.question.id]}
+                      value={deepDiveAnswers[currentPage.question.id] as number | undefined}
                       labels={currentPage.question.scale_labels}
                       onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, val)}
                       accentColor={currentTheme?.accent}
@@ -859,7 +859,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                       question={currentPage.question.text}
                       options={currentPage.question.options}
                       value={deepDiveAnswers[currentPage.question.id]?.toString()}
-                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, val)}
+                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, String(val))}
                     />
                   )}
 
