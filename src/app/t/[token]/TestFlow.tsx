@@ -15,7 +15,6 @@ import { PreparationScreen } from "@/components/test/PreparationScreen";
 import { JourneyMap } from "@/components/test/JourneyMap";
 import { StageIntro } from "@/components/test/StageIntro";
 import { StageCompletion } from "@/components/test/StageCompletion";
-import { MidwayMotivation } from "@/components/test/MidwayMotivation";
 import {
   ScaleQuestion,
   SingleChoiceQuestion,
@@ -38,7 +37,6 @@ type Phase =
   | "profile"
   | "stage_complete"
   | "core"
-  | "core_midway"
   | "deep_dive"
   | "submitting"
   | "submitted"
@@ -171,7 +169,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   // Stage tracking
   const [currentStage, setCurrentStage] = useState(0);
-  const [midwayShown, setMidwayShown] = useState(false);
 
   // Build pages based on current phase - with conditional filtering for profile fields
   const pages: PageItem[] = useMemo(() => {
@@ -275,13 +272,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
-  function handleMidwayContinue() {
-    // Midway'den sonra bir sonraki soruya geç
-    setDirection(1);
-    setCurrentIndex((i) => i + 1);
-    setPhase("core");
-  }
-
   function getStageIntroContent(): { title: string; subtitle: string } {
     switch (currentStage) {
       case 1:
@@ -345,15 +335,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     const newAnswers = { ...coreAnswers, [questionId]: value };
     setCoreAnswers(newAnswers);
 
-    // Check for midway motivation
-    if (sessionData && !midwayShown) {
-      const midpoint = Math.floor(sessionData.core_questions.length / 2);
-      if (Object.keys(newAnswers).length === midpoint) {
-        setMidwayShown(true);
-        setTimeout(() => setPhase("core_midway"), 300);
-        return;
-      }
-    }
+    // Midway motivation removed - continue directly to next question
 
     setTimeout(() => {
       if (currentIndex < totalPages - 1) {
@@ -599,16 +581,6 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         stageNumber={currentStage}
         isLastStage={isDeepDiveComplete}
         onContinue={isDeepDiveComplete ? handleFinalAnalysis : handleStageCompleteContinue}
-      />
-    );
-  }
-
-  if (phase === "core_midway" && sessionData) {
-    return (
-      <MidwayMotivation
-        completedCount={Object.keys(coreAnswers).length}
-        totalCount={sessionData.core_questions.length}
-        onContinue={handleMidwayContinue}
       />
     );
   }

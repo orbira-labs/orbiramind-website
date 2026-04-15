@@ -82,7 +82,7 @@ const STATUS_MAP: Record<
   { label: string; variant: "success" | "warning" | "info" | "danger" | "accent" }
 > = {
   sent: { label: "Danışan Bekleniyor", variant: "warning" },
-  started: { label: "Devam Ediyor", variant: "info" },
+  started: { label: "Danışan Bekleniyor", variant: "warning" },
   completed: { label: "Analiz Hazır", variant: "accent" },
   reviewed: { label: "Tamamlandı", variant: "success" },
   expired: { label: "Süresi Doldu", variant: "danger" },
