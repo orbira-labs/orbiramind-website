@@ -1,26 +1,156 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PHASES = [
-  { message: "Analiz motoru başlatılıyor", icon: "⚡" },
-  { message: "Sorular kalibre ediliyor", icon: "🎯" },
-  { message: "Kişiselleştirme uygulanıyor", icon: "✨" },
-  { message: "Güvenli bağlantı kuruluyor", icon: "🔐" },
-  { message: "Test hazır, son kontroller", icon: "🚀" },
+  { message: "Analiz motoru başlatılıyor...", at: 0 },
+  { message: "Sorular kalibre ediliyor...", at: 1000 },
+  { message: "Kişiselleştirme uygulanıyor...", at: 2200 },
+  { message: "Güvenli bağlantı kuruluyor...", at: 3400 },
+  { message: "Test hazır, son kontroller...", at: 4400 },
 ];
 
-const PHASE_TIMING = [0, 1000, 2200, 3400, 4400];
+/* ------------------------------------------------------------------ */
+/*  DNA Helix – continuous double-strand flowing across screen        */
+/* ------------------------------------------------------------------ */
 
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  duration: number;
-  delay: number;
+function DnaStrand({ y, delay, reverse }: { y: number; delay: number; reverse?: boolean }) {
+  const points = 24;
+  const width = 2400;
+  const amplitude = 18;
+  const wavelength = 200;
+
+  const strand1: string[] = [];
+  const strand2: string[] = [];
+  const rungs: { x: number; y1: number; y2: number }[] = [];
+
+  for (let i = 0; i <= points; i++) {
+    const x = (i / points) * width;
+    const phase = (x / wavelength) * Math.PI * 2;
+    const y1 = y + Math.sin(phase) * amplitude;
+    const y2 = y + Math.sin(phase + Math.PI) * amplitude;
+    strand1.push(`${i === 0 ? "M" : "L"}${x},${y1}`);
+    strand2.push(`${i === 0 ? "M" : "L"}${x},${y2}`);
+    if (i % 3 === 0 && i > 0 && i < points) {
+      rungs.push({ x, y1, y2 });
+    }
+  }
+
+  return (
+    <motion.g
+      initial={{ x: reverse ? -1200 : 0 }}
+      animate={{ x: reverse ? 0 : -1200 }}
+      transition={{ duration: 30 + delay * 5, repeat: Infinity, ease: "linear" }}
+    >
+      <path d={strand1.join(" ")} fill="none" stroke="rgba(91,123,106,0.12)" strokeWidth="1.5" />
+      <path d={strand2.join(" ")} fill="none" stroke="rgba(212,133,106,0.10)" strokeWidth="1.5" />
+      {rungs.map((r, i) => (
+        <line
+          key={i}
+          x1={r.x}
+          y1={r.y1}
+          x2={r.x}
+          y2={r.y2}
+          stroke="rgba(91,123,106,0.07)"
+          strokeWidth="1"
+        />
+      ))}
+    </motion.g>
+  );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Breathing Cosmos Atom – green ↔ coral color shift                 */
+/* ------------------------------------------------------------------ */
+
+function CosmosAtom() {
+  const uid = useId();
+
+  const orbits = [
+    { rotateZ: 0, dur: 4, stroke1: "rgba(91,123,106,0.5)", stroke2: "rgba(212,133,106,0.3)", electron: "#5B7B6A", electronAlt: "#7d9e8c" },
+    { rotateZ: 60, dur: 5, stroke1: "rgba(91,123,106,0.4)", stroke2: "rgba(212,133,106,0.35)", electron: "#D4856A", electronAlt: "#e0a08c" },
+    { rotateZ: -60, dur: 6, stroke1: "rgba(91,123,106,0.35)", stroke2: "rgba(212,133,106,0.4)", electron: "#8aab99", electronAlt: "#c9907c" },
+  ];
+
+  return (
+    <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center" style={{ perspective: "500px" }}>
+      {orbits.map((o, idx) => (
+        <svg
+          key={idx}
+          className="absolute inset-0 w-full h-full overflow-visible"
+          viewBox="-100 -100 200 200"
+          style={{ transform: `rotateZ(${o.rotateZ}deg) rotateX(78deg)` }}
+        >
+          <defs>
+            <filter id={`${uid}-g${idx}`} x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="4" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+
+          {/* Orbit ring with animated stroke color */}
+          <ellipse cx="0" cy="0" rx="85" ry="85" fill="none" strokeWidth="1.2">
+            <animate attributeName="stroke" values={`${o.stroke1};${o.stroke2};${o.stroke1}`} dur="4s" repeatCount="indefinite" />
+          </ellipse>
+
+          {/* Primary electron */}
+          <circle r="5.5" filter={`url(#${uid}-g${idx})`}>
+            <animate attributeName="fill" values={`${o.electron};${o.electronAlt};${o.electron}`} dur="4s" repeatCount="indefinite" />
+            <animateMotion dur={`${o.dur}s`} repeatCount="indefinite">
+              <mpath href={`#${uid}-p${idx}`} />
+            </animateMotion>
+          </circle>
+
+          {/* Secondary electron (offset) */}
+          <circle r="3.5" opacity="0.7" filter={`url(#${uid}-g${idx})`}>
+            <animate attributeName="fill" values={`${o.electronAlt};${o.electron};${o.electronAlt}`} dur="4s" repeatCount="indefinite" />
+            <animateMotion dur={`${o.dur}s`} repeatCount="indefinite" begin={`-${o.dur / 2}s`}>
+              <mpath href={`#${uid}-p${idx}`} />
+            </animateMotion>
+          </circle>
+
+          <path id={`${uid}-p${idx}`} d="M 85,0 A 85,85 0 1,1 -85,0 A 85,85 0 1,1 85,0" fill="none" />
+        </svg>
+      ))}
+
+      {/* Glow behind nucleus */}
+      <motion.div
+        className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full blur-2xl"
+        animate={{
+          backgroundColor: [
+            "rgba(91,123,106,0.2)",
+            "rgba(212,133,106,0.18)",
+            "rgba(91,123,106,0.2)",
+          ],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Nucleus */}
+      <motion.div
+        className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full z-10"
+        animate={{
+          background: [
+            "radial-gradient(circle at 35% 30%, #b4d4c4 0%, #5B7B6A 50%, #3d5a4b 100%)",
+            "radial-gradient(circle at 35% 30%, #f0c4b4 0%, #D4856A 50%, #b36a50 100%)",
+            "radial-gradient(circle at 35% 30%, #b4d4c4 0%, #5B7B6A 50%, #3d5a4b 100%)",
+          ],
+          boxShadow: [
+            "0 0 25px 8px rgba(91,123,106,0.5), 0 0 60px 20px rgba(91,123,106,0.2), inset 0 0 10px rgba(255,255,255,0.3)",
+            "0 0 30px 10px rgba(212,133,106,0.55), 0 0 70px 25px rgba(212,133,106,0.2), inset 0 0 12px rgba(255,255,255,0.35)",
+            "0 0 25px 8px rgba(91,123,106,0.5), 0 0 60px 20px rgba(91,123,106,0.2), inset 0 0 10px rgba(255,255,255,0.3)",
+          ],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Overlay                                                            */
+/* ------------------------------------------------------------------ */
 
 interface TestCreatingOverlayProps {
   visible: boolean;
@@ -29,17 +159,6 @@ interface TestCreatingOverlayProps {
 export function TestCreatingOverlay({ visible }: TestCreatingOverlayProps) {
   const [messageIdx, setMessageIdx] = useState(0);
   const [phaseProgress, setPhaseProgress] = useState(0);
-
-  const particles = useMemo<Particle[]>(() => 
-    Array.from({ length: 30 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 4 + 2,
-      duration: Math.random() * 3 + 4,
-      delay: Math.random() * 2,
-    })), []
-  );
 
   useEffect(() => {
     if (!visible) {
@@ -50,8 +169,8 @@ export function TestCreatingOverlay({ visible }: TestCreatingOverlayProps) {
 
     const timers: ReturnType<typeof setTimeout>[] = [];
 
-    PHASE_TIMING.forEach((time, i) => {
-      timers.push(setTimeout(() => setMessageIdx(i), time));
+    PHASES.forEach((phase, i) => {
+      timers.push(setTimeout(() => setMessageIdx(i), phase.at));
     });
 
     const interval = setInterval(() => {
@@ -72,310 +191,75 @@ export function TestCreatingOverlay({ visible }: TestCreatingOverlayProps) {
           className="fixed inset-0 z-[60] flex flex-col items-center justify-center overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.5 } }}
+          exit={{ opacity: 0, transition: { duration: 0.6 } }}
           transition={{ duration: 0.4 }}
         >
-          {/* Light gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#f8faf9] via-[#f0f7f4] to-[#e8f5ec]" />
-          
-          {/* Animated organic waves */}
-          <svg 
-            className="absolute inset-0 w-full h-full" 
-            preserveAspectRatio="none"
-            viewBox="0 0 1440 900"
-          >
-            <defs>
-              <linearGradient id="wave1Gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(91,123,106,0.08)" />
-                <stop offset="50%" stopColor="rgba(91,123,106,0.15)" />
-                <stop offset="100%" stopColor="rgba(91,123,106,0.08)" />
-              </linearGradient>
-              <linearGradient id="wave2Gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(91,123,106,0.05)" />
-                <stop offset="50%" stopColor="rgba(91,123,106,0.12)" />
-                <stop offset="100%" stopColor="rgba(91,123,106,0.05)" />
-              </linearGradient>
-              <linearGradient id="wave3Gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(91,123,106,0.03)" />
-                <stop offset="50%" stopColor="rgba(91,123,106,0.08)" />
-                <stop offset="100%" stopColor="rgba(91,123,106,0.03)" />
-              </linearGradient>
-            </defs>
-            
-            {/* Wave 1 - slowest, biggest */}
-            <motion.path
-              fill="url(#wave1Gradient)"
-              initial={{ d: "M0,450 C360,350 720,550 1080,450 C1260,400 1440,500 1440,500 L1440,900 L0,900 Z" }}
-              animate={{ 
-                d: [
-                  "M0,450 C360,350 720,550 1080,450 C1260,400 1440,500 1440,500 L1440,900 L0,900 Z",
-                  "M0,500 C360,550 720,350 1080,500 C1260,550 1440,400 1440,400 L1440,900 L0,900 Z",
-                  "M0,450 C360,350 720,550 1080,450 C1260,400 1440,500 1440,500 L1440,900 L0,900 Z",
-                ]
-              }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            
-            {/* Wave 2 - medium */}
-            <motion.path
-              fill="url(#wave2Gradient)"
-              initial={{ d: "M0,550 C240,450 480,650 720,550 C960,450 1200,650 1440,550 L1440,900 L0,900 Z" }}
-              animate={{ 
-                d: [
-                  "M0,550 C240,450 480,650 720,550 C960,450 1200,650 1440,550 L1440,900 L0,900 Z",
-                  "M0,600 C240,650 480,450 720,600 C960,650 1200,450 1440,600 L1440,900 L0,900 Z",
-                  "M0,550 C240,450 480,650 720,550 C960,450 1200,650 1440,550 L1440,900 L0,900 Z",
-                ]
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            />
-            
-            {/* Wave 3 - fastest, smallest */}
-            <motion.path
-              fill="url(#wave3Gradient)"
-              initial={{ d: "M0,650 C180,600 360,700 540,650 C720,600 900,700 1080,650 C1260,600 1440,700 1440,700 L1440,900 L0,900 Z" }}
-              animate={{ 
-                d: [
-                  "M0,650 C180,600 360,700 540,650 C720,600 900,700 1080,650 C1260,600 1440,700 1440,700 L1440,900 L0,900 Z",
-                  "M0,680 C180,720 360,640 540,680 C720,720 900,640 1080,680 C1260,720 1440,640 1440,640 L1440,900 L0,900 Z",
-                  "M0,650 C180,600 360,700 540,650 C720,600 900,700 1080,650 C1260,600 1440,700 1440,700 L1440,900 L0,900 Z",
-                ]
-              }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </svg>
+          {/* Clean light background */}
+          <div className="absolute inset-0 bg-[#f6f9f7]" />
 
-          {/* Floating particles */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {particles.map((p) => (
-              <motion.div
-                key={p.id}
-                className="absolute rounded-full bg-[#5B7B6A]"
-                style={{
-                  left: `${p.x}%`,
-                  top: `${p.y}%`,
-                  width: p.size,
-                  height: p.size,
-                  opacity: 0.15,
-                }}
-                animate={{
-                  y: [0, -30, 0],
-                  opacity: [0.1, 0.25, 0.1],
-                  scale: [1, 1.2, 1],
-                }}
-                transition={{
-                  duration: p.duration,
-                  delay: p.delay,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Radial glow behind center */}
-          <div 
-            className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
-            style={{
-              background: "radial-gradient(circle, rgba(91,123,106,0.12) 0%, rgba(91,123,106,0.05) 40%, transparent 70%)",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
+          {/* Breathing center glow */}
+          <motion.div
+            className="absolute pointer-events-none"
+            style={{ width: "120vmax", height: "120vmax", borderRadius: "50%" }}
+            animate={{
+              background: [
+                "radial-gradient(circle, rgba(91,123,106,0.09) 0%, rgba(91,123,106,0.03) 35%, transparent 60%)",
+                "radial-gradient(circle, rgba(212,133,106,0.08) 0%, rgba(212,133,106,0.025) 35%, transparent 60%)",
+                "radial-gradient(circle, rgba(91,123,106,0.09) 0%, rgba(91,123,106,0.03) 35%, transparent 60%)",
+              ],
             }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
+
+          {/* DNA helix strands flowing across */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
+            <DnaStrand y={120} delay={0} />
+            <DnaStrand y={280} delay={1} reverse />
+            <DnaStrand y={440} delay={2} />
+            <DnaStrand y={600} delay={0.5} reverse />
+            <DnaStrand y={760} delay={1.5} />
+          </svg>
 
           {/* Content */}
           <div className="relative z-10 flex flex-col items-center gap-10 px-8">
-            
-            {/* Central animated icon/logo */}
-            <div className="relative">
-              {/* Orbiting rings */}
-              <motion.div
-                className="absolute inset-0 w-40 h-40 -m-8"
-                style={{ 
-                  border: "1px solid rgba(91,123,106,0.2)",
-                  borderRadius: "50%",
-                }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-              >
-                <motion.div 
-                  className="absolute w-3 h-3 bg-[#5B7B6A] rounded-full shadow-lg"
-                  style={{ top: -6, left: "50%", marginLeft: -6 }}
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </motion.div>
-              
-              <motion.div
-                className="absolute inset-0 w-52 h-52 -m-14"
-                style={{ 
-                  border: "1px solid rgba(91,123,106,0.12)",
-                  borderRadius: "50%",
-                }}
-                animate={{ rotate: -360 }}
-                transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-              >
-                <motion.div 
-                  className="absolute w-2 h-2 bg-[#5B7B6A]/60 rounded-full"
-                  style={{ top: -4, left: "50%", marginLeft: -4 }}
-                />
-              </motion.div>
+            {/* Cosmos Atom */}
+            <CosmosAtom />
 
-              {/* Center nucleus with pulse */}
-              <motion.div
-                className="relative w-24 h-24 rounded-full flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #5B7B6A 0%, #4a6a59 50%, #3d5a4b 100%)",
-                  boxShadow: "0 8px 32px rgba(91,123,106,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset",
-                }}
-                animate={{
-                  boxShadow: [
-                    "0 8px 32px rgba(91,123,106,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset",
-                    "0 12px 48px rgba(91,123,106,0.5), 0 0 0 1px rgba(255,255,255,0.2) inset",
-                    "0 8px 32px rgba(91,123,106,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                {/* Inner glow */}
-                <div 
-                  className="absolute inset-2 rounded-full"
-                  style={{
-                    background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 60%)",
-                  }}
-                />
-                
-                {/* DNA Helix SVG */}
-                <svg 
-                  width="40" 
-                  height="40" 
-                  viewBox="0 0 40 40" 
-                  className="relative z-10"
-                >
-                  <motion.g
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                    style={{ transformOrigin: "20px 20px" }}
-                  >
-                    {/* Helix strand 1 */}
-                    <motion.path
-                      d="M10,5 Q20,12 10,20 Q0,28 10,35"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.9)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    {/* Helix strand 2 */}
-                    <motion.path
-                      d="M30,5 Q20,12 30,20 Q40,28 30,35"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.6)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    {/* Connecting bars */}
-                    {[8, 14, 20, 26, 32].map((y, i) => (
-                      <motion.line
-                        key={i}
-                        x1={i % 2 === 0 ? 12 : 10}
-                        y1={y}
-                        x2={i % 2 === 0 ? 28 : 30}
-                        y2={y}
-                        stroke="rgba(255,255,255,0.4)"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        animate={{ opacity: [0.3, 0.7, 0.3] }}
-                        transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
-                      />
-                    ))}
-                  </motion.g>
-                </svg>
-              </motion.div>
-            </div>
-
-            {/* Phase message with icon */}
-            <div className="flex flex-col items-center gap-3">
+            {/* Phase message */}
+            <div className="h-6 flex items-center justify-center">
               <AnimatePresence mode="wait">
-                <motion.div
+                <motion.p
                   key={messageIdx}
-                  className="flex items-center gap-3"
-                  initial={{ opacity: 0, y: 12 }}
+                  className="text-[13px] sm:text-sm font-medium tracking-[0.2em] text-[#5B7B6A]/80 text-center uppercase"
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.4 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.35 }}
                 >
-                  <span className="text-2xl">{PHASES[messageIdx].icon}</span>
-                  <p className="text-lg font-medium tracking-wide text-[#3d5a4b]">
-                    {PHASES[messageIdx].message}
-                  </p>
-                </motion.div>
+                  {PHASES[messageIdx].message}
+                </motion.p>
               </AnimatePresence>
-              
-              {/* Animated dots */}
-              <div className="flex gap-1.5">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-[#5B7B6A]"
-                    animate={{ 
-                      opacity: [0.3, 1, 0.3],
-                      scale: [0.8, 1.2, 0.8],
-                    }}
-                    transition={{ 
-                      duration: 1.2, 
-                      delay: i * 0.2, 
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-                ))}
-              </div>
             </div>
 
             {/* Progress bar */}
-            <div className="w-72 sm:w-80">
-              <div className="h-1.5 bg-[#5B7B6A]/10 rounded-full overflow-hidden backdrop-blur-sm">
+            <div className="w-56 sm:w-64">
+              <div className="h-[2px] bg-[#5B7B6A]/10 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full rounded-full relative overflow-hidden"
-                  style={{
-                    background: "linear-gradient(90deg, #5B7B6A 0%, #6d8f7c 50%, #5B7B6A 100%)",
+                  className="h-full rounded-full"
+                  animate={{
+                    width: `${phaseProgress}%`,
+                    background: [
+                      "linear-gradient(90deg, #5B7B6A, #7d9e8c)",
+                      "linear-gradient(90deg, #D4856A, #e0a08c)",
+                      "linear-gradient(90deg, #5B7B6A, #7d9e8c)",
+                    ],
                   }}
-                  animate={{ width: `${phaseProgress}%` }}
-                  transition={{ duration: 0.1, ease: "linear" }}
-                >
-                  {/* Shimmer effect */}
-                  <motion.div
-                    className="absolute inset-0"
-                    style={{
-                      background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
-                    }}
-                    animate={{ x: ["-100%", "100%"] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                  />
-                </motion.div>
-              </div>
-              
-              {/* Progress percentage */}
-              <div className="flex justify-between mt-2">
-                <span className="text-xs text-[#5B7B6A]/60 font-medium">Hazırlanıyor</span>
-                <span className="text-xs text-[#5B7B6A] font-semibold">{phaseProgress}%</span>
-              </div>
-            </div>
-
-            {/* Step indicators */}
-            <div className="flex gap-2 mt-2">
-              {PHASES.map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="w-2 h-2 rounded-full"
-                  style={{
-                    backgroundColor: i <= messageIdx ? "#5B7B6A" : "rgba(91,123,106,0.2)",
+                  transition={{
+                    width: { duration: 0.1, ease: "linear" },
+                    background: { duration: 4, repeat: Infinity, ease: "easeInOut" },
                   }}
-                  animate={i === messageIdx ? { scale: [1, 1.3, 1] } : {}}
-                  transition={{ duration: 0.6, repeat: i === messageIdx ? Infinity : 0 }}
                 />
-              ))}
+              </div>
             </div>
           </div>
         </motion.div>
