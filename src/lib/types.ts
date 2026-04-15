@@ -271,6 +271,19 @@ export interface SessionGuideItem {
   timing: TherapeuticTiming;
 }
 
+export type TaskPriority = "high" | "medium" | "low";
+export type TaskTiming = "this_week" | "weeks_2_4" | "months_1_3";
+
+export interface TherapeuticTask {
+  title: string;
+  description: string;
+  rationale: string;
+  priority: TaskPriority;
+  timing: TaskTiming;
+  candidate_ids: string[];
+  evidence_refs: string[];
+}
+
 export interface CoachingRoadmap {
   immediate: string[];
   short_term: string[];
@@ -289,6 +302,7 @@ export interface Report {
     weak5: StrengthWeakness[];
   };
   session_guide?: SessionGuideItem[];
+  therapeutic_tasks?: TherapeuticTask[];
   blind_spots?: BlindSpot[];
   therapeutic_guidance?: TherapeuticGuidance[];
   coaching_roadmap: CoachingRoadmap;

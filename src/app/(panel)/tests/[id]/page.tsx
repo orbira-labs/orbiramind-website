@@ -557,7 +557,7 @@ export default function TestResultPage() {
 
               {activeTab === "roadmap" && (
                 <Card padding="lg" variant="elevated">
-                  <CoachingTimeline roadmap={report.coaching_roadmap} />
+                  <CoachingTimeline roadmap={report.coaching_roadmap} tasks={report.therapeutic_tasks} />
                 </Card>
               )}
             </motion.div>
