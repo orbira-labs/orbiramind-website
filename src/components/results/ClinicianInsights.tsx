@@ -215,9 +215,9 @@ export function ClinicianInsights({
   });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 sm:p-5 -m-3 sm:-m-5">
+    <div className="space-y-4 p-3 sm:p-5 -m-3 sm:-m-5">
       {reportBlindSpots.length > 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+        <div className="rounded-xl border border-[#d4e4d9] bg-[#f8fbf9] p-4 sm:p-5">
           <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
             <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#EEF4F0] flex items-center justify-center flex-shrink-0">
               <Lightbulb className="h-4 w-4 text-[#5B7B6A]" />
@@ -248,9 +248,9 @@ export function ClinicianInsights({
       )}
 
       {sortedGuidance.length > 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+        <div className="rounded-xl border border-indigo-100 bg-indigo-50/30 p-4 sm:p-5">
           <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
-            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
               <Compass className="h-4 w-4 text-indigo-500" />
             </div>
             <div>
@@ -280,10 +280,10 @@ export function ClinicianInsights({
       )}
 
       {analysisBlindSpots.length > 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+        <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
           <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
-            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <Eye className="h-4 w-4 text-gray-500" />
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <Eye className="h-4 w-4 text-slate-500" />
             </div>
             <div>
               <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">Gizli Kalan Dinamikler</h3>
@@ -311,9 +311,9 @@ export function ClinicianInsights({
       )}
 
       {sortedInferences.length > 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+        <div className="rounded-xl border border-amber-100 bg-amber-50/30 p-4 sm:p-5">
           <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
-            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
               <RefreshCw className="h-4 w-4 text-amber-600" />
             </div>
             <div>
