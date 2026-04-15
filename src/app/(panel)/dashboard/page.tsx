@@ -67,21 +67,12 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     })
   );
 
-  const statusPriority: Record<string, number> = {
-    completed: 1,
-    started: 2,
-    sent: 3,
-  };
-
   const pendingTests = (testsRes.data as TestRow[] || [])
     .map((t) => ({
       ...t,
       client: Array.isArray(t.client) ? t.client[0] || null : t.client,
     }))
     .sort((a, b) => {
-      const priorityA = statusPriority[a.status] ?? 99;
-      const priorityB = statusPriority[b.status] ?? 99;
-      if (priorityA !== priorityB) return priorityA - priorityB;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 

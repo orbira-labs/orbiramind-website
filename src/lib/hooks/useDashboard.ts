@@ -128,12 +128,6 @@ export function useDashboard(initialData?: DashboardInitialData) {
       client: Array.isArray(a.client) ? a.client[0] || null : a.client,
     })) as DashboardAppointment[];
 
-    const statusPriority: Record<string, number> = {
-      completed: 1,
-      started: 2,
-      sent: 3,
-    };
-
     const newTests = ((testsRes.data || []) as Array<Record<string, unknown>>)
       .map((t) => ({
         id: t.id as string,
@@ -147,9 +141,6 @@ export function useDashboard(initialData?: DashboardInitialData) {
           : (t.client as { first_name: string; last_name: string } | null),
       }))
       .sort((a, b) => {
-        const priorityA = statusPriority[a.status] ?? 99;
-        const priorityB = statusPriority[b.status] ?? 99;
-        if (priorityA !== priorityB) return priorityA - priorityB;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
 
