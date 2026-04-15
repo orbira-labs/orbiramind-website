@@ -308,7 +308,7 @@ export function AnalysisDetailModal({
               ============================================================ */}
           <div
             ref={overlayRef}
-            className="desktop-only fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="desktop-only-flex fixed inset-0 z-50 items-center justify-center p-4"
             onClick={(e) => {
               if (e.target === overlayRef.current) onClose();
             }}
