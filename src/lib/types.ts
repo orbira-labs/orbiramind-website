@@ -202,6 +202,7 @@ export interface Insight {
   insight: string;
   severity: string;
   suggestion?: string;
+  type?: "hidden_strength" | "absence_signal" | "inconsistency";
 }
 
 export interface ProfileSummary {

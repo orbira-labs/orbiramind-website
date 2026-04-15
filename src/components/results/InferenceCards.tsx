@@ -57,9 +57,8 @@ const TYPE_LABELS: Record<string, string> = {
 export function InferenceCards({ inferences }: InferenceCardsProps) {
   if (!inferences || inferences.length === 0) return null;
 
-  // Filter out hidden_strength and absence_signal as they belong in BlindSpotCard
   const filtered = inferences.filter(
-    (inf) => (inf as any).type !== "hidden_strength" && (inf as any).type !== "absence_signal"
+    (inf) => inf.type !== "hidden_strength" && inf.type !== "absence_signal"
   );
 
   if (filtered.length === 0) return null;
