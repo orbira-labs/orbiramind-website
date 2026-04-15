@@ -130,9 +130,9 @@ export function AnalysisDetailModal({
     <div className="relative bg-gradient-to-br from-[#5B7BA0] via-[#4A6A90] to-[#3A5A80] px-6 pt-5 pb-6">
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/10 transition-all"
+        className="absolute top-3 right-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white/50 hover:text-white hover:bg-white/10 active:bg-white/20 transition-all touch-target"
       >
-        <X className="h-4 w-4" />
+        <X className="h-5 w-5" />
       </button>
 
       <div className="flex items-center gap-4 pr-6">

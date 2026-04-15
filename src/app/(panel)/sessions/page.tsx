@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { TopBar } from "@/components/layout/TopBar";
@@ -59,6 +60,7 @@ function StepIndicator({ step, completed }: { step: 1 | 2; completed: boolean })
 export default function SessionsPage() {
   const { professional, refreshProfile } = useProContext();
   const supabase = useRef(createSupabase());
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const {
     templates,
@@ -372,7 +374,7 @@ export default function SessionsPage() {
                             setBasePriceInput(val);
                           }}
                           placeholder={hasBasePrice ? Number(currentBasePriceCents! / 100).toLocaleString("tr-TR") : "1.000"}
-                          autoFocus
+                          autoFocus={isDesktop}
                           className="w-20 bg-transparent text-xl font-semibold text-pro-text focus:outline-none placeholder:text-pro-text-tertiary/50 placeholder:font-normal"
                         />
                         <span className="text-pro-text-tertiary text-base font-medium">TL</span>
@@ -412,9 +414,9 @@ export default function SessionsPage() {
                     background: "linear-gradient(135deg, var(--pro-surface) 0%, var(--pro-surface-alt) 100%)",
                   }}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="h-14 w-14 rounded-2xl bg-pro-primary-light flex items-center justify-center relative">
+                      <div className="h-14 w-14 rounded-2xl bg-pro-primary-light flex items-center justify-center relative shrink-0">
                         <Banknote className="h-7 w-7 text-pro-primary" />
                         <AnimatePresence>
                           {justSaved && (
@@ -432,7 +434,7 @@ export default function SessionsPage() {
                       </div>
                       <div>
                         <p className="text-xs text-pro-text-tertiary font-medium mb-0.5">Seans Ücretiniz</p>
-                        <p className="text-3xl font-bold text-pro-text tracking-tight">
+                        <p className="text-2xl sm:text-3xl font-bold text-pro-text tracking-tight">
                           {formatCurrency(currentBasePriceCents!)}
                         </p>
                       </div>
@@ -444,6 +446,7 @@ export default function SessionsPage() {
                         setBasePriceInput(String(currentBasePriceCents! / 100));
                         setEditingBasePrice(true);
                       }}
+                      className="self-end sm:self-auto min-h-[44px] min-w-[44px]"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Değiştir
@@ -470,7 +473,7 @@ export default function SessionsPage() {
 
           {/* ── Step 2: Packages ── */}
           <motion.div variants={staggerItem}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
                 <StepIndicator step={2} completed={hasBasePrice && templates.length > 0} />
                 <div>
@@ -483,7 +486,7 @@ export default function SessionsPage() {
                 </div>
               </div>
               {hasBasePrice && (
-                <Button size="sm" onClick={openCreate}>
+                <Button size="sm" onClick={openCreate} className="min-h-[44px]">
                   <Plus className="h-4 w-4" />
                   Yeni Paket
                 </Button>
@@ -582,15 +585,15 @@ export default function SessionsPage() {
                                 <div className="flex items-center gap-0.5">
                                   <button
                                     onClick={() => openEdit(tpl)}
-                                    className="p-1.5 rounded-lg text-pro-text-tertiary hover:text-pro-text hover:bg-pro-surface-alt transition-colors"
+                                    className="min-w-[44px] min-h-[44px] rounded-lg text-pro-text-tertiary hover:text-pro-text hover:bg-pro-surface-alt active:bg-pro-surface-alt transition-colors flex items-center justify-center"
                                   >
-                                    <Pencil className="h-3.5 w-3.5" />
+                                    <Pencil className="h-4 w-4" />
                                   </button>
                                   <button
                                     onClick={() => setDeleteConfirm(tpl.id)}
-                                    className="p-1.5 rounded-lg text-pro-text-tertiary hover:text-pro-danger hover:bg-red-50 transition-colors"
+                                    className="min-w-[44px] min-h-[44px] rounded-lg text-pro-text-tertiary hover:text-pro-danger hover:bg-red-50 active:bg-red-50 transition-colors flex items-center justify-center"
                                   >
-                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <Trash2 className="h-4 w-4" />
                                   </button>
                                 </div>
                               )}
@@ -608,15 +611,15 @@ export default function SessionsPage() {
                                   </span>
                                 </div>
                                 <div className="flex items-baseline justify-between">
-                                  <span className="text-2xl font-bold text-pro-text">
+                                  <span className="text-xl sm:text-2xl font-bold text-pro-text tracking-tight">
                                     {formatCurrency(tpl.total_price_cents)}
                                   </span>
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-pro-text-tertiary pt-1 border-t border-pro-border">
+                                <div className="flex items-center justify-between text-xs text-pro-text-tertiary pt-1 border-t border-pro-border gap-2">
                                   <span>Seans başı</span>
-                                  <span className="font-medium text-pro-success">
+                                  <span className="font-medium text-pro-success text-right">
                                     {formatCurrency(Math.round(indirimliFiyat))}
-                                    <span className="text-pro-text-tertiary font-normal ml-1">
+                                    <span className="text-pro-text-tertiary font-normal ml-1 hidden sm:inline">
                                       (eski: {formatCurrency(tpl.price_per_session_cents)})
                                     </span>
                                   </span>
@@ -625,7 +628,7 @@ export default function SessionsPage() {
                             ) : (
                               <div className="space-y-2">
                                 <div className="flex items-baseline justify-between">
-                                  <span className="text-2xl font-bold text-pro-text">
+                                  <span className="text-xl sm:text-2xl font-bold text-pro-text tracking-tight">
                                     {formatCurrency(tpl.total_price_cents)}
                                   </span>
                                 </div>
@@ -680,6 +683,7 @@ export default function SessionsPage() {
         title={editingTemplate ? "Paketi Düzenle" : "Yeni Paket Şablonu"}
         subtitle={`Baz ücret: ${formatCurrency(currentBasePriceCents ?? 0)} / seans`}
         size="sm"
+        fullScreen={!isDesktop}
       >
         <div className="space-y-5">
           <div>
@@ -693,10 +697,10 @@ export default function SessionsPage() {
                   type="button"
                   onClick={() => handleSessionCountChange(count)}
                   className={clsx(
-                    "px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
+                    "px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all border",
                     sessionCount === count
                       ? "bg-pro-primary text-white border-pro-primary shadow-sm"
-                      : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary hover:text-pro-primary"
+                      : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary hover:text-pro-primary active:border-pro-primary active:text-pro-primary"
                   )}
                 >
                   {count}
@@ -726,10 +730,10 @@ export default function SessionsPage() {
                   type="button"
                   onClick={() => { setDiscountType("percent"); setDiscountValue(""); }}
                   className={clsx(
-                    "flex-1 py-2 rounded-lg text-sm font-medium border transition-all",
+                    "flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-medium border transition-all",
                     discountType === "percent"
                       ? "bg-pro-primary text-white border-pro-primary shadow-sm"
-                      : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary"
+                      : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary active:border-pro-primary"
                   )}
                 >
                   % Yüzde
@@ -738,10 +742,10 @@ export default function SessionsPage() {
                   type="button"
                   onClick={() => { setDiscountType("amount"); setDiscountValue(""); }}
                   className={clsx(
-                    "flex-1 py-2 rounded-lg text-sm font-medium border transition-all",
+                    "flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-medium border transition-all",
                     discountType === "amount"
                       ? "bg-pro-primary text-white border-pro-primary shadow-sm"
-                      : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary"
+                      : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary active:border-pro-primary"
                   )}
                 >
                   ₺ Tutar

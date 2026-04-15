@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -45,6 +46,7 @@ export function AddPaymentModal({
   const [method, setMethod] = useState<"cash" | "card" | "transfer" | "other" | "">("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     if (open) {
@@ -84,6 +86,7 @@ export function AddPaymentModal({
       title="Ödeme Ekle"
       subtitle={packageName}
       size="sm"
+      fullScreen={isMobile}
     >
       <div className="space-y-4">
         {remainingCents > 0 && (
@@ -111,7 +114,7 @@ export function AddPaymentModal({
           <label className="block text-sm font-medium text-pro-text mb-2">
             Ödeme Yöntemi
           </label>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {PAYMENT_METHODS.map((m) => {
               const Icon = METHOD_ICONS[m.id] || MoreHorizontal;
               return (
@@ -120,13 +123,13 @@ export function AddPaymentModal({
                   type="button"
                   onClick={() => setMethod(m.id as typeof method)}
                   className={clsx(
-                    "flex flex-col items-center gap-1 py-2.5 rounded-lg text-xs font-medium border transition-colors",
+                    "flex flex-col items-center gap-1.5 py-3 sm:py-2.5 rounded-lg text-xs font-medium border transition-colors min-h-[56px] sm:min-h-0",
                     method === m.id
                       ? "bg-pro-primary-light text-pro-primary border-pro-primary"
-                      : "bg-pro-surface text-pro-text-tertiary border-pro-border hover:border-pro-primary hover:text-pro-primary"
+                      : "bg-pro-surface text-pro-text-tertiary border-pro-border hover:border-pro-primary hover:text-pro-primary active:border-pro-primary active:text-pro-primary"
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5 sm:h-4 sm:w-4" />
                   {m.label}
                 </button>
               );

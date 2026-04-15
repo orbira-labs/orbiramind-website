@@ -177,12 +177,13 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
                       label="Ad"
                       value={firstName}
                       maxLength={50}
                       error={errors.first_name}
+                      touchFriendly
                       onChange={(e) => {
                         setFirstName(e.target.value);
                         setErrors((current) => ({ ...current, first_name: undefined }));
@@ -193,6 +194,7 @@ export default function SettingsPage() {
                       value={lastName}
                       maxLength={50}
                       error={errors.last_name}
+                      touchFriendly
                       onChange={(e) => {
                         setLastName(e.target.value);
                         setErrors((current) => ({ ...current, last_name: undefined }));
@@ -201,7 +203,7 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Telefon ve E-posta yan yana */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
                       label="Telefon"
                       type="tel"
@@ -209,6 +211,7 @@ export default function SettingsPage() {
                       inputMode="numeric"
                       maxLength={14}
                       error={errors.phone}
+                      touchFriendly
                       onChange={(e) => {
                         setPhone(formatTurkeyPhoneInput(e.target.value));
                         setErrors((current) => ({ ...current, phone: undefined }));
@@ -221,15 +224,17 @@ export default function SettingsPage() {
                       value={professional?.email ?? ""}
                       disabled
                       readOnly
+                      touchFriendly
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
                       label="İl"
                       value={city}
                       maxLength={50}
                       error={errors.city}
+                      touchFriendly
                       onChange={(e) => {
                         setCity(e.target.value);
                         setErrors((current) => ({ ...current, city: undefined }));
@@ -240,6 +245,7 @@ export default function SettingsPage() {
                       value={district}
                       maxLength={60}
                       error={errors.district}
+                      touchFriendly
                       onChange={(e) => {
                         setDistrict(e.target.value);
                         setErrors((current) => ({ ...current, district: undefined }));
@@ -257,8 +263,9 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => setSpecsOpen((v) => !v)}
                         className={clsx(
-                          "w-full flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-sm",
-                          "bg-pro-surface transition-colors duration-150",
+                          "w-full flex items-center justify-between rounded-lg border px-4 py-3 sm:px-3.5 sm:py-2.5 text-base sm:text-sm",
+                          "min-h-[44px] sm:min-h-0",
+                          "bg-pro-surface transition-colors duration-150 touch-manipulation",
                           "focus:outline-none focus:ring-2 focus:ring-pro-primary/30 focus:border-pro-primary",
                           specsOpen
                             ? "border-pro-primary ring-2 ring-pro-primary/30"
@@ -275,7 +282,7 @@ export default function SettingsPage() {
                       </button>
 
                       {specsOpen && (
-                        <div className="absolute z-20 mt-1 w-full rounded-xl border border-pro-border bg-pro-surface shadow-[var(--pro-shadow-md)] overflow-hidden">
+                        <div className="absolute z-20 mt-1 w-full rounded-xl border border-pro-border bg-pro-surface shadow-[var(--pro-shadow-md)] overflow-hidden max-h-[50vh] overflow-y-auto overscroll-contain">
                           {SPECIALIZATIONS.map((s) => {
                             const selected = specs.includes(s.id);
                             return (
@@ -290,15 +297,16 @@ export default function SettingsPage() {
                                   );
                                 }}
                                 className={clsx(
-                                  "w-full flex items-center justify-between px-3.5 py-2.5 text-sm",
-                                  "transition-colors duration-150",
+                                  "w-full flex items-center justify-between px-3.5 py-3 sm:py-2.5 text-sm",
+                                  "transition-colors duration-150 touch-manipulation",
+                                  "min-h-[44px] sm:min-h-0",
                                   selected
                                     ? "bg-pro-primary-light text-pro-primary"
-                                    : "text-pro-text hover:bg-pro-surface-alt"
+                                    : "text-pro-text hover:bg-pro-surface-alt active:bg-pro-surface-alt"
                                 )}
                               >
                                 <span>{s.label}</span>
-                                {selected && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
+                                {selected && <Check className="h-4 w-4 flex-shrink-0" />}
                               </button>
                             );
                           })}
@@ -310,9 +318,12 @@ export default function SettingsPage() {
                     )}
                   </div>
 
-                  <Button onClick={handleSave} loading={saving} className="mt-2">
-                    Değişiklikleri Kaydet
-                  </Button>
+                  {/* Desktop'ta inline buton */}
+                  <div className="hidden sm:block">
+                    <Button onClick={handleSave} loading={saving} className="mt-2">
+                      Değişiklikleri Kaydet
+                    </Button>
+                  </div>
                 </div>
               </Card>
 
@@ -366,7 +377,7 @@ export default function SettingsPage() {
 
               {/* Hesabı Sil */}
               <Card padding="lg">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
                     <h2 className="text-base font-semibold text-pro-text mb-1">Hesabı Sil</h2>
                     <p className="text-xs text-pro-text-tertiary">
@@ -377,16 +388,32 @@ export default function SettingsPage() {
                     variant="danger"
                     size="sm"
                     onClick={() => setDeleteStep(1)}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto min-h-[44px] sm:min-h-0"
                   >
                     Hesabı Sil
                   </Button>
                 </div>
               </Card>
+              
+              {/* Mobile sticky save button spacer */}
+              <div className="h-20 sm:hidden" />
             </div>
           )}
         </div>
       </main>
+
+      {/* Mobile sticky save button */}
+      {!loading && (
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-pro-surface/95 backdrop-blur-sm border-t border-pro-border sm:hidden z-40 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <Button 
+            onClick={handleSave} 
+            loading={saving} 
+            className="w-full min-h-[48px]"
+          >
+            Değişiklikleri Kaydet
+          </Button>
+        </div>
+      )}
 
       {/* Hesap Silme — 1. Adım: Onay */}
       <Modal

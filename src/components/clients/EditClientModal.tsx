@@ -124,7 +124,7 @@ export function EditClientModal({
 
   const formContent = (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-pro-text mb-1.5">
             Ad *
@@ -199,7 +199,7 @@ export function EditClientModal({
         {errors.phone && <p className="mt-1 text-xs text-pro-danger">{errors.phone}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-pro-text mb-1.5">
             Doğum Tarihi

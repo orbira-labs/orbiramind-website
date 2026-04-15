@@ -122,7 +122,7 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="w-11 h-11 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors touch-manipulation"
           >
             <X className="h-5 w-5" />
           </button>
@@ -160,17 +160,17 @@ function NoteModal({ open, onClose, note, onSave, onDelete }: NoteModalProps) {
         <div className="flex items-center justify-between p-5 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
           <div className="flex items-center gap-2">
             {/* Priority Dots */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {PRIORITY_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => setPriority(option.value)}
                   className={clsx(
-                    "w-5 h-5 rounded-full transition-all duration-200 flex items-center justify-center",
+                    "w-9 h-9 rounded-full transition-all duration-200 flex items-center justify-center touch-manipulation",
                     priority === option.value
-                      ? "ring-2 ring-offset-1 ring-gray-300"
-                      : "hover:scale-110"
+                      ? "ring-2 ring-offset-2 ring-gray-300"
+                      : "hover:scale-110 active:scale-95"
                   )}
                   style={{ backgroundColor: option.color }}
                   title={option.label}
@@ -310,9 +310,9 @@ function NoteDetailModal({
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-white/40 transition-colors z-10"
+            className="absolute top-2 right-2 w-11 h-11 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-white/40 transition-colors z-10 touch-manipulation"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
 
           {/* Content area */}
@@ -425,9 +425,9 @@ export function NotesCard() {
           <h3 className="font-semibold text-pro-text">Notlarım</h3>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-semibold"
+            className="flex items-center gap-1.5 text-sm text-pro-primary hover:text-pro-primary-hover font-semibold min-h-[44px] min-w-[44px] px-2 -mr-2 rounded-lg transition-colors touch-manipulation active:bg-pro-primary-light"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
             Ekle
           </button>
         </div>

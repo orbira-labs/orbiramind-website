@@ -117,41 +117,23 @@ export default function BillingPage() {
             </Card>
 
             {/* Pricing Cards */}
-            <div className="grid sm:grid-cols-3 gap-4">
+            {/* Mobile: Gold card first (most popular), then others stacked */}
+            {/* Tablet (md): 2 columns, Desktop (lg+): 3 columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-              {/* White card — 5 adet */}
-              <div className="rounded-2xl border-2 border-pro-border bg-white overflow-hidden flex flex-col">
-                <div className="bg-gradient-to-br from-[#EDF5F0] to-[#E0EDE4] px-6 py-5 border-b border-pro-border">
-                  <p className="text-xs font-semibold text-pro-primary uppercase tracking-wide mb-2">Başlangıç</p>
-                  <MindTestBadge count={5} size="lg" variant="primary" />
-                  <p className="text-xs text-pro-text-tertiary mt-1">analiz başına ₺32,99</p>
-                </div>
-                <div className="px-6 py-5 flex-1 flex flex-col">
-                  <ul className="space-y-2.5 flex-1">
-                    {PACKAGE_FEATURES.map((item, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-pro-text-secondary">
-                        <Check className="h-4 w-4 text-pro-success shrink-0" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => toast.info("Ödeme sistemi yakında aktif olacak")}
-                    className="mt-5 w-full py-3 rounded-xl border-2 border-pro-primary text-pro-primary font-semibold hover:bg-pro-primary hover:text-white transition-all active:scale-[0.98]"
-                  >
-                    Satın Al · ₺164,95
-                  </button>
-                </div>
-              </div>
-
-              {/* Gold card — 20 adet */}
-              <div className="rounded-2xl overflow-hidden flex flex-col relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C] via-[#E8C963] to-[#A67C34]" />
+              {/* Gold card — 20 adet (First on mobile for visibility) */}
+              <div className="rounded-2xl overflow-hidden flex flex-col relative group order-first md:order-none lg:order-none md:col-span-2 lg:col-span-1">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C] via-[#E8C963] to-[#A67C34] rounded-2xl" />
                 <div className="absolute top-0 right-0 w-[140px] h-[140px] rounded-full bg-white opacity-[0.08] blur-[50px]" />
 
-                {/* Diagonal ribbon — top right */}
-                <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1">
+                {/* Diagonal ribbon — top right with proper clipping */}
+                <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1 sm:-right-[30px]">
                   <span className="text-[11px] font-bold text-[#8B6914] tracking-wide">%18 tasarruf</span>
+                </div>
+
+                {/* Mobile "Most Popular" indicator */}
+                <div className="sm:hidden absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+                  <span className="text-[10px] font-bold text-[#8B6914] tracking-wide">EN POPÜLER</span>
                 </div>
 
                 <div className="relative px-6 py-5 border-b border-white/20">
@@ -171,21 +153,46 @@ export default function BillingPage() {
                   </ul>
                   <button
                     onClick={() => toast.info("Ödeme sistemi yakında aktif olacak")}
-                    className="mt-5 w-full py-3 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98]"
+                    className="mt-5 w-full min-h-[48px] py-3 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98]"
                   >
                     Satın Al · ₺540,00
                   </button>
                 </div>
               </div>
 
+              {/* White card — 5 adet */}
+              <div className="rounded-2xl border-2 border-pro-border bg-white overflow-hidden flex flex-col">
+                <div className="bg-gradient-to-br from-[#EDF5F0] to-[#E0EDE4] px-6 py-5 border-b border-pro-border">
+                  <p className="text-xs font-semibold text-pro-primary uppercase tracking-wide mb-2">Başlangıç</p>
+                  <MindTestBadge count={5} size="lg" variant="primary" />
+                  <p className="text-xs text-pro-text-tertiary mt-1">analiz başına ₺32,99</p>
+                </div>
+                <div className="px-6 py-5 flex-1 flex flex-col">
+                  <ul className="space-y-2.5 flex-1">
+                    {PACKAGE_FEATURES.map((item, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-pro-text-secondary">
+                        <Check className="h-4 w-4 text-pro-success shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => toast.info("Ödeme sistemi yakında aktif olacak")}
+                    className="mt-5 w-full min-h-[48px] py-3 rounded-xl border-2 border-pro-primary text-pro-primary font-semibold hover:bg-pro-primary hover:text-white transition-all active:scale-[0.98]"
+                  >
+                    Satın Al · ₺164,95
+                  </button>
+                </div>
+              </div>
+
               {/* Purple card — Pro Üyelik (Yakında) */}
               <div className="rounded-2xl overflow-hidden flex flex-col relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9] rounded-2xl" />
                 <div className="absolute top-0 right-0 w-[140px] h-[140px] rounded-full bg-white opacity-[0.08] blur-[50px]" />
                 <div className="absolute bottom-0 left-0 w-[100px] h-[100px] rounded-full bg-white opacity-[0.05] blur-[40px]" />
 
-                {/* Diagonal ribbon — top right */}
-                <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1">
+                {/* Diagonal ribbon — top right with proper clipping */}
+                <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1 sm:-right-[30px]">
                   <span className="text-[11px] font-bold text-[#7C3AED] tracking-wide">Yakında</span>
                 </div>
 
@@ -219,7 +226,7 @@ export default function BillingPage() {
                   </ul>
                   <button
                     onClick={() => setShowProModal(true)}
-                    className="mt-5 w-full py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white font-semibold border border-white/30 hover:bg-white/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    className="mt-5 w-full min-h-[48px] py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white font-semibold border border-white/30 hover:bg-white/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                   >
                     <Lock className="h-4 w-4" />
                     Keşfet
@@ -231,16 +238,27 @@ export default function BillingPage() {
 
             {/* Pro Üyelik Modal */}
             {showProModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-4">
                 <div 
                   className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                   onClick={() => setShowProModal(false)}
                 />
-                <div className="relative bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9] rounded-2xl p-6 max-w-lg w-full shadow-2xl overflow-hidden">
+                {/* Mobile: full-screen sheet, Desktop: centered modal */}
+                <div className="relative bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9] max-w-lg w-full shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto
+                  fixed inset-0 rounded-none md:relative md:inset-auto md:rounded-2xl md:max-h-[90vh]">
                   <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-white opacity-[0.08] blur-[60px]" />
                   <div className="absolute bottom-0 left-0 w-[150px] h-[150px] rounded-full bg-white opacity-[0.05] blur-[50px]" />
                   
-                  <div className="relative">
+                  {/* Close button - 44x44px touch target */}
+                  <button
+                    onClick={() => setShowProModal(false)}
+                    className="absolute top-3 right-3 z-20 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    aria-label="Kapat"
+                  >
+                    <X className="h-5 w-5 text-white" />
+                  </button>
+                  
+                  <div className="relative p-6 pt-14 md:pt-6">
                     <div className="text-center mb-6">
                       <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 mb-4">
                         <Sparkles className="h-8 w-8 text-white" />
@@ -305,7 +323,7 @@ export default function BillingPage() {
                     
                     <button
                       onClick={() => setShowProModal(false)}
-                      className="w-full py-3 rounded-xl bg-white text-[#7C3AED] font-semibold hover:bg-white/95 transition-all active:scale-[0.98]"
+                      className="w-full min-h-[48px] py-3 rounded-xl bg-white text-[#7C3AED] font-semibold hover:bg-white/95 transition-all active:scale-[0.98]"
                     >
                       Sabırsızlanıyorum!
                     </button>
@@ -332,41 +350,47 @@ export default function BillingPage() {
             {/* Comparison Table */}
             {showComparison && (
               <Card padding="none" variant="elevated">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-pro-border">
-                        <th className="text-left px-4 py-3 text-pro-text-tertiary font-medium">Özellik</th>
-                        <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
-                          <span className="inline-block px-2 py-0.5 bg-pro-primary-light rounded-md text-pro-primary text-xs">Başlangıç</span>
-                        </th>
-                        <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
-                          <span className="inline-block px-2 py-0.5 bg-[#E8C963]/20 rounded-md text-[#8B6914] text-xs">Profesyonel</span>
-                        </th>
-                        <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
-                          <span className="inline-block px-2 py-0.5 bg-[#8B5CF6]/10 rounded-md text-[#7C3AED] text-xs">Pro Üyelik</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {COMPARISON_ROWS.map((row, i) => (
-                        <tr key={i} className={i % 2 === 0 ? "bg-pro-primary-light/30" : ""}>
-                          <td className="px-4 py-2.5 text-pro-text-secondary">{row.feature}</td>
-                          {(["starter", "pro", "subscription"] as const).map((plan) => (
-                            <td key={plan} className="text-center px-3 py-2.5">
-                              {row[plan] === true ? (
-                                <Check className="h-4 w-4 text-pro-success mx-auto" />
-                              ) : row[plan] === false ? (
-                                <X className="h-4 w-4 text-pro-text-tertiary/40 mx-auto" />
-                              ) : (
-                                <span className="text-xs font-semibold text-pro-text">{row[plan]}</span>
-                              )}
-                            </td>
-                          ))}
+                {/* Table container with scroll affordance gradient */}
+                <div className="relative">
+                  {/* Right fade gradient for scroll affordance */}
+                  <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 md:hidden" />
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-pro-border">
+                          <th className="text-left px-4 py-3 text-pro-text-tertiary font-medium sticky left-0 bg-white z-20 min-w-[140px]">Özellik</th>
+                          <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
+                            <span className="inline-block px-2 py-0.5 bg-pro-primary-light rounded-md text-pro-primary text-xs">Başlangıç</span>
+                          </th>
+                          <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
+                            <span className="inline-block px-2 py-0.5 bg-[#E8C963]/20 rounded-md text-[#8B6914] text-xs">Profesyonel</span>
+                          </th>
+                          <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
+                            <span className="inline-block px-2 py-0.5 bg-[#8B5CF6]/10 rounded-md text-[#7C3AED] text-xs">Pro Üyelik</span>
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {COMPARISON_ROWS.map((row, i) => (
+                          <tr key={i} className={i % 2 === 0 ? "bg-pro-primary-light/30" : ""}>
+                            <td className={`px-4 py-2.5 text-pro-text-secondary sticky left-0 z-20 ${i % 2 === 0 ? "bg-[#f5f9f6]" : "bg-white"}`}>{row.feature}</td>
+                            {(["starter", "pro", "subscription"] as const).map((plan) => (
+                              <td key={plan} className="text-center px-3 py-2.5">
+                                {row[plan] === true ? (
+                                  <Check className="h-4 w-4 text-pro-success mx-auto" />
+                                ) : row[plan] === false ? (
+                                  <X className="h-4 w-4 text-pro-text-tertiary/40 mx-auto" />
+                                ) : (
+                                  <span className="text-xs font-semibold text-pro-text">{row[plan]}</span>
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </Card>
             )}

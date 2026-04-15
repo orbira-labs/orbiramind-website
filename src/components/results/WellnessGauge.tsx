@@ -9,7 +9,7 @@ interface WellnessGaugeProps {
 
 const SIZES = {
   xs: { outer: 90, strokeWidth: 5, innerStroke: 2, fontSize: "text-lg", labelSize: "text-[10px]", gap: 8 },
-  sm: { outer: 130, strokeWidth: 7, innerStroke: 3, fontSize: "text-2xl", labelSize: "text-xs", gap: 12 },
+  sm: { outer: 150, strokeWidth: 7, innerStroke: 3, fontSize: "text-3xl", labelSize: "text-xs", gap: 12 },
   md: { outer: 180, strokeWidth: 9, innerStroke: 4, fontSize: "text-4xl", labelSize: "text-sm", gap: 16 },
   lg: { outer: 220, strokeWidth: 10, innerStroke: 5, fontSize: "text-5xl", labelSize: "text-base", gap: 18 },
 };

@@ -39,32 +39,32 @@ function ExpandableCard({
   return (
     <motion.div
       variants={staggerItem}
-      className="group rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
+      className="group rounded-lg sm:rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-sm"
     >
       <button
         type="button"
         onClick={() => hasAction && setExpanded((prev) => !prev)}
-        className={`w-full text-left p-4 ${hasAction ? "cursor-pointer" : "cursor-default"}`}
+        className={`w-full text-left p-3 sm:p-4 touch-manipulation ${hasAction ? "cursor-pointer" : "cursor-default"}`}
       >
-        <div className="flex items-start gap-3">
-          <span className="mt-1.5 flex-shrink-0 text-sm font-medium text-gray-300 tabular-nums w-5 text-right">
+        <div className="flex items-start gap-2.5 sm:gap-3">
+          <span className="mt-1 sm:mt-1.5 flex-shrink-0 text-xs sm:text-sm font-medium text-gray-300 tabular-nums w-4 sm:w-5 text-right">
             {index}
           </span>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
-              <h4 className="text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
+              <h4 className="text-sm sm:text-[14px] font-semibold text-gray-900 leading-snug">{title}</h4>
               {severity && (
-                <span className="inline-flex items-center gap-1.5 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                   <span className={`h-1.5 w-1.5 rounded-full ${severity.dot}`} />
-                  <span className="text-[11px] text-gray-400 font-medium">{severity.label}</span>
+                  <span className="text-[10px] sm:text-[11px] text-gray-400 font-medium">{severity.label}</span>
                 </span>
               )}
             </div>
-            <p className="text-[13px] leading-relaxed text-gray-500">{description}</p>
+            <p className="text-xs sm:text-[13px] leading-relaxed text-gray-500">{description}</p>
           </div>
           {hasAction && (
             <ChevronDown
-              className={`h-4 w-4 mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+              className={`h-4 w-4 mt-0.5 sm:mt-1 flex-shrink-0 text-gray-300 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
             />
           )}
         </div>
@@ -80,12 +80,12 @@ function ExpandableCard({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-4 pb-4 pl-12">
-                <div className="rounded-lg bg-gray-50 px-4 py-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
+              <div className="px-3 pb-3 pl-9 sm:px-4 sm:pb-4 sm:pl-12">
+                <div className="rounded-lg bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3">
+                  <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
                     {actionLabel}
                   </p>
-                  <p className="text-[13px] leading-relaxed text-gray-600">{actionContent}</p>
+                  <p className="text-xs sm:text-[13px] leading-relaxed text-gray-600">{actionContent}</p>
                 </div>
               </div>
             </motion.div>
@@ -113,13 +113,13 @@ function SectionBlock({
 }) {
   return (
     <section>
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`h-8 w-8 rounded-lg ${accentColor} flex items-center justify-center`}>
+      <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+        <div className={`h-7 w-7 sm:h-8 sm:w-8 rounded-lg ${accentColor} flex items-center justify-center flex-shrink-0`}>
           {icon}
         </div>
         <div>
-          <h3 className="text-[15px] font-semibold text-gray-900">{title}</h3>
-          <p className="text-[12px] text-gray-400 leading-snug">{subtitle}</p>
+          <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">{title}</h3>
+          <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -154,9 +154,9 @@ export function ClinicianInsights({
   let sectionNumber = 0;
 
   return (
-    <div className="space-y-8">
-      <div className="pb-4 border-b border-gray-100">
-        <p className="text-[13px] text-gray-400">
+    <div className="space-y-6 sm:space-y-8 p-3 sm:p-5 -m-3 sm:-m-5">
+      <div className="pb-3 sm:pb-4 border-b border-gray-100">
+        <p className="text-xs sm:text-[13px] text-gray-400 leading-relaxed">
           Bu bölüm, testin sayısal verileri ve yapay zeka analizleri birleştirilerek oluşturulmuştur.
           Seanslarda araştırılabilecek <span className="font-medium text-gray-600">{totalItems} klinik bulgu</span> içerir.
         </p>

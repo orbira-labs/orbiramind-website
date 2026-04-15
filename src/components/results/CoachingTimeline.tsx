@@ -81,19 +81,19 @@ const itemVariant = {
 
 export function CoachingTimeline({ roadmap }: CoachingTimelineProps) {
   return (
-    <div className="relative">
+    <div className="relative p-3 sm:p-5 -m-3 sm:-m-5">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-8">
         <div className="relative">
-          <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4A] flex items-center justify-center shadow-md">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4A] flex items-center justify-center shadow-md flex-shrink-0">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
             </svg>
           </div>
           <div className="absolute -inset-1 bg-[#5B7B6A]/15 rounded-xl blur-md -z-10" />
         </div>
         <div>
-          <h3 className="text-xl font-bold text-gray-900">Danışanın Yol Haritası</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">Danışanın Yol Haritası</h3>
           <p className="text-xs text-gray-500">Önerilen aksiyon planı</p>
         </div>
       </div>
@@ -111,7 +111,7 @@ export function CoachingTimeline({ roadmap }: CoachingTimelineProps) {
       </div>
 
       {/* Phase cards */}
-      <div className="grid md:grid-cols-3 gap-5">
+      <div className="grid md:grid-cols-3 gap-4 sm:gap-5">
         {PHASES.map((phase, phaseIdx) => {
           const items = roadmap[phase.key] || [];
           return (
@@ -126,27 +126,27 @@ export function CoachingTimeline({ roadmap }: CoachingTimelineProps) {
                 boxShadow: `0 12px 40px -8px ${phase.shadowColor}`,
                 transition: { duration: 0.25 },
               }}
-              className={`relative rounded-2xl ${phase.bgLight} border ${phase.borderColor} overflow-hidden transition-colors`}
+              className={`relative rounded-xl sm:rounded-2xl ${phase.bgLight} border ${phase.borderColor} overflow-hidden transition-colors`}
             >
               {/* Phase header */}
-              <div className={`relative bg-gradient-to-r ${phase.gradient} px-5 py-4 overflow-hidden`}>
+              <div className={`relative bg-gradient-to-r ${phase.gradient} px-4 py-3 sm:px-5 sm:py-4 overflow-hidden`}>
                 <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
                 <div className="absolute bottom-0 left-0 w-12 h-12 bg-white/5 rounded-full translate-y-6 -translate-x-4" />
-                <div className="relative flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <div className="relative flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
                     {phase.icon}
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-base">{phase.title}</h4>
-                    <p className="text-white/70 text-xs font-medium">{phase.subtitle}</p>
+                    <h4 className="font-bold text-white text-sm sm:text-base">{phase.title}</h4>
+                    <p className="text-white/70 text-[11px] sm:text-xs font-medium">{phase.subtitle}</p>
                   </div>
                 </div>
               </div>
 
               {/* Items */}
-              <div className="p-5 space-y-3">
+              <div className="p-4 sm:p-5 space-y-2.5 sm:space-y-3">
                 {items.length === 0 ? (
-                  <p className="text-sm text-gray-400 italic text-center py-3">Öneri yok</p>
+                  <p className="text-xs sm:text-sm text-gray-400 italic text-center py-3">Öneri yok</p>
                 ) : (
                   items.map((item, idx) => (
                     <motion.div
@@ -155,12 +155,12 @@ export function CoachingTimeline({ roadmap }: CoachingTimelineProps) {
                       variants={itemVariant}
                       initial="initial"
                       animate="animate"
-                      className="flex items-start gap-3 group"
+                      className="flex items-start gap-2.5 sm:gap-3 group"
                     >
-                      <div className={`flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br ${phase.gradient} flex items-center justify-center mt-0.5 shadow-sm group-hover:scale-110 transition-transform`}>
-                        <span className="text-[10px] font-bold text-white">{idx + 1}</span>
+                      <div className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br ${phase.gradient} flex items-center justify-center mt-0.5 shadow-sm group-hover:scale-110 transition-transform`}>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-white">{idx + 1}</span>
                       </div>
-                      <p className={`text-sm ${phase.textColor} leading-relaxed font-medium`}>{item}</p>
+                      <p className={`text-xs sm:text-sm ${phase.textColor} leading-relaxed font-medium`}>{item}</p>
                     </motion.div>
                   ))
                 )}

@@ -74,27 +74,27 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
         {/* Desktop: Form Panel (Sağ) */}
         <div className="flex-1 flex flex-col items-center justify-center px-8">
-          <div className="w-full max-w-[420px]">
+          <div className="w-full max-w-md">
             {children}
           </div>
         </div>
       </div>
 
       {/* ========== MOBILE LAYOUT ========== */}
-      <div className="mobile-only min-h-screen flex flex-col pt-safe pb-safe">
+      <div className="mobile-only min-h-screen min-h-[100dvh] flex flex-col pt-safe pb-safe overflow-y-auto">
         {/* Mobile: Compact Header with Logo */}
-        <div className="px-5 pt-8 pb-6 text-center">
-          <div className="mx-auto h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center mb-3 shadow-[var(--pro-shadow-md)]">
-            <span className="text-white text-2xl font-bold">O</span>
+        <div className="px-4 pt-6 pb-4 text-center shrink-0">
+          <div className="mx-auto h-12 w-12 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] flex items-center justify-center mb-2 shadow-[var(--pro-shadow-md)]">
+            <span className="text-white text-xl font-bold">O</span>
           </div>
           <p className="text-sm font-semibold text-pro-text">
             Orbira <span className="font-light text-pro-text-secondary">Mind</span>
           </p>
         </div>
 
-        {/* Mobile: Form Area - Full Width */}
-        <div className="flex-1 px-5 pb-8">
-          <div className="w-full max-w-[420px] mx-auto">
+        {/* Mobile: Form Area - Full Width with keyboard-aware scroll */}
+        <div className="flex-1 px-4 pb-6 overflow-y-auto">
+          <div className="w-full max-w-md mx-auto">
             {children}
           </div>
         </div>

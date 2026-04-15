@@ -186,7 +186,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMode("choice")}
-                className="h-10 w-10 md:h-8 md:w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors touch-manipulation"
+                className="h-11 w-11 min-w-[44px] min-h-[44px] md:h-8 md:w-8 md:min-w-0 md:min-h-0 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt active:bg-pro-surface-alt transition-colors touch-manipulation"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -240,7 +240,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMode("choice")}
-                className="h-10 w-10 md:h-8 md:w-8 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt transition-colors touch-manipulation"
+                className="h-11 w-11 min-w-[44px] min-h-[44px] md:h-8 md:w-8 md:min-w-0 md:min-h-0 rounded-lg flex items-center justify-center text-pro-text-secondary hover:bg-pro-surface-alt active:bg-pro-surface-alt transition-colors touch-manipulation"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -285,6 +285,7 @@ export default function LoginPage() {
                       if (passwordError) setPasswordError(null);
                     }}
                     error={passwordError ?? undefined}
+                    showPasswordToggle
                     className="mobile-input md:w-full md:min-h-0"
                   />
                 </div>

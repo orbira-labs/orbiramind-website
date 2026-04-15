@@ -78,9 +78,9 @@ function Tag({ label, variant = "default" }: TagProps) {
 
 function SectionRow({ icon, children }: { icon: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center mt-0.5">
-        <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+    <div className="flex items-start gap-2.5 sm:gap-3">
+      <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gray-50 flex items-center justify-center mt-0.5">
+        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
         </svg>
       </div>
@@ -144,17 +144,18 @@ export function ProfileCard({ summary }: ProfileCardProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="p-3 sm:p-5 -m-3 sm:-m-5"
     >
-      <div className="flex items-center gap-3 mb-5">
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4A] flex items-center justify-center shadow-sm">
-          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-5">
+        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4A] flex items-center justify-center shadow-sm flex-shrink-0">
+          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900">Danışan Kimlik Kartı</h3>
+        <h3 className="text-base sm:text-lg font-bold text-gray-900">Danışan Kimlik Kartı</h3>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5 sm:space-y-3">
         {sections.map((section, idx) => (
           <SectionRow key={idx} icon={section.icon}>
             {section.tags.map((tag, tidx) => (

@@ -78,6 +78,10 @@ export default function ClientDetailPage() {
   const [sessionModalOpen, setSessionModalOpen] = useState(false);
   const [paymentModalPkgId, setPaymentModalPkgId] = useState<string | null>(null);
   const [expandedPkg, setExpandedPkg] = useState<string | null>(null);
+  
+  const INITIAL_ITEMS_COUNT = 5;
+  const [showAllTests, setShowAllTests] = useState(false);
+  const [showAllAppointments, setShowAllAppointments] = useState(false);
 
   const {
     packages: sessionPackages,
@@ -234,14 +238,24 @@ export default function ClientDetailPage() {
 
   return (
     <>
-      <TopBar title={`${client.first_name} ${client.last_name}`} />
+      <TopBar title={`${client.first_name} ${client.last_name}`} showBackButton />
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-5xl space-y-6">
+          {/* Desktop: Simple text link */}
           <Link
             href="/clients"
-            className="inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
+            Danışanlara Dön
+          </Link>
+          
+          {/* Mobile: Prominent back button */}
+          <Link
+            href="/clients"
+            className="sm:hidden inline-flex items-center gap-2 px-3 py-2 -ml-1 rounded-lg text-sm font-medium text-pro-text-secondary active:bg-pro-surface-alt transition-colors touch-manipulation min-h-[44px]"
+          >
+            <ArrowLeft className="h-5 w-5" />
             Danışanlara Dön
           </Link>
 
@@ -284,11 +298,29 @@ export default function ClientDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-pro-text-tertiary shrink-0" />
-                  <span className="text-pro-text">{client.phone || "—"}</span>
+                  {client.phone ? (
+                    <a 
+                      href={`tel:${client.phone.replace(/\s/g, "")}`}
+                      className="text-pro-text hover:text-pro-primary underline-offset-2 hover:underline transition-colors touch-manipulation"
+                    >
+                      {client.phone}
+                    </a>
+                  ) : (
+                    <span className="text-pro-text">—</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-pro-text-tertiary shrink-0" />
-                  <span className="text-pro-text">{client.email || "—"}</span>
+                  {client.email ? (
+                    <a 
+                      href={`mailto:${client.email}`}
+                      className="text-pro-text hover:text-pro-primary underline-offset-2 hover:underline transition-colors touch-manipulation"
+                    >
+                      {client.email}
+                    </a>
+                  ) : (
+                    <span className="text-pro-text">—</span>
+                  )}
                 </div>
               </div>
 
@@ -353,38 +385,50 @@ export default function ClientDetailPage() {
                   onAction={() => {}}
                 />
               ) : (
-                tests.map((test) => {
-                  const s = TEST_STATUSES.find((ts) => ts.id === test.status);
-                  const isCompleted = test.status === "completed";
-                  return (
-                    <Card key={test.id} padding="sm">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-pro-text">
-                            Karakter Analizi
-                          </p>
-                          <p className="text-xs text-pro-text-tertiary">
-                            {formatDate(test.created_at)}
-                          </p>
+                <>
+                  {(showAllTests ? tests : tests.slice(0, INITIAL_ITEMS_COUNT)).map((test) => {
+                    const s = TEST_STATUSES.find((ts) => ts.id === test.status);
+                    const isCompleted = test.status === "completed";
+                    return (
+                      <Card key={test.id} padding="sm">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-pro-text">
+                              Karakter Analizi
+                            </p>
+                            <p className="text-xs text-pro-text-tertiary">
+                              {formatDate(test.created_at)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={s?.color as "success" | "warning" | "info" | "danger" || "muted"} dot>
+                              {s?.label || test.status}
+                            </Badge>
+                            {isCompleted && (
+                              <Link
+                                href={`/tests/${test.id}`}
+                                className="flex items-center gap-1.5 min-h-[44px] px-3 bg-[var(--pro-analysis)] text-white text-xs font-medium rounded-lg hover:bg-[var(--pro-analysis-hover)] active:bg-[var(--pro-analysis-hover)] transition-colors touch-manipulation"
+                              >
+                                <Eye className="h-4 w-4" />
+                                <span className="hidden sm:inline">Sonucu Gör</span>
+                              </Link>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={s?.color as "success" | "warning" | "info" | "danger" || "muted"} dot>
-                            {s?.label || test.status}
-                          </Badge>
-                          {isCompleted && (
-                            <Link
-                              href={`/tests/${test.id}`}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-analysis)] text-white text-xs font-medium rounded-lg hover:bg-[var(--pro-analysis-hover)] transition-colors"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                              Sonucu Gör
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })
+                      </Card>
+                    );
+                  })}
+                  {tests.length > INITIAL_ITEMS_COUNT && (
+                    <button
+                      onClick={() => setShowAllTests(!showAllTests)}
+                      className="w-full py-3 text-sm font-medium text-pro-text-secondary hover:text-pro-text active:text-pro-text transition-colors touch-manipulation"
+                    >
+                      {showAllTests 
+                        ? "Daha Az Göster" 
+                        : `Tümünü Göster (${tests.length - INITIAL_ITEMS_COUNT} daha)`}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -400,30 +444,42 @@ export default function ClientDetailPage() {
                   onAction={() => router.push("/appointments")}
                 />
               ) : (
-                appointments.map((apt) => (
-                  <Card key={apt.id} padding="sm">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-pro-text">
-                          Randevu
-                        </p>
-                        <p className="text-xs text-pro-text-tertiary">
-                          {formatDateTime(apt.starts_at)} · {apt.duration_minutes} dk
-                        </p>
+                <>
+                  {(showAllAppointments ? appointments : appointments.slice(0, INITIAL_ITEMS_COUNT)).map((apt) => (
+                    <Card key={apt.id} padding="sm">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-pro-text">
+                            Randevu
+                          </p>
+                          <p className="text-xs text-pro-text-tertiary">
+                            {formatDateTime(apt.starts_at)} · {apt.duration_minutes} dk
+                          </p>
+                        </div>
+                        <Badge
+                          variant={
+                            apt.status === "completed" ? "success" :
+                            apt.status === "cancelled" ? "danger" : "info"
+                          }
+                          dot
+                        >
+                          {apt.status === "scheduled" ? "Planlandı" :
+                           apt.status === "completed" ? "Tamamlandı" : "İptal"}
+                        </Badge>
                       </div>
-                      <Badge
-                        variant={
-                          apt.status === "completed" ? "success" :
-                          apt.status === "cancelled" ? "danger" : "info"
-                        }
-                        dot
-                      >
-                        {apt.status === "scheduled" ? "Planlandı" :
-                         apt.status === "completed" ? "Tamamlandı" : "İptal"}
-                      </Badge>
-                    </div>
-                  </Card>
-                ))
+                    </Card>
+                  ))}
+                  {appointments.length > INITIAL_ITEMS_COUNT && (
+                    <button
+                      onClick={() => setShowAllAppointments(!showAllAppointments)}
+                      className="w-full py-3 text-sm font-medium text-pro-text-secondary hover:text-pro-text active:text-pro-text transition-colors touch-manipulation"
+                    >
+                      {showAllAppointments 
+                        ? "Daha Az Göster" 
+                        : `Tümünü Göster (${appointments.length - INITIAL_ITEMS_COUNT} daha)`}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -725,19 +781,20 @@ function SessionsTabContent({
                           size="sm"
                           variant="secondary"
                           onClick={() => onAddPayment(pkg.id)}
+                          className="min-h-[44px] min-w-[44px] touch-manipulation"
                         >
-                          <Wallet className="h-3.5 w-3.5" />
-                          Ödeme Ekle
+                          <Wallet className="h-4 w-4" />
+                          <span className="hidden sm:inline">Ödeme Ekle</span>
                         </Button>
                       )}
                       <button
                         onClick={() => setExpandedPkg(isExpanded ? null : pkg.id)}
-                        className="flex items-center gap-1 text-xs text-pro-text-tertiary hover:text-pro-text transition-colors ml-auto"
+                        className="flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-3 text-xs text-pro-text-tertiary hover:text-pro-text active:text-pro-text transition-colors ml-auto touch-manipulation rounded-lg hover:bg-pro-surface-alt"
                       >
                         {isExpanded ? "Gizle" : "Detay"}
                         {isExpanded
-                          ? <ChevronUp className="h-3.5 w-3.5" />
-                          : <ChevronDown className="h-3.5 w-3.5" />}
+                          ? <ChevronUp className="h-4 w-4" />
+                          : <ChevronDown className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
@@ -812,7 +869,7 @@ function SessionsTabContent({
           </div>
 
           <div className="flex justify-center">
-            <Button size="sm" variant="secondary" onClick={onAddPackage}>
+            <Button size="sm" variant="secondary" onClick={onAddPackage} className="min-h-[44px] touch-manipulation">
               <Plus className="h-4 w-4" />
               Yeni Seans Tanımla
             </Button>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Send, Clock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Avatar } from "../ui/Avatar";
 import { NotificationCenter, type ProPanelNotification } from "./NotificationCenter";
 import { useProContext } from "@/lib/context";
@@ -15,6 +15,7 @@ interface TopBarProps {
   title?: string;
   onTestSent?: () => void;
   showGreeting?: boolean;
+  showBackButton?: boolean;
 }
 
 function formatWeekday(): string {
@@ -40,7 +41,7 @@ function getGreeting(): string {
   return "İyi akşamlar";
 }
 
-export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps) {
+export function TopBar({ title, onTestSent, showGreeting = false, showBackButton = false }: TopBarProps) {
   const { professional } = useProContext();
   const router = useRouter();
   const [showSendModal, setShowSendModal] = useState(false);
@@ -118,13 +119,24 @@ export function TopBar({ title, onTestSent, showGreeting = false }: TopBarProps)
 
         {/* Mobile Header */}
         <div className="flex md:hidden h-14 border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] items-center justify-between px-4 pt-[env(safe-area-inset-top)]">
-          {showGreeting ? (
-            <h1 className="text-base font-semibold text-[#3D5A4C] truncate max-w-[180px]">
-              {getGreeting()}{professional?.first_name ? `, ${professional.first_name}` : ""}
-            </h1>
-          ) : (
-            <h1 className="text-base font-semibold text-[#3D5A4C] truncate max-w-[200px]">{title}</h1>
-          )}
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            {showBackButton && (
+              <button
+                onClick={() => router.back()}
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 rounded-lg text-[#6B8F7B] active:bg-white/60 active:text-[#3D5A4C] transition-colors touch-manipulation"
+                aria-label="Geri"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+            )}
+            {showGreeting ? (
+              <h1 className="text-base font-semibold text-[#3D5A4C] truncate max-w-[180px]">
+                {getGreeting()}{professional?.first_name ? `, ${professional.first_name}` : ""}
+              </h1>
+            ) : (
+              <h1 className="text-base font-semibold text-[#3D5A4C] truncate flex-1">{title}</h1>
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
             {showGreeting && (

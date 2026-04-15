@@ -260,7 +260,7 @@ export default function AppointmentsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={clsx(
-                  "mobile-chip touch-manipulation",
+                  "mobile-chip touch-manipulation min-h-[36px] px-4",
                   filter === f && "mobile-chip-active"
                 )}
               >
@@ -298,7 +298,7 @@ export default function AppointmentsPage() {
               </p>
               <button
                 onClick={() => handleCreateAppointment()}
-                className="mobile-btn bg-pro-primary text-white"
+                className="mobile-btn min-h-[48px] bg-pro-primary text-white"
               >
                 <Plus className="h-5 w-5" />
                 Randevu Ekle
@@ -322,7 +322,7 @@ export default function AppointmentsPage() {
                     {/* Date Badge */}
                     <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-pro-appointment-light">
                       <span className="text-sm font-bold text-pro-appointment leading-none">{dayNumber}</span>
-                      <span className="text-[10px] font-medium text-pro-appointment/70 uppercase">{monthShort}</span>
+                      <span className="text-[11px] font-semibold text-pro-appointment/70 uppercase">{monthShort}</span>
                     </div>
                     
                     {/* Content */}

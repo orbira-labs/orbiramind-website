@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow, isToday, isTomorrow } from "date-fns";
+import { format, formatDistanceToNow, isToday, isTomorrow, isYesterday, isThisWeek, isThisMonth, startOfDay } from "date-fns";
 import { tr } from "date-fns/locale";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { TIMEZONE } from "./constants";
@@ -110,4 +110,32 @@ Bu kısa test, birlikte daha iyi çalışmamıza yardımcı olacak.
 
 İyi günler,
 ${professionalName}`;
+}
+
+export function formatRelativeDate(date: string | Date): string {
+  const d = new Date(date);
+  if (isToday(d)) return "Bugün";
+  if (isYesterday(d)) return "Dün";
+  if (isThisWeek(d, { weekStartsOn: 1 })) return "Bu Hafta";
+  if (isThisMonth(d)) return "Bu Ay";
+  return format(d, "MMMM yyyy", { locale: tr });
+}
+
+export function groupByRelativeDate<T extends { created_at: string }>(
+  items: T[]
+): { label: string; items: T[] }[] {
+  const groups = new Map<string, T[]>();
+
+  items.forEach((item) => {
+    const label = formatRelativeDate(item.created_at);
+    if (!groups.has(label)) {
+      groups.set(label, []);
+    }
+    groups.get(label)!.push(item);
+  });
+
+  return Array.from(groups.entries()).map(([label, items]) => ({
+    label,
+    items,
+  }));
 }

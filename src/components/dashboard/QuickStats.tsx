@@ -80,10 +80,10 @@ function DesktopQuickStats({ stats, loading }: QuickStatsProps) {
 function MobileQuickStats({ stats, loading }: QuickStatsProps) {
   if (loading) {
     return (
-      <div className="mobile-only -mx-3">
+      <div className="mobile-only -mx-3 relative">
         <div className="mobile-scroll-snap gap-3 px-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="mobile-stat-card min-w-[140px]">
+            <div key={i} className="mobile-stat-card min-w-[120px] w-[calc(40vw-12px)]">
               <div className="animate-pulse w-full">
                 <div className="h-3 w-16 bg-pro-surface-alt rounded mb-2 mx-auto" />
                 <div className="h-7 w-10 bg-pro-surface-alt rounded mx-auto" />
@@ -91,16 +91,18 @@ function MobileQuickStats({ stats, loading }: QuickStatsProps) {
             </div>
           ))}
         </div>
+        {/* Scroll affordance gradient */}
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-pro-surface to-transparent pointer-events-none" />
       </div>
     );
   }
 
   return (
-    <div className="mobile-only -mx-3">
+    <div className="mobile-only -mx-3 relative">
       <div className="mobile-scroll-snap gap-3 px-3 pb-1">
         {stats.map((stat) => (
           <Link key={stat.key} href={stat.href} className="flex-shrink-0">
-            <div className="mobile-stat-card min-w-[140px] active:scale-[0.98] transition-transform touch-manipulation">
+            <div className="mobile-stat-card min-w-[120px] w-[calc(40vw-12px)] active:scale-[0.98] transition-transform touch-manipulation">
               <div className={`h-9 w-9 rounded-lg ${stat.iconBg} flex items-center justify-center mb-2`}>
                 <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
               </div>
@@ -114,6 +116,8 @@ function MobileQuickStats({ stats, loading }: QuickStatsProps) {
           </Link>
         ))}
       </div>
+      {/* Scroll affordance gradient */}
+      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-pro-surface to-transparent pointer-events-none" />
     </div>
   );
 }

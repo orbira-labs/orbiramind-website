@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,8 @@ import {
   ArrowUpDown,
   MapIcon,
   Search,
+  Share2,
+  ChevronLeft,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -85,6 +87,33 @@ export default function TestResultPage() {
   const [test, setTest] = useState<(TestInvitation & { client: Client }) | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [markingComplete, setMarkingComplete] = useState(false);
+  const tabContainerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({
+    overview: null,
+    strengths: null,
+    clinician: null,
+    roadmap: null,
+  });
+
+  const scrollTabIntoView = useCallback((tabId: Tab) => {
+    const container = tabContainerRef.current;
+    const tabEl = tabRefs.current[tabId];
+    if (!container || !tabEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const tabRect = tabEl.getBoundingClientRect();
+    const scrollLeft = tabEl.offsetLeft - (containerRect.width / 2) + (tabRect.width / 2);
+    
+    container.scrollTo({
+      left: Math.max(0, scrollLeft),
+      behavior: "smooth",
+    });
+  }, []);
+
+  const handleTabChange = useCallback((tabId: Tab) => {
+    setActiveTab(tabId);
+    scrollTabIntoView(tabId);
+  }, [scrollTabIntoView]);
 
   useEffect(() => {
     async function fetchTest() {
@@ -313,21 +342,56 @@ export default function TestResultPage() {
   const { analysis, report: reportOrNull } = results;
   const report = reportOrNull!;
 
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${test?.client?.first_name} ${test?.client?.last_name} - Analiz Raporu`,
+          text: "Orbira Mind analiz raporu",
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link panoya kopyalandı");
+      }
+    } catch {
+      // User cancelled or share failed
+    }
+  };
+
   return (
     <>
-      <TopBar title="Analiz Sonucu" />
-      <main className="relative flex-1 p-4 sm:p-6 lg:p-8">
+      {/* Mobile back button in TopBar area */}
+      <div className="md:hidden sticky top-0 z-40 flex items-center h-14 border-b border-[#B8CCBE] bg-gradient-to-r from-[#DCE8E0] via-[#E3ECE6] to-[#E8EDE9] px-4 pt-[env(safe-area-inset-top)]">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 rounded-lg active:bg-white/50 transition-colors touch-manipulation"
+          aria-label="Geri"
+        >
+          <ChevronLeft className="h-6 w-6 text-[#3D5A4C]" />
+        </button>
+        <h1 className="flex-1 text-base font-semibold text-[#3D5A4C] truncate">
+          Analiz Sonucu
+        </h1>
+      </div>
+      
+      {/* Desktop TopBar */}
+      <div className="hidden md:block">
+        <TopBar title="Analiz Sonucu" />
+      </div>
+      
+      <main className="relative flex-1 p-3 sm:p-6 lg:p-8 pb-24 md:pb-8">
         {/* Ambient background glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
           <div className="absolute -top-60 -right-60 w-[500px] h-[500px] bg-[#5B7B6A]/[0.025] rounded-full blur-[100px]" />
           <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-[#C4956A]/[0.015] rounded-full blur-[80px]" />
         </div>
 
-        <div className="relative mx-auto max-w-5xl space-y-6">
-          {/* Back link */}
+        <div className="relative mx-auto max-w-5xl space-y-4 sm:space-y-6">
+          {/* Back link - desktop only */}
           <Link
             href="/tests"
-            className="inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors"
+            className="hidden md:inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Analizlere Dön
@@ -398,40 +462,47 @@ export default function TestResultPage() {
             </Card>
           </motion.div>
 
-          {/* Premium tab bar */}
+          {/* Premium tab bar - sticky on mobile */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl border border-pro-border p-1.5 shadow-[var(--pro-shadow-sm)] overflow-x-auto"
+            className="sticky top-14 md:top-16 z-30 -mx-3 px-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-2 bg-[#F5F8F6]/95 backdrop-blur-sm md:relative md:top-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none"
           >
-            <div className="flex gap-1 min-w-max">
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex-1 min-w-[120px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
-                      isActive
-                        ? "text-white shadow-md"
-                        : "text-pro-text-secondary hover:text-pro-text hover:bg-gray-50"
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] rounded-xl"
-                        transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                      />
-                    )}
-                    <span className="relative flex items-center gap-2">
-                      {tab.icon}
-                      <span className="hidden sm:inline">{tab.label}</span>
-                    </span>
-                  </button>
-                );
-              })}
+            <div 
+              ref={tabContainerRef}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl border border-pro-border p-1.5 shadow-[var(--pro-shadow-sm)] overflow-x-auto scrollbar-hide scroll-smooth"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              <div className="flex gap-1 min-w-max">
+                {TABS.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      ref={(el) => { tabRefs.current[tab.id] = el; }}
+                      onClick={() => handleTabChange(tab.id)}
+                      className={`relative flex-1 min-w-[90px] sm:min-w-[120px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 touch-manipulation ${
+                        isActive
+                          ? "text-white shadow-md"
+                          : "text-pro-text-secondary hover:text-pro-text hover:bg-gray-50 active:bg-gray-100"
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeTab"
+                          className="absolute inset-0 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] rounded-xl"
+                          transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                        />
+                      )}
+                      <span className="relative flex items-center gap-1.5 sm:gap-2">
+                        {tab.icon}
+                        <span className="text-xs sm:text-sm">{tab.label}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </motion.div>
 
@@ -503,6 +574,17 @@ export default function TestResultPage() {
             </p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-gray-200" />
           </motion.div>
+        </div>
+
+        {/* Mobile sticky share footer */}
+        <div className="fixed bottom-20 left-0 right-0 md:hidden z-30 px-4 pb-[env(safe-area-inset-bottom)]">
+          <button
+            onClick={handleShare}
+            className="w-full flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-xl bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white font-medium shadow-lg active:opacity-90 transition-opacity touch-manipulation"
+          >
+            <Share2 className="h-5 w-5" />
+            Raporu Paylaş
+          </button>
         </div>
       </main>
     </>

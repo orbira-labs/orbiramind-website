@@ -30,7 +30,9 @@ import {
   MessageCircle,
   Check,
   Plus,
+  ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
 import { useProContext } from "@/lib/context";
 import {
   useDashboard,
@@ -91,11 +93,13 @@ function SharePopover({
   clientName,
   professionalName,
   onClose,
+  isMobile = false,
 }: {
   testToken: string;
   clientName: string;
   professionalName: string;
   onClose: () => void;
+  isMobile?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
@@ -132,6 +136,60 @@ function SharePopover({
       },
     },
   ];
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Backdrop */}
+        <div 
+          className="fixed inset-0 bg-black/40 z-40 animate-in fade-in duration-200"
+          onClick={onClose}
+        />
+        {/* Bottom Sheet */}
+        <div
+          ref={ref}
+          className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl pb-safe animate-in slide-in-from-bottom duration-200"
+        >
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          </div>
+          {/* Header */}
+          <div className="px-4 pb-3 border-b border-pro-border">
+            <h3 className="text-base font-semibold text-pro-text">Analizi Paylaş</h3>
+          </div>
+          {/* Actions */}
+          <div className="p-2">
+            {actions.map((a) => (
+              <button
+                key={a.label}
+                onClick={a.onClick}
+                className={`w-full flex items-center gap-3 px-4 py-4 text-sm rounded-xl transition-colors touch-manipulation ${
+                  a.accent
+                    ? "text-pro-success bg-pro-success-light/50"
+                    : "text-pro-text active:bg-pro-surface-alt"
+                }`}
+              >
+                <div className="h-10 w-10 rounded-full bg-pro-surface-alt flex items-center justify-center">
+                  <a.icon className="h-5 w-5 shrink-0" />
+                </div>
+                <span className="font-medium">{a.label}</span>
+              </button>
+            ))}
+          </div>
+          {/* Cancel button */}
+          <div className="p-4 pt-2">
+            <button
+              onClick={onClose}
+              className="w-full py-3.5 text-sm font-semibold text-pro-text-secondary bg-pro-surface-alt rounded-xl active:bg-pro-border transition-colors touch-manipulation"
+            >
+              İptal
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div
@@ -438,9 +496,9 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                 </h3>
                 <button
                   onClick={() => setShowAppointmentModal(true)}
-                  className="flex items-center gap-1 text-xs text-pro-primary font-semibold touch-target touch-manipulation"
+                  className="flex items-center gap-1.5 text-xs text-pro-primary font-semibold min-h-[44px] min-w-[44px] px-3 -mr-3 touch-manipulation active:bg-pro-primary-light rounded-lg transition-colors"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-4 w-4" />
                   Oluştur
                 </button>
               </div>
@@ -465,44 +523,55 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                   <p className="text-xs text-pro-text-tertiary mt-0.5">Yeni randevu oluşturun</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {upcomingAppointments.slice(0, 3).map((apt) => (
-                    <button
-                      key={apt.id}
-                      onClick={() =>
-                        setSelectedApt({
-                          id: apt.id,
-                          client_id: apt.client_id,
-                          starts_at: apt.starts_at,
-                          duration_minutes: apt.duration_minutes,
-                          note: apt.note ?? null,
-                          status: apt.status ?? "scheduled",
-                          client: apt.client,
-                        })
-                      }
-                      className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface w-full text-left active:bg-pro-surface-alt touch-manipulation"
+                <>
+                  <div className="space-y-2">
+                    {upcomingAppointments.slice(0, 3).map((apt) => (
+                      <button
+                        key={apt.id}
+                        onClick={() =>
+                          setSelectedApt({
+                            id: apt.id,
+                            client_id: apt.client_id,
+                            starts_at: apt.starts_at,
+                            duration_minutes: apt.duration_minutes,
+                            note: apt.note ?? null,
+                            status: apt.status ?? "scheduled",
+                            client: apt.client,
+                          })
+                        }
+                        className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface w-full text-left active:bg-pro-surface-alt touch-manipulation"
+                      >
+                        <Avatar
+                          firstName={apt.client?.first_name || "?"}
+                          lastName={apt.client?.last_name || ""}
+                          size="sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-pro-text line-clamp-1">
+                            {apt.client?.first_name} {apt.client?.last_name}
+                          </p>
+                          <p className="text-xs text-pro-text-tertiary">
+                            {formatDayLabel(apt.starts_at)}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-sm font-semibold text-pro-text">
+                            {formatTime(apt.starts_at)}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {upcomingAppointments.length > 3 && (
+                    <Link 
+                      href="/appointments" 
+                      className="flex items-center justify-center gap-1.5 mt-3 py-2 text-sm font-medium text-pro-primary active:text-pro-primary-hover touch-manipulation"
                     >
-                      <Avatar
-                        firstName={apt.client?.first_name || "?"}
-                        lastName={apt.client?.last_name || ""}
-                        size="sm"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-pro-text line-clamp-1">
-                          {apt.client?.first_name} {apt.client?.last_name}
-                        </p>
-                        <p className="text-xs text-pro-text-tertiary">
-                          {formatDayLabel(apt.starts_at)}
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-sm font-semibold text-pro-text">
-                          {formatTime(apt.starts_at)}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                      Tümünü Gör ({upcomingAppointments.length})
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  )}
+                </>
               )}
             </section>
 
@@ -514,9 +583,9 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                 </h3>
                 <button
                   onClick={() => setShowSendTestModal(true)}
-                  className="flex items-center gap-1 text-xs text-[#D4856A] font-semibold touch-target touch-manipulation"
+                  className="flex items-center gap-1.5 text-xs text-[#D4856A] font-semibold min-h-[44px] min-w-[44px] px-3 -mr-3 touch-manipulation active:bg-[#D4856A]/10 rounded-lg transition-colors"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-4 w-4" />
                   Gönder
                 </button>
               </div>
@@ -541,84 +610,96 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                   <p className="text-xs text-pro-text-tertiary mt-0.5">Tüm testler tamamlandı</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {pendingTests.slice(0, 3).map((test) => {
-                    const s = STATUS_MAP[test.status] || STATUS_MAP.sent;
-                    const canViewResults = test.status === "completed" || test.status === "reviewed";
-                    const isPending =
-                      test.status !== "completed" &&
-                      test.status !== "reviewed" &&
-                      test.status !== "expired";
-                    const profName = professional
-                      ? `${professional.first_name} ${professional.last_name}`
-                      : "";
+                <>
+                  <div className="space-y-2">
+                    {pendingTests.slice(0, 3).map((test) => {
+                      const s = STATUS_MAP[test.status] || STATUS_MAP.sent;
+                      const canViewResults = test.status === "completed" || test.status === "reviewed";
+                      const isPending =
+                        test.status !== "completed" &&
+                        test.status !== "reviewed" &&
+                        test.status !== "expired";
+                      const profName = professional
+                        ? `${professional.first_name} ${professional.last_name}`
+                        : "";
 
-                    return (
-                      <button
-                        key={test.id}
-                        onClick={() =>
-                          setSelectedAnalysis({
-                            id: test.id,
-                            token: test.token,
-                            status: test.status,
-                            created_at: test.created_at,
-                            started_at: test.started_at,
-                            completed_at: test.completed_at,
-                            client: test.client,
-                          })
-                        }
-                        className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface w-full text-left active:bg-pro-surface-alt touch-manipulation"
-                      >
-                        <Avatar
-                          firstName={test.client?.first_name || "?"}
-                          lastName={test.client?.last_name || ""}
-                          size="sm"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-pro-text line-clamp-1">
-                            {test.client?.first_name} {test.client?.last_name}
-                          </p>
-                          <p className="text-xs text-pro-text-tertiary">
-                            {formatRelative(test.created_at)}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Badge variant={s.variant} size="sm" dot>
-                            {s.label}
-                          </Badge>
-                          {canViewResults && (
-                            <span className="p-1.5 rounded-lg text-pro-primary">
-                              <Eye className="h-4 w-4" />
-                            </span>
-                          )}
-                          {isPending && (
-                            <div className="relative">
-                              <span
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShareOpenId(
-                                    shareOpenId === test.id ? null : test.id
-                                  );
-                                }}
-                                className="p-1.5 rounded-lg text-pro-text-tertiary active:text-pro-primary active:bg-pro-primary-light touch-manipulation"
-                              >
-                                <Share2 className="h-4 w-4" />
+                      return (
+                        <button
+                          key={test.id}
+                          onClick={() =>
+                            setSelectedAnalysis({
+                              id: test.id,
+                              token: test.token,
+                              status: test.status,
+                              created_at: test.created_at,
+                              started_at: test.started_at,
+                              completed_at: test.completed_at,
+                              client: test.client,
+                            })
+                          }
+                          className="mobile-list-item rounded-xl border border-pro-border bg-pro-surface w-full text-left active:bg-pro-surface-alt touch-manipulation"
+                        >
+                          <Avatar
+                            firstName={test.client?.first_name || "?"}
+                            lastName={test.client?.last_name || ""}
+                            size="sm"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-pro-text line-clamp-1">
+                              {test.client?.first_name} {test.client?.last_name}
+                            </p>
+                            <p className="text-xs text-pro-text-tertiary">
+                              {formatRelative(test.created_at)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Badge variant={s.variant} size="sm" dot>
+                              {s.label}
+                            </Badge>
+                            {canViewResults && (
+                              <span className="p-1.5 rounded-lg text-pro-primary">
+                                <Eye className="h-4 w-4" />
                               </span>
-                              {shareOpenId === test.id && (
-                                <SharePopover
-                                  testToken={test.token}
-                                  clientName={test.client?.first_name || ""}
-                                  professionalName={profName}
-                                  onClose={() => setShareOpenId(null)}
-                                />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                            )}
+                            {isPending && (
+                              <div className="relative">
+                                <span
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShareOpenId(
+                                      shareOpenId === test.id ? null : test.id
+                                    );
+                                  }}
+                                  className="p-2 rounded-lg text-pro-text-tertiary active:text-pro-primary active:bg-pro-primary-light touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                >
+                                  <Share2 className="h-4 w-4" />
+                                </span>
+                                {shareOpenId === test.id && (
+                                  <SharePopover
+                                    testToken={test.token}
+                                    clientName={test.client?.first_name || ""}
+                                    professionalName={profName}
+                                    onClose={() => setShareOpenId(null)}
+                                    isMobile={true}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {pendingTests.length > 3 && (
+                    <Link 
+                      href="/tests" 
+                      className="flex items-center justify-center gap-1.5 mt-3 py-2 text-sm font-medium text-[#D4856A] active:text-[#C97B5D] touch-manipulation"
+                    >
+                      Tümünü Gör ({pendingTests.length})
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  )}
+                </>
               )}
             </section>
 

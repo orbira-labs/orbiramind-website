@@ -38,22 +38,22 @@ function formatTime(dateString: string): string {
   });
 }
 
-function getTimeUntil(dateString: string): string {
+function getTimeUntilInfo(dateString: string): { text: string; minutes: number } {
   const now = new Date();
   const target = new Date(dateString);
   const diffMs = target.getTime() - now.getTime();
   const diffMins = Math.floor(diffMs / (1000 * 60));
   
-  if (diffMins < 0) return "Geçmiş";
-  if (diffMins < 60) return `${diffMins} dk`;
-  if (diffMins < 1440) return `${Math.floor(diffMins / 60)} saat`;
-  return `${Math.floor(diffMins / 1440)} gün`;
+  if (diffMins < 0) return { text: "Geçmiş", minutes: diffMins };
+  if (diffMins < 60) return { text: `${diffMins} dk`, minutes: diffMins };
+  if (diffMins < 1440) return { text: `${Math.floor(diffMins / 60)} saat`, minutes: diffMins };
+  return { text: `${Math.floor(diffMins / 1440)} gün`, minutes: diffMins };
 }
 
 function DesktopSessionPreviewCard({ session }: SessionPreviewCardProps) {
-  const timeUntil = getTimeUntil(session.startsAt);
+  const timeInfo = getTimeUntilInfo(session.startsAt);
   const isToday = new Date(session.startsAt).toDateString() === new Date().toDateString();
-  const isSoon = isToday && parseInt(timeUntil) < 60;
+  const isSoon = isToday && timeInfo.minutes >= 0 && timeInfo.minutes < 60;
 
   return (
     <motion.div variants={cardReveal} className="desktop-only">
@@ -94,7 +94,7 @@ function DesktopSessionPreviewCard({ session }: SessionPreviewCardProps) {
                 <span>{formatTime(session.startsAt)}</span>
               </div>
               <div className="flex items-center gap-1.5 text-pro-warning font-medium">
-                <span>{timeUntil} sonra</span>
+                <span>{timeInfo.text} sonra</span>
               </div>
             </div>
 
@@ -152,19 +152,19 @@ function DesktopSessionPreviewCard({ session }: SessionPreviewCardProps) {
 }
 
 function MobileSessionPreviewCard({ session }: SessionPreviewCardProps) {
-  const timeUntil = getTimeUntil(session.startsAt);
+  const timeInfo = getTimeUntilInfo(session.startsAt);
   const isToday = new Date(session.startsAt).toDateString() === new Date().toDateString();
-  const isSoon = isToday && parseInt(timeUntil) < 60;
+  const isSoon = isToday && timeInfo.minutes >= 0 && timeInfo.minutes < 60;
 
   return (
     <div className="mobile-only">
-      <Link href="/appointments">
-        <div 
-          className={`mobile-card p-3 active:scale-[0.98] transition-transform touch-manipulation ${
-            isSoon ? "border-pro-warning/40 bg-gradient-to-br from-pro-warning-light/30 to-pro-surface" : ""
-          }`}
-        >
-          <div className="flex items-center gap-3">
+      <div 
+        className={`mobile-card p-3 touch-manipulation ${
+          isSoon ? "border-pro-warning/40 bg-gradient-to-br from-pro-warning-light/30 to-pro-surface" : ""
+        }`}
+      >
+        <Link href="/appointments">
+          <div className="flex items-center gap-3 active:opacity-70 transition-opacity">
             <Avatar
               firstName={session.clientFirstName}
               lastName={session.clientLastName}
@@ -186,28 +186,39 @@ function MobileSessionPreviewCard({ session }: SessionPreviewCardProps) {
                   <Clock className="h-3 w-3 text-pro-text-tertiary" />
                   <span>{formatTime(session.startsAt)}</span>
                 </div>
-                <span className="text-pro-warning font-medium">{timeUntil} sonra</span>
+                <span className="text-pro-warning font-medium">{timeInfo.text} sonra</span>
               </div>
             </div>
             
             <ChevronRight className="h-5 w-5 text-pro-text-tertiary shrink-0" />
           </div>
+        </Link>
 
-          {!session.hasRecentAnalysis && (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-pro-warning">
-              <AlertTriangle className="h-3 w-3" />
-              <span>Analiz önerilir</span>
-            </div>
-          )}
+        {!session.hasRecentAnalysis && (
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-pro-warning">
+            <AlertTriangle className="h-3 w-3" />
+            <span>Analiz önerilir</span>
+          </div>
+        )}
 
-          {session.hasRecentAnalysis && session.analysisHighlights && session.analysisHighlights.length > 0 && (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-pro-text-secondary">
-              <FileText className="h-3 w-3 text-[var(--pro-analysis)]" />
+        {session.hasRecentAnalysis && session.analysisHighlights && session.analysisHighlights.length > 0 && (
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-xs text-pro-text-secondary flex-1 min-w-0">
+              <FileText className="h-3 w-3 text-[var(--pro-analysis)] shrink-0" />
               <span className="line-clamp-1">{session.analysisHighlights[0]}</span>
             </div>
-          )}
-        </div>
-      </Link>
+            {session.analysisId && (
+              <Link 
+                href={`/tests/${session.analysisId}`}
+                className="flex items-center gap-1 text-xs font-medium text-pro-primary shrink-0 min-h-[36px] px-2 -mr-2 rounded-lg active:bg-pro-primary-light transition-colors touch-manipulation"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Raporu Gör
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

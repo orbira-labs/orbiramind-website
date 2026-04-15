@@ -12,8 +12,8 @@ import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SendTestModal } from "@/components/tests/SendTestModal";
-import { FlaskConical, Eye, Link2, Check, Send, Loader2, ChevronRight } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { FlaskConical, Eye, Link2, Check, Send, Loader2, ChevronRight, Plus, RefreshCw } from "lucide-react";
+import { formatDate, formatRelativeDate, groupByRelativeDate } from "@/lib/utils";
 import { TEST_STATUSES } from "@/lib/constants";
 import { clsx } from "clsx";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export default function TestsPage() {
         <div className="mx-auto max-w-6xl">
           <div className="bg-gradient-to-br from-[#5B7B6A]/12 to-[#5B7B6A]/5 rounded-2xl p-2.5 sm:p-3 space-y-3">
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {creditBalance > 0 ? (
                 <Card padding="md" variant="elevated">
                   <div className="flex items-center justify-between">
@@ -133,6 +133,20 @@ export default function TestsPage() {
                     ))}
                   </div>
                 </div>
+                {/* Desktop MindTest Gönder CTA */}
+                <button
+                  onClick={() => setShowSendModal(true)}
+                  disabled={creditBalance <= 0}
+                  className={clsx(
+                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all",
+                    creditBalance > 0
+                      ? "bg-[var(--pro-analysis)] text-white hover:bg-[var(--pro-analysis-hover)] shadow-sm"
+                      : "bg-pro-surface-alt text-pro-text-tertiary cursor-not-allowed"
+                  )}
+                >
+                  <Send className="h-4 w-4" />
+                  MindTest Gönder
+                </button>
               </div>
 
               {/* Content */}
@@ -289,15 +303,15 @@ export default function TestsPage() {
           </div>
         </div>
 
-        {/* Mobile Filter Chips */}
-        <div className="px-4 pb-3">
-          <div className="mobile-scroll-snap gap-2">
+        {/* Mobile Filter Chips with scroll affordance */}
+        <div className="px-4 pb-3 relative">
+          <div className="mobile-scroll-snap gap-2 pr-6">
             {(["waiting_analysis", "waiting_client", "completed"] as Filter[]).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={clsx(
-                  "mobile-chip",
+                  "mobile-chip min-h-[36px] px-4",
                   filter === f && "mobile-chip-active"
                 )}
               >
@@ -305,9 +319,11 @@ export default function TestsPage() {
               </button>
             ))}
           </div>
+          {/* Scroll affordance gradient */}
+          <div className="absolute right-4 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--background)] to-transparent pointer-events-none" />
         </div>
 
-        {/* Mobile List */}
+        {/* Mobile List with date grouping */}
         <div className="bg-pro-surface rounded-t-2xl min-h-[60vh]">
           {loading ? (
             <div className="p-4 space-y-3">
@@ -328,74 +344,97 @@ export default function TestsPage() {
                 <FlaskConical className="h-8 w-8 text-pro-text-tertiary" />
               </div>
               <p className="text-base font-semibold text-pro-text mb-1">Sonuç Bulunamadı</p>
-              <p className="text-sm text-pro-text-tertiary">Farklı bir filtre deneyin</p>
+              <p className="text-sm text-pro-text-tertiary mb-4">Farklı bir filtre deneyin</p>
+              {creditBalance > 0 && (
+                <button
+                  onClick={() => setShowSendModal(true)}
+                  className="mobile-btn bg-[var(--pro-analysis)] text-white max-w-[200px]"
+                >
+                  <Send className="h-5 w-5" />
+                  MindTest Gönder
+                </button>
+              )}
             </div>
           ) : (
-            <div className="divide-y divide-pro-border">
-              {tests.map((test) => {
-                const s = TEST_STATUSES.find((ts) => ts.id === test.status);
-                const canViewResults = test.status === "completed" || test.status === "reviewed";
-                const isPending = test.status === "sent" || test.status === "started";
-                const isCopied = copiedTestId === test.id;
+            <div>
+              {groupByRelativeDate(tests).map((group) => (
+                <div key={group.label}>
+                  {/* Date Group Header */}
+                  <div className="sticky top-0 bg-pro-surface-alt/95 backdrop-blur-sm px-4 py-2 border-b border-pro-border z-10">
+                    <p className="text-xs font-semibold text-pro-text-secondary uppercase tracking-wide">
+                      {group.label}
+                    </p>
+                  </div>
+                  <div className="divide-y divide-pro-border">
+                    {group.items.map((test) => {
+                      const s = TEST_STATUSES.find((ts) => ts.id === test.status);
+                      const canViewResults = test.status === "completed" || test.status === "reviewed";
+                      const isPending = test.status === "sent" || test.status === "started";
+                      const isCopied = copiedTestId === test.id;
 
-                return (
-                  <div
-                    key={test.id}
-                    onClick={() => canViewResults && router.push(`/tests/${test.id}`)}
-                    className={clsx(
-                      "mobile-list-item touch-manipulation",
-                      canViewResults && "active:bg-pro-surface-alt"
-                    )}
-                  >
-                    <Avatar
-                      firstName={test.client?.first_name || "?"}
-                      lastName={test.client?.last_name || ""}
-                      size="sm"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-pro-text line-clamp-1">
-                        {test.client?.first_name} {test.client?.last_name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant={s?.color as "success" | "warning" | "info" | "danger" | "accent" || "muted"} size="sm" dot>
-                          {s?.label || test.status}
-                        </Badge>
-                        <span className="text-xs text-pro-text-tertiary">
-                          {formatDate(test.created_at)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {isPending && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyTestLinkById(test.token, test.id);
-                          }}
+                      return (
+                        <div
+                          key={test.id}
+                          onClick={() => canViewResults && router.push(`/tests/${test.id}`)}
                           className={clsx(
-                            "p-2 rounded-full touch-target transition-colors",
-                            isCopied
-                              ? "text-pro-success bg-pro-success-light"
-                              : "text-pro-text-tertiary active:bg-pro-surface-alt"
+                            "mobile-list-item touch-manipulation",
+                            canViewResults && "active:bg-pro-surface-alt"
                           )}
                         >
-                          {isCopied ? <Check className="h-5 w-5" /> : <Link2 className="h-5 w-5" />}
-                        </button>
-                      )}
-                      {canViewResults && (
-                        <ChevronRight className="h-5 w-5 text-pro-text-tertiary" />
-                      )}
-                    </div>
+                          <Avatar
+                            firstName={test.client?.first_name || "?"}
+                            lastName={test.client?.last_name || ""}
+                            size="sm"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-pro-text line-clamp-1">
+                              {test.client?.first_name} {test.client?.last_name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <Badge variant={s?.color as "success" | "warning" | "info" | "danger" | "accent" || "muted"} size="sm" dot>
+                                {s?.label || test.status}
+                              </Badge>
+                              <span className="text-xs text-pro-text-tertiary">
+                                {formatDate(test.created_at)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {isPending && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyTestLinkById(test.token, test.id);
+                                }}
+                                className={clsx(
+                                  "p-2.5 rounded-full touch-target transition-colors",
+                                  isCopied
+                                    ? "text-pro-success bg-pro-success-light"
+                                    : "text-pro-text-tertiary active:bg-pro-surface-alt"
+                                )}
+                              >
+                                {isCopied ? <Check className="h-5 w-5" /> : <Link2 className="h-5 w-5" />}
+                              </button>
+                            )}
+                            {canViewResults && (
+                              <div className="p-2.5 touch-target">
+                                <Eye className="h-5 w-5 text-[var(--pro-analysis)]" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              ))}
               
               {/* Load More Button */}
               {hasMore && (
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="w-full py-4 text-sm font-medium text-pro-primary flex items-center justify-center gap-2 disabled:opacity-50 touch-manipulation"
+                  className="w-full py-4 text-sm font-medium text-pro-primary flex items-center justify-center gap-2 disabled:opacity-50 touch-manipulation min-h-[48px]"
                 >
                   {loadingMore ? (
                     <>
@@ -410,6 +449,17 @@ export default function TestsPage() {
             </div>
           )}
         </div>
+
+        {/* Mobile FAB - MindTest Gönder */}
+        {creditBalance > 0 && (
+          <button
+            onClick={() => setShowSendModal(true)}
+            className="mobile-fab bg-[var(--pro-analysis)] text-white shadow-lg active:scale-95 transition-transform"
+            aria-label="MindTest Gönder"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+        )}
       </main>
     </>
   );

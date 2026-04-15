@@ -210,7 +210,7 @@ export default function ClientsPage() {
 
   const formContent = (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-3">
         <Input
           label="Ad"
           placeholder="Adı"
@@ -543,17 +543,19 @@ export default function ClientsPage() {
           />
         </div>
 
-        {/* Mobile: Filter Chips - Horizontal scroll */}
-        <div className="mobile-scroll-snap gap-2 px-4 pb-3">
-          {(["active", "passive", "all"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setStatusFilter(f)}
-              className={`mobile-chip ${statusFilter === f ? "mobile-chip-active" : ""}`}
-            >
-              {f === "active" ? "Aktif" : f === "passive" ? "Pasif" : "Tümü"}
-            </button>
-          ))}
+        {/* Mobile: Filter Chips - Horizontal scroll with fade affordance */}
+        <div className="mobile-filter-scroll">
+          <div className="mobile-scroll-snap gap-2 px-4 pb-3 pr-10">
+            {(["active", "passive", "all"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setStatusFilter(f)}
+                className={`mobile-chip ${statusFilter === f ? "mobile-chip-active" : ""}`}
+              >
+                {f === "active" ? "Aktif" : f === "passive" ? "Pasif" : "Tümü"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Mobile: Client List */}
@@ -660,20 +662,27 @@ export default function ClientsPage() {
           </div>
         )}
 
-        {/* Mobile: Full Screen Delete Confirmation Modal */}
+        {/* Mobile: Bottom Sheet Delete Confirmation Modal */}
         {deleteTarget && (
-          <div className="mobile-modal">
-            <div className="mobile-modal-header">
-              <h2 className="text-lg font-semibold text-pro-text">Danışanı Sil</h2>
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="p-2 -mr-2 text-pro-text-secondary"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="p-4">
-              {deleteConfirmContent}
+          <div 
+            className="mobile-modal-overlay"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setDeleteTarget(null);
+            }}
+          >
+            <div className="mobile-modal-sheet">
+              <div className="flex items-center justify-between p-4 border-b border-pro-border">
+                <h2 className="text-lg font-semibold text-pro-text">Danışanı Sil</h2>
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  className="p-2 -mr-2 text-pro-text-secondary min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-4">
+                {deleteConfirmContent}
+              </div>
             </div>
           </div>
         )}

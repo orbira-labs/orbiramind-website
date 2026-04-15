@@ -198,20 +198,20 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 pt-[calc(3rem+env(safe-area-inset-top))] pb-[calc(3rem+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-lg space-y-8">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-pro-text">
+          <h1 className="text-xl sm:text-2xl font-semibold text-pro-text">
             Sizi tanıyalım
           </h1>
-          <p className="mt-2 text-[15px] text-pro-text-secondary leading-relaxed">
+          <p className="mt-2 text-sm sm:text-[15px] text-pro-text-secondary leading-relaxed">
             Birkaç bilgi ile kişisel deneyiminizi oluşturalım.
           </p>
         </div>
 
-        <div className="bg-pro-surface rounded-2xl border border-pro-border p-6 sm:p-8 shadow-[var(--pro-shadow-md)]">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="bg-pro-surface rounded-2xl border border-pro-border p-5 sm:p-8 shadow-[var(--pro-shadow-md)]">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Ad"
                 placeholder="Adınız"
@@ -221,6 +221,7 @@ export default function OnboardingPage() {
                   clearError("firstName");
                 }}
                 error={errors.firstName}
+                touchFriendly
               />
               <Input
                 label="Soyad"
@@ -231,6 +232,7 @@ export default function OnboardingPage() {
                   clearError("lastName");
                 }}
                 error={errors.lastName}
+                touchFriendly
               />
             </div>
 
@@ -248,9 +250,10 @@ export default function OnboardingPage() {
                 clearError("phone");
               }}
               error={errors.phone}
+              touchFriendly
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 label="İl"
                 placeholder="İl seçin"
@@ -261,6 +264,7 @@ export default function OnboardingPage() {
                   clearError("city");
                 }}
                 error={errors.city}
+                touchFriendly
               />
               <Input
                 label="İlçe"
@@ -272,11 +276,12 @@ export default function OnboardingPage() {
                   clearError("district");
                 }}
                 error={errors.district}
+                touchFriendly
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-pro-text">
+              <label className="block text-sm sm:text-sm font-medium text-pro-text">
                 Çalışma Şekli
               </label>
               <div className="flex gap-3">
@@ -284,7 +289,7 @@ export default function OnboardingPage() {
                   <label
                     key={wt.id}
                     className={clsx(
-                      "flex-1 flex items-center justify-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors text-sm",
+                      "flex-1 flex items-center justify-center gap-2 rounded-lg border px-4 min-h-[48px] cursor-pointer transition-colors text-sm sm:text-sm",
                       workType === wt.id
                         ? "border-pro-primary bg-pro-primary-light text-pro-primary font-medium"
                         : "border-pro-border bg-pro-surface text-pro-text-secondary hover:border-pro-border-strong"
@@ -315,6 +320,7 @@ export default function OnboardingPage() {
                   clearError("companyName");
                 }}
                 error={errors.companyName}
+                touchFriendly
               />
             )}
 
@@ -329,10 +335,10 @@ export default function OnboardingPage() {
                     type="button"
                     onClick={() => toggleSpec(spec.id)}
                     className={clsx(
-                      "rounded-full px-4 py-2 text-sm transition-colors",
+                      "rounded-full px-4 py-2.5 text-sm transition-colors min-h-[40px] touch-manipulation",
                       specializations.includes(spec.id)
                         ? "bg-pro-primary text-white"
-                        : "bg-pro-surface-alt text-pro-text-secondary hover:bg-pro-border"
+                        : "bg-pro-surface-alt text-pro-text-secondary hover:bg-pro-border active:bg-pro-border"
                     )}
                   >
                     {spec.label}
@@ -347,7 +353,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex items-start gap-3 cursor-pointer min-h-[44px] py-2 touch-manipulation">
                 <input
                   type="checkbox"
                   checked={kvkkAccepted}
@@ -355,9 +361,9 @@ export default function OnboardingPage() {
                     setKvkkAccepted(e.target.checked);
                     clearError("kvkk");
                   }}
-                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  className="mt-0.5 h-5 w-5 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
                 />
-                <span className="text-sm text-pro-text-secondary">
+                <span className="text-sm text-pro-text-secondary leading-relaxed">
                   <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-pro-primary underline">
                     KVKK Aydınlatma Metni
                   </a>
@@ -365,12 +371,12 @@ export default function OnboardingPage() {
                 </span>
               </label>
               {errors.kvkk && (
-                <p className="text-xs text-pro-danger pl-7">
+                <p className="text-xs text-pro-danger pl-8">
                   {errors.kvkk}
                 </p>
               )}
 
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex items-start gap-3 cursor-pointer min-h-[44px] py-2 touch-manipulation">
                 <input
                   type="checkbox"
                   checked={termsAccepted}
@@ -378,9 +384,9 @@ export default function OnboardingPage() {
                     setTermsAccepted(e.target.checked);
                     clearError("terms");
                   }}
-                  className="mt-0.5 h-4 w-4 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
+                  className="mt-0.5 h-5 w-5 rounded border-pro-border text-pro-primary focus:ring-pro-primary shrink-0"
                 />
-                <span className="text-sm text-pro-text-secondary">
+                <span className="text-sm text-pro-text-secondary leading-relaxed">
                   <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-pro-primary underline">
                     Kullanım Koşulları
                   </a>
@@ -388,13 +394,13 @@ export default function OnboardingPage() {
                 </span>
               </label>
               {errors.terms && (
-                <p className="text-xs text-pro-danger pl-7">
+                <p className="text-xs text-pro-danger pl-8">
                   {errors.terms}
                 </p>
               )}
             </div>
 
-            <Button type="submit" fullWidth size="lg" loading={loading}>
+            <Button type="submit" fullWidth size="mobile" loading={loading} className="sm:min-h-[48px]">
               Tamamla ve Başla
             </Button>
           </form>

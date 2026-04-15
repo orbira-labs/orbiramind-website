@@ -441,43 +441,50 @@ export function AppointmentDetailModal({
                 </AnimatePresence>
               </div>
 
-              {/* Mobile Action Bar */}
+              {/* Mobile Action Bar - 2 satır düzeni */}
               {apt.status === "scheduled" && !confirmCancel && (
-                <div className="mobile-action-bar">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    loading={completing}
-                    onClick={handleComplete}
-                    className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
-                  >
-                    Tamamla
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="orange"
-                    onClick={() => onEditRequest?.(apt)}
-                    className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
-                  >
-                    <CalendarClock className="h-5 w-5" />
-                    Ertele
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="blue"
-                    onClick={() => setShowSendTest(true)}
-                    className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
-                  >
-                    <Send className="h-5 w-5" />
-                    Test Gönder
-                  </Button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmCancel(true)}
-                    className="h-12 w-12 rounded-xl border border-red-200 bg-red-50 text-red-500 flex items-center justify-center active:scale-95 transition-transform touch-manipulation"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
+                <div className="mobile-action-bar flex-col gap-2">
+                  {/* Primary actions row */}
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      loading={completing}
+                      onClick={handleComplete}
+                      className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
+                    >
+                      Tamamla
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="orange"
+                      onClick={() => onEditRequest?.(apt)}
+                      className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
+                    >
+                      <CalendarClock className="h-5 w-5" />
+                      Ertele
+                    </Button>
+                  </div>
+                  {/* Secondary actions row */}
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      type="button"
+                      variant="blue"
+                      onClick={() => setShowSendTest(true)}
+                      className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
+                    >
+                      <Send className="h-5 w-5" />
+                      Test Gönder
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmCancel(true)}
+                      className="min-h-[48px] min-w-[48px] px-4 rounded-xl border border-red-200 bg-red-50 text-red-500 flex items-center justify-center gap-2 active:scale-95 transition-transform touch-manipulation"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                      <span className="text-sm font-medium">İptal</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </motion.div>

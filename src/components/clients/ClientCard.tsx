@@ -59,6 +59,24 @@ export function ClientCard({
      MOBILE VIEW - Kompakt liste item görünümü
      ============================================================ */
   if (viewMode === "mobile") {
+    const badges: { variant: "success" | "warning" | "muted"; label: string }[] = [];
+    
+    badges.push({
+      variant: (statusInfo?.color as "success" | "warning" | "muted") || "muted",
+      label: statusInfo?.label || client.status,
+    });
+    
+    if (analysisInfo?.status === "completed") {
+      badges.push({ variant: "success", label: "Rapor" });
+    }
+    if (analysisInfo?.status === "pending") {
+      badges.push({ variant: "warning", label: "Bekliyor" });
+    }
+    
+    const maxBadges = 2;
+    const visibleBadges = badges.slice(0, maxBadges);
+    const hiddenCount = badges.length - maxBadges;
+
     return (
       <Link href={`/clients/${client.id}`} className="mobile-list-item touch-manipulation">
         <Avatar firstName={client.first_name} lastName={client.last_name} size="md" />
@@ -75,18 +93,20 @@ export function ClientCard({
             )}
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <Badge 
-              variant={(statusInfo?.color as "success" | "warning" | "muted") || "muted"} 
-              size="sm"
-              dot
-            >
-              {statusInfo?.label || client.status}
-            </Badge>
-            {analysisInfo?.status === "completed" && (
-              <Badge variant="success" size="sm">Rapor</Badge>
-            )}
-            {analysisInfo?.status === "pending" && (
-              <Badge variant="warning" size="sm">Bekliyor</Badge>
+            {visibleBadges.map((badge, idx) => (
+              <Badge 
+                key={idx}
+                variant={badge.variant} 
+                size="sm"
+                dot={idx === 0}
+              >
+                {badge.label}
+              </Badge>
+            ))}
+            {hiddenCount > 0 && (
+              <span className="text-xs text-pro-text-tertiary font-medium">
+                +{hiddenCount}
+              </span>
             )}
           </div>
         </div>

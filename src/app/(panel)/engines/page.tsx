@@ -48,7 +48,7 @@ function StepList({
           {/* Left: step indicator + connector line */}
           <div className="flex flex-col items-center">
             <div
-              className="h-8 w-8 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 z-10"
+              className="h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 z-10"
               style={{
                 background: s.ai ? aiBg : s.transfer || s.done ? transferBg : accentColor + "18",
                 color: s.ai ? aiText : s.transfer || s.done ? transferText : accentColor,
@@ -58,7 +58,7 @@ function StepList({
               {s.step}
             </div>
             {i < steps.length - 1 && (
-              <div className="w-px flex-1 my-1" style={{ background: accentColor + "20", minHeight: "16px" }} />
+              <div className="w-0.5 flex-1 my-1" style={{ background: accentColor + "30", minHeight: "16px" }} />
             )}
           </div>
 
@@ -99,13 +99,13 @@ export default function EnginesPage() {
                   <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5 blur-2xl" />
                   <div className="relative flex items-end justify-between">
                     <div>
-                      <p className="text-[10px] font-mono text-white/40 mb-1">aqe.flow.engine — running</p>
+                      <p className="text-xs font-mono text-white/40 mb-1">aqe.flow.engine — running</p>
                       <h2 className="text-2xl font-black text-white tracking-tight">AQE</h2>
                       <p className="text-sm text-white/60 mt-0.5">Adaptive Question Engine</p>
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/15 self-start">
                       <div className="h-1.5 w-1.5 rounded-full bg-green-300 animate-pulse" />
-                      <span className="text-[10px] text-white/80 font-medium">v1.0</span>
+                      <span className="text-xs text-white/80 font-medium">v1.0</span>
                     </div>
                   </div>
                 </div>
@@ -128,13 +128,13 @@ export default function EnginesPage() {
                     href="https://www.orbiralabs.com/engines/aqe"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative overflow-hidden flex items-center justify-between px-4 py-3 rounded-xl"
+                    className="group relative overflow-hidden flex items-center justify-between px-4 py-3 rounded-xl touch-manipulation active:scale-[0.98] active:opacity-90 transition-all"
                     style={{ background: "linear-gradient(135deg, #3D44B8, #7C6FCD)" }}
                   >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none"
                       style={{ background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)" }} />
                     <span className="text-sm font-semibold text-white relative">Teknik detayları incele</span>
-                    <svg className="h-4 w-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all relative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-4 w-4 text-white/70 group-hover:text-white group-active:text-white group-hover:translate-x-0.5 group-active:translate-x-0.5 transition-all relative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </a>
@@ -149,13 +149,13 @@ export default function EnginesPage() {
                   <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5 blur-2xl" />
                   <div className="relative flex items-end justify-between">
                     <div>
-                      <p className="text-[10px] font-mono text-white/40 mb-1">hae.engine.core — active</p>
+                      <p className="text-xs font-mono text-white/40 mb-1">hae.engine.core — active</p>
                       <h2 className="text-2xl font-black text-white tracking-tight">HAE</h2>
                       <p className="text-sm text-white/60 mt-0.5">Human Analysis Engine</p>
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/15 self-start">
                       <div className="h-1.5 w-1.5 rounded-full bg-green-300 animate-pulse" />
-                      <span className="text-[10px] text-white/80 font-medium">v2.0</span>
+                      <span className="text-xs text-white/80 font-medium">v2.0</span>
                     </div>
                   </div>
                 </div>
@@ -178,13 +178,13 @@ export default function EnginesPage() {
                     href="https://www.orbiralabs.com/engines/hae"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative overflow-hidden flex items-center justify-between px-4 py-3 rounded-xl"
+                    className="group relative overflow-hidden flex items-center justify-between px-4 py-3 rounded-xl touch-manipulation active:scale-[0.98] active:opacity-90 transition-all"
                     style={{ background: "linear-gradient(135deg, #1B5E3E, #3DAA6E)" }}
                   >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none"
                       style={{ background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)" }} />
                     <span className="text-sm font-semibold text-white relative">Teknik detayları incele</span>
-                    <svg className="h-4 w-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all relative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-4 w-4 text-white/70 group-hover:text-white group-active:text-white group-hover:translate-x-0.5 group-active:translate-x-0.5 transition-all relative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </a>

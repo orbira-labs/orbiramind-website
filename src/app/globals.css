@@ -166,6 +166,13 @@
 
 html {
   scroll-behavior: smooth;
+  height: -webkit-fill-available;
+}
+
+@supports (height: 100dvh) {
+  html {
+    height: 100dvh;
+  }
 }
 
 body {
@@ -173,6 +180,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================================
@@ -307,10 +316,18 @@ textarea:focus {
   }
 }
 
-/* Touch manipulation for faster mobile response */
+/* Touch manipulation for faster mobile response - keeps scroll enabled */
 .touch-manipulation {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure main content areas can scroll properly on mobile */
+@media (max-width: 767px) {
+  main {
+    touch-action: pan-y pan-x;
+    overscroll-behavior: auto;
+  }
 }
 
 /* Prevent text selection on interactive elements */
@@ -670,7 +687,7 @@ textarea:focus {
   min-height: 56px;
   gap: 0.75rem;
   border-bottom: 1px solid var(--pro-border);
-  touch-action: pan-y;
+  touch-action: auto;
 }
 
 .mobile-list-item:last-child {
@@ -709,7 +726,50 @@ textarea:focus {
   background: var(--pro-surface, #fff);
   z-index: 100;
   overflow-y: auto;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  animation: slide-in-from-bottom 0.25s ease-out;
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile modal with backdrop for confirmation dialogs */
+.mobile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mobile-modal-sheet {
+  width: 100%;
+  background: var(--pro-surface, #fff);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: slide-in-from-bottom 0.25s ease-out;
 }
 
 /* Mobile modal header */
@@ -729,7 +789,7 @@ textarea:focus {
 /* Mobile floating action button */
 .mobile-fab {
   position: fixed;
-  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px) + 0.5rem);
   right: 1rem;
   width: 56px;
   height: 56px;
@@ -773,6 +833,40 @@ textarea:focus {
 .mobile-scroll-snap > * {
   scroll-snap-align: start;
   flex-shrink: 0;
+}
+
+/* Mobile scroll container with fade affordance */
+.mobile-scroll-fade-container {
+  position: relative;
+}
+
+.mobile-scroll-fade-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2rem;
+  background: linear-gradient(to right, transparent, var(--background, #FAFAF7));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Filter chips with scroll affordance */
+.mobile-filter-scroll {
+  position: relative;
+}
+
+.mobile-filter-scroll::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2.5rem;
+  background: linear-gradient(to right, transparent, var(--background, #FAFAF7));
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Mobile stats card - compact horizontal layout */

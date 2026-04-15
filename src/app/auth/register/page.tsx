@@ -161,6 +161,7 @@ export default function RegisterPage() {
                   clearError("password");
                 }}
                 error={errors.password}
+                showPasswordToggle
                 className="mobile-input md:w-full md:min-h-0"
               />
             </div>
@@ -177,6 +178,7 @@ export default function RegisterPage() {
                   clearError("confirmPassword");
                 }}
                 error={errors.confirmPassword}
+                showPasswordToggle
                 className="mobile-input md:w-full md:min-h-0"
               />
             </div>

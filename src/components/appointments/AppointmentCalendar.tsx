@@ -32,7 +32,7 @@ interface AppointmentCalendarProps {
 
 const WEEKDAYS = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 const WEEKDAYS_SHORT = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
-const WEEKDAYS_MOBILE = ["P", "S", "Ç", "P", "C", "C", "P"];
+const WEEKDAYS_MOBILE = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pa"];
 
 export function AppointmentCalendar({ 
   onSelectAppointment, 
@@ -69,8 +69,27 @@ export function AppointmentCalendar({
 
   const numWeeks = calendarDays.length / 7;
 
-  const goToPreviousMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
-  const goToNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+  const goToPreviousMonth = () => {
+    const newMonth = subMonths(currentMonth, 1);
+    setCurrentMonth(newMonth);
+    const today = new Date();
+    if (isSameMonth(newMonth, today)) {
+      setSelectedDate(today);
+    } else {
+      setSelectedDate(startOfMonth(newMonth));
+    }
+  };
+  
+  const goToNextMonth = () => {
+    const newMonth = addMonths(currentMonth, 1);
+    setCurrentMonth(newMonth);
+    const today = new Date();
+    if (isSameMonth(newMonth, today)) {
+      setSelectedDate(today);
+    } else {
+      setSelectedDate(startOfMonth(newMonth));
+    }
+  };
   const goToToday = () => {
     setCurrentMonth(new Date());
     setSelectedDate(new Date());
@@ -288,6 +307,16 @@ export function AppointmentCalendar({
 
         {/* Mobile Week Selector */}
         <div className="bg-white border-b border-pro-border">
+          {loading ? (
+            <div className="grid grid-cols-7 gap-1 px-3 py-2">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="flex flex-col items-center py-2">
+                  <div className="h-3 w-5 bg-pro-border/50 rounded animate-pulse mb-1" />
+                  <div className="h-5 w-5 bg-pro-border/50 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="grid grid-cols-7 gap-1 px-3 py-2">
             {mobileWeekDays.map((day, i) => {
               const dateKey = format(day, "yyyy-MM-dd");
@@ -333,6 +362,7 @@ export function AppointmentCalendar({
               );
             })}
           </div>
+          )}
         </div>
 
         {/* Mobile Selected Day Header */}
@@ -358,7 +388,20 @@ export function AppointmentCalendar({
 
         {/* Mobile Day Appointments List */}
         <div className="flex-1 overflow-y-auto bg-[#FAFAF7]">
-          {selectedDayAppointments.length === 0 ? (
+          {loading ? (
+            <div className="p-4 space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="mobile-card flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-pro-border/30 animate-pulse" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-32 bg-pro-border/30 rounded animate-pulse" />
+                    <div className="h-3 w-20 bg-pro-border/30 rounded animate-pulse" />
+                  </div>
+                  <div className="h-2 w-2 rounded-full bg-pro-border/30 animate-pulse" />
+                </div>
+              ))}
+            </div>
+          ) : selectedDayAppointments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <div className="h-14 w-14 rounded-full bg-pro-surface flex items-center justify-center mb-3">
                 <Calendar className="h-7 w-7 text-pro-text-tertiary" />
@@ -369,9 +412,9 @@ export function AppointmentCalendar({
                   <p className="text-xs text-pro-text-tertiary mb-4">Yeni bir randevu ekleyebilirsiniz</p>
                   <button
                     onClick={() => onCreateAppointment(selectedDate)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pro-primary text-white text-sm font-medium touch-manipulation"
+                    className="mobile-btn min-h-[48px] flex items-center justify-center gap-2 px-6 rounded-xl bg-pro-primary text-white text-sm font-medium touch-manipulation"
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-5 w-5" />
                     Randevu Ekle
                   </button>
                 </>

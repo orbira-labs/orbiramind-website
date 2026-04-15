@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -47,6 +48,7 @@ export function CreateSessionPackageModal({
 }: CreateSessionPackageModalProps) {
   const { professional } = useProContext();
   const { templates, loading: templatesLoading } = useSessionTemplates();
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const [step, setStep] = useState<"select" | "custom" | "payment">("select");
   const [selectedTemplate, setSelectedTemplate] = useState<SessionPriceTemplate | null>(null);
@@ -149,6 +151,7 @@ export function CreateSessionPackageModal({
       title="Seans Tanımla"
       subtitle={clientName}
       size="md"
+      fullScreen={isMobile}
     >
       {step === "select" && (
         <div className="space-y-4">
@@ -343,10 +346,10 @@ export function CreateSessionPackageModal({
                   setPaymentAmount(effectivePriceCents / 100);
                 }}
                 className={clsx(
-                  "flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all",
+                  "flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-medium border transition-all",
                   fullPayment
                     ? "bg-pro-primary text-white border-pro-primary shadow-sm"
-                    : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary"
+                    : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary active:border-pro-primary"
                 )}
               >
                 <Check className={clsx("h-4 w-4 inline mr-1.5", !fullPayment && "opacity-0")} />
@@ -359,10 +362,10 @@ export function CreateSessionPackageModal({
                   setPaymentAmount("");
                 }}
                 className={clsx(
-                  "flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all",
+                  "flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-medium border transition-all",
                   !fullPayment
                     ? "bg-pro-primary text-white border-pro-primary shadow-sm"
-                    : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary"
+                    : "bg-pro-surface text-pro-text-secondary border-pro-border hover:border-pro-primary active:border-pro-primary"
                 )}
               >
                 Kısmi ödeme

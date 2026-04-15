@@ -25,12 +25,14 @@ export function ProShell({
 }: ProShellProps) {
   return (
     <ProProvider initialProfessional={initialProfessional} initialCredits={initialCredits}>
-      <div className="flex h-screen overflow-hidden bg-[var(--background)] relative">
+      {/* Desktop: fixed height with internal scroll */}
+      {/* Mobile: natural document flow with proper scroll */}
+      <div className="flex min-h-[100dvh] lg:h-screen lg:overflow-hidden bg-[var(--background)] relative">
         <PageDecoration />
         <Sidebar />
         
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 relative z-[1] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+        <div className="flex-1 flex flex-col min-w-0 relative z-[1] lg:overflow-y-auto lg:overscroll-contain">
           {/* Mobile safe-area top padding handled by TopBar */}
           {children}
           <TrustFooter showBadges={false} showDate={true} />
