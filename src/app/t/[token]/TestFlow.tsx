@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   createSession,
   submitAnswers,
@@ -155,6 +155,16 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   const [profile, setProfile] = useState<Record<string, unknown>>({});
   const [coreAnswers, setCoreAnswers] = useState<Record<string, number>>({});
   const [deepDiveAnswers, setDeepDiveAnswers] = useState<Record<string, number>>({});
+
+  // Refs to always have latest answers for submit (React state batching fix)
+  const coreAnswersRef = useRef<Record<string, number>>({});
+  const deepDiveAnswersRef = useRef<Record<string, number>>({});
+  useEffect(() => {
+    coreAnswersRef.current = coreAnswers;
+  }, [coreAnswers]);
+  useEffect(() => {
+    deepDiveAnswersRef.current = deepDiveAnswers;
+  }, [deepDiveAnswers]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -416,7 +426,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         console.error("Test başlangıcı kaydedilemedi");
       }
 
-      const data = await submitAnswers(sessionId, profile, coreAnswers, {}, token);
+      const data = await submitAnswers(sessionId, profile, coreAnswersRef.current, {}, token);
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
       setCurrentIndex(0);
@@ -443,7 +453,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         body: JSON.stringify({
           token,
           session_id: sessionId,
-          deep_dive_answers: deepDiveAnswers,
+          deep_dive_answers: deepDiveAnswersRef.current,
         }),
       });
 
