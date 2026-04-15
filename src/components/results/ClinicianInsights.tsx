@@ -279,7 +279,7 @@ export function ClinicianInsights({
         </div>
       )}
 
-      {analysisBlindSpots.length > 0 && (
+      {analysisBlindSpots.filter((s) => s.type !== "inconsistency").length > 0 && (
         <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
           <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
             <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
@@ -296,7 +296,9 @@ export function ClinicianInsights({
             animate="animate"
             className="space-y-2"
           >
-            {analysisBlindSpots.map((spot, index) => (
+            {analysisBlindSpots
+              .filter((spot) => spot.type !== "inconsistency")
+              .map((spot, index) => (
               <ExpandableCard
                 key={`bs-${index}`}
                 index={index + 1}
