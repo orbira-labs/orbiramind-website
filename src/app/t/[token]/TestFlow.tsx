@@ -29,6 +29,27 @@ import { ChevronLeft, Activity, Sparkles } from "lucide-react";
 import { celebrateCompletion } from "@/lib/confetti";
 import { celebrationPop } from "@/lib/animations";
 
+// Normalize options from various DB formats to { label, value } format
+function normalizeOptions(options: unknown[]): { label: string; value: string | number | boolean }[] {
+  if (!options || !Array.isArray(options)) return [];
+  
+  return options.map((opt, index) => {
+    // String format: ["option1", "option2"]
+    if (typeof opt === "string") {
+      return { label: opt, value: opt };
+    }
+    // Object format with text: { text: "Label", value: 1 }
+    if (typeof opt === "object" && opt !== null) {
+      const obj = opt as Record<string, unknown>;
+      const label = (obj.label ?? obj.text ?? `Option ${index + 1}`) as string;
+      const value = obj.value ?? index;
+      return { label, value: value as string | number | boolean };
+    }
+    // Fallback
+    return { label: String(opt), value: index };
+  });
+}
+
 type Phase =
   | "loading"
   | "preparation"
@@ -152,11 +173,11 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   const [profile, setProfile] = useState<Record<string, unknown>>({});
   const [coreAnswers, setCoreAnswers] = useState<Record<string, number>>({});
-  const [deepDiveAnswers, setDeepDiveAnswers] = useState<Record<string, number>>({});
+  const [deepDiveAnswers, setDeepDiveAnswers] = useState<Record<string, number | string | string[]>>({});
 
   // Refs to always have latest answers for submit (React state batching fix)
   const coreAnswersRef = useRef<Record<string, number>>({});
-  const deepDiveAnswersRef = useRef<Record<string, number>>({});
+  const deepDiveAnswersRef = useRef<Record<string, number | string | string[]>>({});
   useEffect(() => {
     coreAnswersRef.current = coreAnswers;
   }, [coreAnswers]);
@@ -347,7 +368,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }, 400);
   }
 
-  function handleDeepDiveAnswer(questionId: string, value: number) {
+  function handleDeepDiveAnswer(questionId: string, value: number | string | string[]) {
     setDeepDiveAnswers((prev) => ({ ...prev, [questionId]: value }));
 
     setTimeout(() => {
@@ -838,7 +859,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                       question={currentPage.question.text}
                       options={currentPage.question.options}
                       value={deepDiveAnswers[currentPage.question.id]?.toString()}
-                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, Number(val))}
+                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, val)}
                     />
                   )}
 
@@ -846,8 +867,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                     <MultiSelectQuestion
                       question={currentPage.question.text}
                       options={currentPage.question.options}
-                      value={[]}
-                      onAnswer={() => {}}
+                      value={(deepDiveAnswers[currentPage.question.id] as string[]) || []}
+                      onAnswer={(val) => handleDeepDiveAnswer(currentPage.question.id, val)}
                       onNext={() => {
                         if (currentIndex < totalPages - 1) {
                           goNext();

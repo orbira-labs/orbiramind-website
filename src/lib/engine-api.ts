@@ -9,7 +9,7 @@ export interface ProfileFieldConditions {
 
 export interface ProfileField {
   id: string;
-  answer_type: "single_choice" | "boolean" | "text" | "multi_select" | "numeric";
+  answer_type: "single_select" | "boolean" | "text" | "multi_select" | "numeric";
   text: string;
   category?: ProfileCategory | string;
   options?: { value: string | boolean; label: string }[];
@@ -126,7 +126,7 @@ export interface CoreQuestion {
 
 export interface MeasurementField {
   id: string;
-  answer_type: "numeric" | "single_choice";
+  answer_type: "numeric" | "single_select";
   text: string;
   numeric_range?: { min: number; max: number } | null;
   options?: { value: string; label: string }[] | null;
@@ -326,7 +326,7 @@ export async function submitAnswers(
 
 export async function completeSession(
   sessionId: string,
-  deepDiveAnswers: Record<string, number>,
+  deepDiveAnswers: Record<string, number | string | string[]>,
   testToken?: string
 ): Promise<CompleteSessionResponse> {
   return secureApiFetch<CompleteSessionResponse>("complete", {

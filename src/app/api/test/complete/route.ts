@@ -137,7 +137,7 @@ async function runBackgroundCompletion({
 }: {
   token: string;
   sessionId: string;
-  deepDiveAnswers: Record<string, number>;
+  deepDiveAnswers: Record<string, number | string | string[]>;
 }) {
   const supabase = await createClient();
 
@@ -253,18 +253,29 @@ export async function POST(request: Request) {
 
     const normalizedToken = String(token).toUpperCase();
     const sessionId = String(session_id);
-    const deepDiveAnswersEntries = Object.entries(deep_dive_answers).map(
-      ([key, value]) => [key, Number(value)] as const
-    );
-
-    if (deepDiveAnswersEntries.some(([, value]) => !Number.isFinite(value))) {
-      return NextResponse.json(
-        { error: "deep_dive_answers contains invalid values" },
-        { status: 400 }
-      );
+    
+    // Validate deep_dive_answers - accept number, string, or string[] values
+    const deepDiveAnswers: Record<string, number | string | string[]> = {};
+    for (const [key, value] of Object.entries(deep_dive_answers)) {
+      if (typeof value === "number") {
+        if (!Number.isFinite(value)) {
+          return NextResponse.json(
+            { error: `deep_dive_answers["${key}"] contains invalid number` },
+            { status: 400 }
+          );
+        }
+        deepDiveAnswers[key] = value;
+      } else if (typeof value === "string") {
+        deepDiveAnswers[key] = value;
+      } else if (Array.isArray(value) && value.every((v) => typeof v === "string")) {
+        deepDiveAnswers[key] = value as string[];
+      } else {
+        return NextResponse.json(
+          { error: `deep_dive_answers["${key}"] has invalid type` },
+          { status: 400 }
+        );
+      }
     }
-
-    const deepDiveAnswers = Object.fromEntries(deepDiveAnswersEntries);
 
     const supabase = await createClient();
     const { data: invitation, error } = await supabase
