@@ -194,12 +194,28 @@ export interface Report {
     top5: { name: string; insight: string }[];
     weak5: { name: string; insight: string }[];
   };
+  session_guide?: {
+    title: string;
+    insight: string;
+    action: string;
+    timing: "first_session" | "early_phase" | "mid_therapy" | "throughout";
+  }[];
+  therapeutic_tasks?: {
+    title: string;
+    description: string;
+    rationale: string;
+    priority: "high" | "medium" | "low";
+    timing: "this_week" | "weeks_2_4" | "months_1_3";
+    candidate_ids: string[];
+    evidence_refs: string[];
+  }[];
   blind_spots?: {
     title: string;
     insight: string;
     coach_tip: string;
   }[];
-  coaching_roadmap: {
+  /** @deprecated Replaced by `therapeutic_tasks`. Kept optional for legacy snapshots. */
+  coaching_roadmap?: {
     immediate: string[];
     short_term: string[];
     medium_term: string[];

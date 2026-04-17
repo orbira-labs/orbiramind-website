@@ -305,7 +305,8 @@ export interface Report {
   therapeutic_tasks?: TherapeuticTask[];
   blind_spots?: BlindSpot[];
   therapeutic_guidance?: TherapeuticGuidance[];
-  coaching_roadmap: CoachingRoadmap;
+  /** @deprecated Replaced by `therapeutic_tasks`. Kept optional for legacy snapshots. */
+  coaching_roadmap?: CoachingRoadmap;
   generated_at: string;
   model: string;
 }

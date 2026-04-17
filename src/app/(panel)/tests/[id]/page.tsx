@@ -214,7 +214,9 @@ export default function TestResultPage() {
     results?.report &&
     typeof results.report.character_analysis === "string" &&
     results.report.top5_and_weak5 &&
-    results.report.coaching_roadmap;
+    // New format (therapeutic_tasks) or legacy format (coaching_roadmap) is acceptable
+    (Boolean(results.report.therapeutic_tasks?.length) ||
+      Boolean(results.report.coaching_roadmap));
   const isReportError =
     results?.report && "error" in results.report && !hasValidReport;
 

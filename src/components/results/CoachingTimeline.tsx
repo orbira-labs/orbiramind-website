@@ -6,7 +6,8 @@ import { ChevronDown, Zap, Clock, CalendarDays, ArrowUpRight, ArrowRight, ArrowD
 import type { CoachingRoadmap, TherapeuticTask } from "@/lib/types";
 
 interface CoachingTimelineProps {
-  roadmap: CoachingRoadmap;
+  /** Legacy coaching roadmap. Optional — newer reports use `tasks` instead. */
+  roadmap?: CoachingRoadmap;
   tasks?: TherapeuticTask[];
 }
 
@@ -180,7 +181,8 @@ function LegacyRoadmapView({ roadmap }: { roadmap: CoachingRoadmap }) {
 }
 
 export function CoachingTimeline({ roadmap, tasks }: CoachingTimelineProps) {
-  const hasTasks = tasks && tasks.length > 0;
+  const hasTasks = Boolean(tasks && tasks.length > 0);
+  const hasRoadmap = Boolean(roadmap);
 
   return (
     <div className="relative p-3 sm:p-5 -m-3 sm:-m-5">
@@ -203,7 +205,15 @@ export function CoachingTimeline({ roadmap, tasks }: CoachingTimelineProps) {
         </div>
       </div>
 
-      {hasTasks ? <TasksView tasks={tasks} /> : <LegacyRoadmapView roadmap={roadmap} />}
+      {hasTasks ? (
+        <TasksView tasks={tasks!} />
+      ) : hasRoadmap ? (
+        <LegacyRoadmapView roadmap={roadmap!} />
+      ) : (
+        <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-6 text-center">
+          <p className="text-sm text-gray-500">Bu rapor için henüz yol haritası hazırlanmadı.</p>
+        </div>
+      )}
     </div>
   );
 }

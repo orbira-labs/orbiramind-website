@@ -22,10 +22,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isValidReport(report: unknown): boolean {
   if (!isRecord(report)) return false;
   if ("error" in report) return false;
+  // Accept either the new format (therapeutic_tasks) or the legacy
+  // format (coaching_roadmap) as proof that the report finished.
+  const hasActionPlan =
+    Array.isArray(report.therapeutic_tasks) || isRecord(report.coaching_roadmap);
   return (
     typeof report.character_analysis === "string" &&
     isRecord(report.top5_and_weak5) &&
-    isRecord(report.coaching_roadmap)
+    hasActionPlan
   );
 }
 
