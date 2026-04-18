@@ -295,6 +295,15 @@ export interface StrengthWeakness {
   insight: string;
 }
 
+export type CrisisAlertLevel = "elevated" | "high" | "critical";
+
+export interface CrisisAlert {
+  level: CrisisAlertLevel;
+  title: string;
+  detail: string;
+  recommended_action: string;
+}
+
 export interface Report {
   character_analysis: string;
   top5_and_weak5: {
@@ -305,6 +314,13 @@ export interface Report {
   therapeutic_tasks?: TherapeuticTask[];
   blind_spots?: BlindSpot[];
   therapeutic_guidance?: TherapeuticGuidance[];
+  /**
+   * Klinik kriz uyarıları — R45 intihar, R46 travma, R47 panik, R48 karmaşık
+   * yas gibi critical tier patternler veya yüksek şiddetli inference'lar
+   * tarafından tetiklenir. UI'da raporun en üstünde kırmızı banner olarak
+   * terapiste gösterilmelidir.
+   */
+  crisis_alerts?: CrisisAlert[];
   /** @deprecated Replaced by `therapeutic_tasks`. Kept optional for legacy snapshots. */
   coaching_roadmap?: CoachingRoadmap;
   generated_at: string;

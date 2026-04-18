@@ -23,9 +23,24 @@ export interface ClientAppointmentInfo {
   nextDate?: string;
 }
 
+/**
+ * Tier-aware klinik aciliyet ozeti. hae.analysis_snapshots'tan en son
+ * snapshot'in tier ve pattern sayilari. `unknown` = klinik tier eklenmeden
+ * once olusturulmus eski snapshot; pattern listelemesi var ama tier yok.
+ */
+export type ClientTier = "critical" | "high" | "moderate" | "low" | "contextual" | "unknown";
+
+export interface ClientTierInfo {
+  maxTier: ClientTier;
+  criticalPatternCount: number;
+  highPatternCount: number;
+  lastAnalysisAt: string;
+}
+
 export interface ClientWithExtras extends Client {
   analysisInfo?: ClientAnalysisInfo;
   appointmentInfo?: ClientAppointmentInfo;
+  tierInfo?: ClientTierInfo;
 }
 
 interface UseClientsListOptions {
@@ -181,7 +196,7 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
       if (clientList.length > 0) {
         const clientIds = clientList.map(c => c.id);
         
-        const [testsRes, appointmentsRes] = await Promise.all([
+        const [testsRes, appointmentsRes, tierRes] = await Promise.all([
           supabase.current
             .from("test_invitations")
             .select("client_id, status, completed_at")
@@ -193,11 +208,32 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
             .in("client_id", clientIds)
             .eq("status", "scheduled")
             .gte("starts_at", new Date().toISOString())
-            .order("starts_at", { ascending: true })
+            .order("starts_at", { ascending: true }),
+          supabase.current.rpc("get_client_tier_summary", {
+            p_client_ids: clientIds,
+          }),
         ]);
 
         const testsByClient = new Map<string, { completed: string | null; pending: number }>();
         const appointmentsByClient = new Map<string, string>();
+        const tierByClient = new Map<string, ClientTierInfo>();
+
+        type TierRow = {
+          client_id: string;
+          max_tier: string | null;
+          critical_pattern_count: number | null;
+          high_pattern_count: number | null;
+          last_analysis_at: string;
+        };
+        ((tierRes.data as TierRow[] | null) ?? []).forEach((row) => {
+          const tierValue = (row.max_tier ?? "unknown") as ClientTier;
+          tierByClient.set(row.client_id, {
+            maxTier: tierValue,
+            criticalPatternCount: row.critical_pattern_count ?? 0,
+            highPatternCount: row.high_pattern_count ?? 0,
+            lastAnalysisAt: row.last_analysis_at,
+          });
+        });
 
         (testsRes.data || []).forEach((t: { client_id: string; status: string; completed_at: string | null }) => {
           const existing = testsByClient.get(t.client_id) || { completed: null, pending: 0 };
@@ -242,7 +278,9 @@ export function useClientsList({ page, pageSize, statusFilter, search }: UseClie
             };
           }
 
-          return { ...client, analysisInfo, appointmentInfo };
+          const tierInfo = tierByClient.get(client.id);
+
+          return { ...client, analysisInfo, appointmentInfo, tierInfo };
         });
 
         setClients(enrichedClients);

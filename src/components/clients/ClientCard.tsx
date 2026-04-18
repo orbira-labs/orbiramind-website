@@ -8,7 +8,9 @@ import { CLIENT_STATUSES } from "@/lib/constants";
 import { formatRelative } from "@/lib/utils";
 import Link from "next/link";
 import type { Client } from "@/lib/types";
+import type { ClientTierInfo } from "@/lib/hooks/useClientsList";
 import { ClientRowActions } from "./ClientRowActions";
+import { ClientTierDot } from "./ClientTierDot";
 
 interface ClientAnalysisInfo {
   status: "pending" | "completed" | "none";
@@ -30,6 +32,7 @@ interface ClientCardProps {
   client: Client;
   analysisInfo?: ClientAnalysisInfo;
   appointmentInfo?: ClientAppointmentInfo;
+  tierInfo?: ClientTierInfo;
   lastContactAt?: string;
   onSendAnalysis?: () => void;
   onScheduleAppointment?: () => void;
@@ -41,6 +44,7 @@ export function ClientCard({
   client,
   analysisInfo,
   appointmentInfo,
+  tierInfo,
   lastContactAt,
   onSendAnalysis,
   onScheduleAppointment,
@@ -83,6 +87,7 @@ export function ClientCard({
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
+            <ClientTierDot tierInfo={tierInfo} />
             <p className="text-sm font-semibold text-pro-text truncate">
               {client.first_name} {client.last_name}
             </p>
@@ -129,9 +134,12 @@ export function ClientCard({
 
               <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-4 items-center">
                 <div className="sm:col-span-1">
-                  <p className="text-sm font-semibold text-pro-text truncate">
-                    {client.first_name} {client.last_name}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <ClientTierDot tierInfo={tierInfo} />
+                    <p className="text-sm font-semibold text-pro-text truncate">
+                      {client.first_name} {client.last_name}
+                    </p>
+                  </div>
                   <p className="text-xs text-pro-text-tertiary truncate">
                     {client.email || client.phone || "İletişim bilgisi yok"}
                   </p>
@@ -194,9 +202,12 @@ export function ClientCard({
 
             <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-4 items-center">
               <div className="sm:col-span-1">
-                <p className="text-sm font-semibold text-pro-text truncate">
-                  {client.first_name} {client.last_name}
-                </p>
+                <div className="flex items-center gap-2">
+                  <ClientTierDot tierInfo={tierInfo} />
+                  <p className="text-sm font-semibold text-pro-text truncate">
+                    {client.first_name} {client.last_name}
+                  </p>
+                </div>
                 <p className="text-xs text-pro-text-tertiary truncate">
                   {client.email || client.phone || "İletişim bilgisi yok"}
                 </p>
@@ -256,6 +267,7 @@ export function ClientCard({
             <Avatar firstName={client.first_name} lastName={client.last_name} size="lg" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
+                <ClientTierDot tierInfo={tierInfo} size="md" />
                 <p className="text-sm font-semibold text-pro-text truncate">
                   {client.first_name} {client.last_name}
                 </p>

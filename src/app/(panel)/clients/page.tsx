@@ -428,6 +428,7 @@ export default function ClientsPage() {
                     lastContactAt={client.updated_at}
                     analysisInfo={client.analysisInfo}
                     appointmentInfo={client.appointmentInfo}
+                    tierInfo={client.tierInfo}
                     rowActions={{
                       onSetStatus: (status) => handleSetStatus(client, status),
                       onDelete: () => setDeleteTarget(client),
@@ -600,6 +601,7 @@ export default function ClientsPage() {
                   lastContactAt={client.updated_at}
                   analysisInfo={client.analysisInfo}
                   appointmentInfo={client.appointmentInfo}
+                  tierInfo={client.tierInfo}
                   rowActions={{
                     onSetStatus: (status) => handleSetStatus(client, status),
                     onDelete: () => setDeleteTarget(client),

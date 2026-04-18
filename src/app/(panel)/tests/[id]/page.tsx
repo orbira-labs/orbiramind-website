@@ -31,6 +31,7 @@ import { StrengthWeaknessGrid } from "@/components/results/StrengthWeaknessGrid"
 import { CharacterAnalysis } from "@/components/results/CharacterAnalysis";
 import { ClinicianInsights } from "@/components/results/ClinicianInsights";
 import { CoachingTimeline } from "@/components/results/CoachingTimeline";
+import { CrisisAlertBanner } from "@/components/results/CrisisAlertBanner";
 
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { TestInvitation, Client, TestResults } from "@/lib/types";
@@ -463,6 +464,11 @@ export default function TestResultPage() {
               </div>
             </Card>
           </motion.div>
+
+          {/* Crisis alerts — critical tier patternler ve yüksek şiddetli inference'lar */}
+          {report.crisis_alerts && report.crisis_alerts.length > 0 && (
+            <CrisisAlertBanner alerts={report.crisis_alerts} />
+          )}
 
           {/* Premium tab bar - sticky on mobile */}
           <motion.div
