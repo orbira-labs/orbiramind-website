@@ -27,7 +27,6 @@ PERSONAS = [
             "youngest_child_age": "school_age",
             "chronic_condition": False,
             "disability_status": False,
-            "alcohol_use": "social",
             "smoking_status": "social",
             "caffeine_intake": "high",
             "water_intake": "low",
@@ -80,13 +79,6 @@ PERSONAS = [
             "hobby_engagement": 2,
             "perfectionism_pressure": 4,
         },
-        "measurements": {
-            "height": 180,
-            "weight": 88,
-            "water_intake": "low",
-            "caffeine_intake": "high",
-            "alcohol_frequency": "occasional",
-        },
         # Deep dive sorulara persona'ya özgü otomatik cevaplar
         "deep_dive_hints": {
             "scale": 2,          # Genel olarak düşük skorlar (sorunlu alan)
@@ -115,7 +107,6 @@ PERSONAS = [
             "children_status": "no_children",
             "chronic_condition": False,
             "disability_status": False,
-            "alcohol_use": "social",
             "smoking_status": "no",
             "caffeine_intake": "medium",
             "water_intake": "medium",
@@ -168,13 +159,6 @@ PERSONAS = [
             "hobby_engagement": 3,
             "perfectionism_pressure": 4,
         },
-        "measurements": {
-            "height": 165,
-            "weight": 57,
-            "water_intake": "medium",
-            "caffeine_intake": "medium",
-            "alcohol_frequency": "rare",
-        },
         "deep_dive_hints": {
             "scale": 3,
             "stress": 3,
@@ -203,7 +187,6 @@ PERSONAS = [
             "youngest_child_age": "adult",
             "chronic_condition": True,
             "disability_status": False,
-            "alcohol_use": "no",
             "smoking_status": "social",
             "caffeine_intake": "low",
             "water_intake": "medium",
@@ -255,13 +238,6 @@ PERSONAS = [
             "daily_motivation": 2,
             "hobby_engagement": 2,
             "perfectionism_pressure": 2,
-        },
-        "measurements": {
-            "height": 173,
-            "weight": 83,
-            "water_intake": "medium",
-            "caffeine_intake": "low",
-            "alcohol_frequency": "none",
         },
         "deep_dive_hints": {
             "scale": 2,
@@ -417,7 +393,6 @@ def run_persona_test(persona):
             "session_id": session_id,
             "profile": persona["profile"],
             "core_answers": persona["core_answers"],
-            "measurements": persona["measurements"],
         },
         auth_headers,
     )

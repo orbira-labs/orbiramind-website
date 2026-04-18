@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { session_id, profile, core_answers, measurements } = body;
+    const { session_id, profile, core_answers } = body;
 
     if (!session_id) {
       return NextResponse.json(
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
         "x-api-key": ENGINE_API_KEY,
       },
-      body: JSON.stringify({ profile, core_answers, measurements }),
+      body: JSON.stringify({ profile, core_answers }),
     });
 
     let data: unknown;

@@ -429,7 +429,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         console.error("Test başlangıcı kaydedilemedi");
       }
 
-      const data = await submitAnswers(sessionId, profile, coreAnswersRef.current, {}, token);
+      const data = await submitAnswers(sessionId, profile, coreAnswersRef.current, token);
       setDeepDiveQuestions(data.deep_dive_questions);
       setDirection(1);
       setCurrentIndex(0);

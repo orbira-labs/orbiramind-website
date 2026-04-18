@@ -124,14 +124,6 @@ export interface CoreQuestion {
   scale_labels?: string[];
 }
 
-export interface MeasurementField {
-  id: string;
-  answer_type: "numeric" | "single_choice";
-  text: string;
-  numeric_range?: { min: number; max: number } | null;
-  options?: { value: string; label: string }[] | null;
-}
-
 export interface DeepDiveQuestion {
   id: string;
   text: string;
@@ -141,11 +133,15 @@ export interface DeepDiveQuestion {
   options?: { value: string; label: string }[];
 }
 
+/**
+ * AQE Gateway v3.0 (2026-04-18): measurement_context aşaması kaldırıldı.
+ * habit/body alanları (height, weight, water_intake, caffeine_intake,
+ * alcohol_frequency) artık yalnızca profile_fields içinde.
+ */
 export interface SessionData {
   session_id: string;
   profile_fields: ProfileField[];
   core_questions: CoreQuestion[];
-  measurement_context: MeasurementField[];
 }
 
 export interface SubmitAnswersResponse {
@@ -329,14 +325,12 @@ export async function submitAnswers(
   sessionId: string,
   profile: Record<string, unknown>,
   coreAnswers: Record<string, number>,
-  measurements: Record<string, unknown>,
   testToken?: string
 ): Promise<SubmitAnswersResponse> {
   return secureApiFetch<SubmitAnswersResponse>("answers", {
     session_id: sessionId,
     profile,
     core_answers: coreAnswers,
-    measurements,
   }, testToken);
 }
 
