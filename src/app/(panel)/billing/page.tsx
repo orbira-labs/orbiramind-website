@@ -2,162 +2,203 @@
 
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
-import { MindTestBadge } from "@/components/ui/MindTestBadge";
 import {
-  Check,
+  Sparkles,
+  ShieldCheck,
+  Infinity as InfinityIcon,
+  Zap,
+  Lock,
   Fingerprint,
+  ShieldAlert,
   Eye,
   Route,
-  ShieldAlert,
   ScanSearch,
-  Sparkles,
+  FlaskConical,
   ClipboardList,
   TrendingUp,
   BrainCircuit,
-  FlaskConical,
-  ArrowLeft,
   ArrowRight,
+  ArrowLeft,
   ShoppingCart,
+  Check,
+  Gift,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const OUTPUTS = [
+// ─────────────────────────────────────────────────────────────────────────
+// Veri
+// ─────────────────────────────────────────────────────────────────────────
+
+type Plan = {
+  id: string;
+  name: string;
+  tagline: string;
+  credits: number;
+  pricePerCredit: number;
+  total: number;
+  savings?: string;
+  badge?: string;
+  highlight?: boolean;
+};
+
+const PLANS: Plan[] = [
+  {
+    id: "starter",
+    name: "Başlangıç",
+    tagline: "Pratiği denemek için ideal başlangıç",
+    credits: 5,
+    pricePerCredit: 32.99,
+    total: 164.95,
+  },
+  {
+    id: "popular",
+    name: "Popüler",
+    tagline: "Düzenli kullanan uzmanlar için en dengeli seçim",
+    credits: 15,
+    pricePerCredit: 27.99,
+    total: 419.85,
+    savings: "%15 tasarruf",
+    badge: "EN ÇOK TERCİH EDİLEN",
+    highlight: true,
+  },
+  {
+    id: "pro-pack",
+    name: "Profesyonel",
+    tagline: "Yoğun portföylü uzmanlar için en avantajlı paket",
+    credits: 45,
+    pricePerCredit: 23.99,
+    total: 1079.55,
+    savings: "%27 tasarruf",
+    badge: "EN AVANTAJLI",
+  },
+];
+
+const ANALYSIS_INCLUDES = [
   {
     icon: Fingerprint,
     title: "Karakter Haritası",
-    desc: "350+ psikolojik özellik üzerinden kişinin derinlemesine profili",
+    desc: "350+ psikolojik özellik üzerinden derinlemesine profil",
   },
   {
     icon: ShieldAlert,
-    title: "Danışana Özel Kritik Rapor",
-    desc: "Güçlü yönler, risk alanları ve çelişkileri tek bir bakışta",
+    title: "Kritik Rapor",
+    desc: "Güçlü yönler, risk alanları ve çelişkiler tek bakışta",
   },
   {
     icon: Eye,
-    title: "Gizli Katman — Kör Noktalar",
-    desc: "Kişinin farkında olmadığı dinamikler, çıkarım motoru ile tespit edilir",
+    title: "Kör Noktalar",
+    desc: "Kişinin farkında olmadığı gizli dinamikler",
   },
   {
     icon: Route,
-    title: "Danışanın Yol Haritası",
+    title: "Yol Haritası",
     desc: "Acil, kısa ve orta vadeli somut müdahale adımları",
   },
   {
     icon: ScanSearch,
-    title: "Davranış Kalıpları & Çıkarımlar",
-    desc: "Tekrarlayan örüntüler, gizli güçler ve tutarsızlık bayrakları",
+    title: "Davranış Kalıpları",
+    desc: "Tekrarlayan örüntüler ve tutarsızlık bayrakları",
+  },
+  {
+    icon: Check,
+    title: "Hibrit Analiz Motoru",
+    desc: "AQE + HAE bütünleşik değerlendirme modeli",
   },
 ];
 
-// Her MindTest analizinde ortak olan temel içerik — kredi paketlerinde
-// ve Pro Üyelik'te birebir aynıdır, bu yüzden tek bir yerde gösterilir.
-const PACKAGE_FEATURES = [
-  "Karaktere özel adaptif sorular (AQE)",
-  "HAE + AQE hibrit analiz motoru",
-  "Tam kapsamlı hibrit rapor",
-  "350+ özellikli karakter haritası",
-  "Kör nokta ve tutarsızlık tespiti",
-  "Koçluk yol haritası",
-];
-
-const PRO_FEATURES: { icon: typeof FlaskConical; title: string; desc: string }[] = [
+const PRO_FEATURES = [
   {
-    icon: FlaskConical,
+    icon: Gift,
     title: "Aylık 15 MindTest Kredisi",
-    desc: "Her ay otomatik yenilenen analiz hakkıyla danışan portföyünüzü güncel tutun",
+    desc: "Her ay otomatik olarak hesabınıza tanımlanır, birikir.",
   },
   {
     icon: ClipboardList,
     title: "Danışana Özel Ödevler",
-    desc: "Analiz sonuçlarına göre yapay zekânın önerdiği bireysel gelişim görevleri",
+    desc: "Analiz sonuçlarına göre yapay zekânın önerdiği bireysel gelişim görevleri.",
   },
   {
     icon: TrendingUp,
     title: "İlerleme Analizi",
-    desc: "Danışanın süreç boyunca gösterdiği değişimi ölçümleyen detaylı raporlar",
+    desc: "Danışanın süreç boyunca gösterdiği değişimi ölçümleyen detaylı raporlar.",
   },
   {
     icon: BrainCircuit,
     title: "Seans Asistanı",
-    desc: "Görüşme öncesi hazırlanan brifing: geçmiş notlar, ödev durumu ve odak önerileri",
+    desc: "Görüşme öncesi hazırlanan brifing: geçmiş notlar, ödev durumu ve odak önerileri.",
   },
 ];
 
-type BillingView = "root" | "credits" | "pro";
+const TRUST_SIGNALS = [
+  {
+    icon: InfinityIcon,
+    title: "Süresiz krediler",
+    desc: "İstediğiniz zaman kullanın",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Güvenli ödeme",
+    desc: "256-bit SSL şifreleme",
+  },
+  { icon: Zap, title: "Anında kullanım", desc: "Ödeme sonrası hemen aktif" },
+  { icon: Lock, title: "KVKK uyumlu", desc: "Verileriniz yasal güvence altında" },
+];
+
+const fmt = (n: number) =>
+  n.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// ─────────────────────────────────────────────────────────────────────────
+// Sayfa
+// ─────────────────────────────────────────────────────────────────────────
+
+type View = "root" | "credits" | "pro";
 
 export default function BillingPage() {
-  const [view, setView] = useState<BillingView>("root");
+  const [view, setView] = useState<View>("root");
 
   return (
     <>
       <TopBar title="Satın Al" />
       <main className="flex-1 p-3 sm:p-5 lg:p-6">
-        <div className="mx-auto max-w-4xl">
-          <div className="bg-gradient-to-br from-[#5B7B6A]/20 to-[#5B7B6A]/8 rounded-2xl p-4 sm:p-5 space-y-4">
-
-            {/* Top Info Card — analizlerde ne çıkıyor, her iki üründe de geçerli */}
-            <Card padding="lg" variant="elevated">
-              <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-pro-border">
-                <div className="space-y-4 sm:pr-6 pb-4 sm:pb-0">
-                  {OUTPUTS.slice(0, 3).map((item, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-pro-primary-light flex items-center justify-center shrink-0 mt-0.5">
-                        <item.icon className="h-[15px] w-[15px] text-pro-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-pro-text">{item.title}</p>
-                        <p className="text-xs text-pro-text-tertiary leading-relaxed mt-0.5">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="space-y-4 sm:pl-6 pt-4 sm:pt-0">
-                  {OUTPUTS.slice(3).map((item, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-pro-primary-light flex items-center justify-center shrink-0 mt-0.5">
-                        <item.icon className="h-[15px] w-[15px] text-pro-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-pro-text">{item.title}</p>
-                        <p className="text-xs text-pro-text-tertiary leading-relaxed mt-0.5">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-
-            {/* View switcher: root (2 kategori) → credits | pro */}
-            <AnimatePresence mode="wait">
+        <div className="mx-auto max-w-6xl py-2 sm:py-4">
+          <AnimatePresence mode="wait">
+            {view === "root" && (
               <motion.div
-                key={view}
-                initial={{ opacity: 0, y: 8 }}
+                key="root"
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className="space-y-4"
+                transition={{ duration: 0.22, ease: "easeOut" }}
               >
-                {view === "root" && <RootView onSelect={setView} />}
-                {view === "credits" && <CreditsView onBack={() => setView("root")} />}
-                {view === "pro" && <ProView onBack={() => setView("root")} />}
+                <RootView onSelect={setView} />
               </motion.div>
-            </AnimatePresence>
-
-            {/* Nasıl analiz ediyoruz — tüm görünümlerde sabit alt CTA */}
-            <div className="flex justify-center">
-              <a
-                href="/engines"
-                className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pro-border bg-white hover:border-pro-primary/50 hover:shadow-sm transition-all text-sm text-pro-text-secondary hover:text-pro-primary"
+            )}
+            {view === "credits" && (
+              <motion.div
+                key="credits"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
               >
-                <svg className="h-4 w-4 text-pro-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                Nasıl analiz ediyoruz?
-                <svg className="h-3.5 w-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </a>
-            </div>
-
-          </div>
+                <CreditsView onBack={() => setView("root")} />
+              </motion.div>
+            )}
+            {view === "pro" && (
+              <motion.div
+                key="pro"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+              >
+                <ProView onBack={() => setView("root")} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
     </>
@@ -165,249 +206,497 @@ export default function BillingPage() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Root: iki kategori kartı
+// Root: iki premium giriş kartı
 // ─────────────────────────────────────────────────────────────────────────
-function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
+
+function RootView({ onSelect }: { onSelect: (v: View) => void }) {
   return (
-    <div>
-      <div className="mb-4 text-center">
-        <h2 className="text-base sm:text-lg font-bold text-pro-text">Planınızı seçin</h2>
-        <p className="text-xs sm:text-sm text-pro-text-tertiary mt-1">Kullanım şeklinize en uygun seçeneği belirleyin</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Test Satın Al */}
-        <div className="rounded-2xl border-2 border-pro-border bg-white p-5 sm:p-6 hover:border-pro-primary/60 hover:shadow-lg transition-all min-h-[180px] flex flex-col">
-          <div className="flex items-start justify-between mb-4">
-            <div className="h-11 w-11 rounded-xl bg-pro-primary-light flex items-center justify-center">
-              <ShoppingCart className="h-5 w-5 text-pro-primary" />
-            </div>
-          </div>
-          <h3 className="text-lg font-bold text-pro-text mb-1">Kredi Paketleri</h3>
-          <p className="text-xs font-medium text-pro-text-tertiary mb-3 uppercase tracking-wide">Tek seferlik ödeme · üyeliksiz</p>
-          <p className="text-sm text-pro-text-secondary leading-relaxed mb-5 flex-1">
-            5 veya 20 analizlik MindTest paketleri. Krediler süresiz geçerlidir, abonelik gerektirmez.
-          </p>
-          <button
-            type="button"
-            onClick={() => onSelect("credits")}
-            className="mt-auto w-full min-h-[48px] py-3 rounded-xl bg-pro-primary text-white font-semibold shadow-sm hover:bg-pro-primary/90 hover:shadow-md transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
-          >
-            Paketleri Gör
-            <ArrowRight className="h-4 w-4" />
-          </button>
+    <div className="space-y-8 sm:space-y-10">
+      {/* Hero */}
+      <div className="text-center max-w-2xl mx-auto space-y-3 pt-4 sm:pt-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pro-primary-light">
+          <Sparkles className="h-3.5 w-3.5 text-pro-primary" />
+          <span className="text-[11px] font-semibold text-pro-primary tracking-[0.14em] uppercase">
+            Satın Alma Seçenekleri
+          </span>
         </div>
-
-        {/* Pro Üyelik */}
-        <div className="rounded-2xl overflow-hidden relative p-5 sm:p-6 hover:shadow-xl transition-all min-h-[180px] flex flex-col">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
-          <div className="absolute top-0 right-0 w-[140px] h-[140px] rounded-full bg-white opacity-[0.08] blur-[50px]" />
-
-          <div className="relative flex items-start justify-between mb-4">
-            <div className="h-11 w-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-[10px] font-bold text-white tracking-wide">
-              YAKINDA
-            </span>
-          </div>
-          <h3 className="relative text-lg font-bold text-white mb-1">Pro Üyelik</h3>
-          <p className="relative text-xs font-medium text-white/70 mb-3 uppercase tracking-wide">Aylık abonelik · yapay zekâ destekli</p>
-          <p className="relative text-sm text-white/80 leading-relaxed mb-5 flex-1">
-            Otomatik yenilenen krediler, danışana özel ödevler, ilerleme analizi ve seans asistanı bir arada.
-          </p>
-          <button
-            type="button"
-            onClick={() => onSelect("pro")}
-            className="relative mt-auto w-full min-h-[48px] py-3 rounded-xl bg-white text-[#7C3AED] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
-          >
-            Detayları Gör
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Credits view: 5 MindTest + 20 MindTest + ortak içerik kartı
-// ─────────────────────────────────────────────────────────────────────────
-function CreditsView({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="space-y-4">
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex items-center gap-2 text-sm font-medium text-pro-text-secondary hover:text-pro-primary transition-colors"
-        aria-label="Geri"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Geri
-      </button>
-
-      <div>
-        <h2 className="text-lg font-bold text-pro-text">MindTest Kredi Paketleri</h2>
-        <p className="text-xs text-pro-text-tertiary mt-0.5">
-          Tek seferlik ödeme · süresiz geçerlilik · abonelik gerektirmez
+        <h1 className="text-3xl sm:text-5xl font-bold text-pro-text leading-[1.1] tracking-tight">
+          Nasıl devam etmek istersiniz?
+        </h1>
+        <p className="text-sm sm:text-base text-pro-text-secondary leading-relaxed max-w-lg mx-auto">
+          İki farklı yol sunuyoruz: ihtiyaç duydukça kredi alın ya da Pro Üyelikle
+          her ay yenilenen bir danışan takip ekosistemine sahip olun.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* 5 MindTest — sade */}
-        <div className="rounded-2xl border-2 border-pro-border bg-white overflow-hidden flex flex-col">
-          <div className="bg-gradient-to-br from-[#EDF5F0] to-[#E0EDE4] px-6 py-5 border-b border-pro-border">
-            <MindTestBadge count={5} size="lg" variant="primary" />
-            <p className="text-xs text-pro-text-tertiary mt-1">Analiz başına ₺32,99</p>
-          </div>
-          <div className="px-6 py-5 flex-1 flex flex-col">
-            <div className="text-3xl font-bold text-pro-text leading-none">₺164,95</div>
-            <p className="text-xs text-pro-text-tertiary mt-1 mb-5">Tek seferlik ödeme</p>
-            <button
-              type="button"
-              onClick={() => toast.info("Ödeme sistemi yakında devreye alınacak")}
-              className="mt-auto w-full min-h-[48px] py-3 rounded-xl border-2 border-pro-primary text-pro-primary font-semibold hover:bg-pro-primary hover:text-white transition-all active:scale-[0.98]"
-            >
-              Satın Al
-            </button>
-          </div>
-        </div>
+      {/* İki büyük giriş kartı */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        {/* Test Kredisi */}
+        <button
+          type="button"
+          onClick={() => onSelect("credits")}
+          className="group relative text-left rounded-3xl border border-pro-border bg-white overflow-hidden transition-all hover:border-pro-primary/50 hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.995] min-h-[400px] flex flex-col"
+        >
+          {/* Dekoratif arka plan */}
+          <div className="absolute -top-20 -right-20 w-[280px] h-[280px] rounded-full bg-pro-primary-light opacity-60 blur-3xl pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-pro-primary-light/30 pointer-events-none" />
 
-        {/* 20 MindTest — gold, en popüler */}
-        <div className="rounded-2xl overflow-hidden flex flex-col relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C] via-[#E8C963] to-[#A67C34]" />
-          <div className="absolute top-0 right-0 w-[140px] h-[140px] rounded-full bg-white opacity-[0.08] blur-[50px]" />
+          <div className="relative p-7 sm:p-9 flex flex-col h-full">
+            <div className="flex items-start justify-between mb-8">
+              <div className="h-14 w-14 rounded-2xl bg-pro-primary-light flex items-center justify-center ring-1 ring-pro-primary/10">
+                <ShoppingCart className="h-6 w-6 text-pro-primary" />
+              </div>
+              <span className="text-[10px] font-bold text-pro-primary bg-pro-primary-light px-2.5 py-1 rounded-full tracking-[0.1em]">
+                TEK SEFERLİK
+              </span>
+            </div>
 
-          {/* %18 tasarruf rozeti */}
-          <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1">
-            <span className="text-[11px] font-bold text-[#8B6914] tracking-wide">%18 tasarruf</span>
-          </div>
+            <div className="space-y-2 mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-pro-text leading-tight">
+                Test Kredisi
+              </h2>
+              <p className="text-sm text-pro-text-secondary leading-relaxed">
+                İhtiyaç duyduğunuzda kredi paketi satın alın, süresiz kullanın.
+                Abonelik veya düzenli ödeme yoktur.
+              </p>
+            </div>
 
-          {/* Mobilde "EN POPÜLER" etiketi */}
-          <div className="sm:hidden absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
-            <span className="text-[10px] font-bold text-[#8B6914] tracking-wide">EN POPÜLER</span>
-          </div>
+            <div className="space-y-2.5 mb-8 flex-1">
+              {[
+                { icon: InfinityIcon, text: "Krediler süresiz geçerlidir" },
+                { icon: Zap, text: "Ödeme sonrası anında aktif" },
+                { icon: ShieldCheck, text: "Abonelik yok, gizli ücret yok" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <div className="h-6 w-6 rounded-md bg-pro-primary-light flex items-center justify-center shrink-0">
+                    <item.icon className="h-3.5 w-3.5 text-pro-primary" />
+                  </div>
+                  <span className="text-sm text-pro-text-secondary">{item.text}</span>
+                </div>
+              ))}
+            </div>
 
-          <div className="relative px-6 py-5 border-b border-white/20">
-            <MindTestBadge count={20} size="lg" variant="white" />
-            <p className="text-xs text-white/70 mt-1">Analiz başına ₺27,00</p>
+            <div className="inline-flex items-center gap-2 text-pro-primary font-semibold text-sm group-hover:gap-3 transition-all">
+              Paketleri keşfet
+              <ArrowRight className="h-4 w-4" />
+            </div>
           </div>
-          <div className="relative px-6 py-5 flex-1 flex flex-col">
-            <div className="text-3xl font-bold text-white leading-none">₺540,00</div>
-            <p className="text-xs text-white/70 mt-1 mb-5">Tek seferlik ödeme</p>
-            <button
-              type="button"
-              onClick={() => toast.info("Ödeme sistemi yakında devreye alınacak")}
-              className="mt-auto w-full min-h-[48px] py-3 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98]"
-            >
-              Satın Al
-            </button>
+        </button>
+
+        {/* Pro Üyelik */}
+        <button
+          type="button"
+          onClick={() => onSelect("pro")}
+          className="group relative text-left rounded-3xl overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.995] min-h-[400px] flex flex-col"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
+          <div className="absolute -top-24 -right-24 w-[320px] h-[320px] rounded-full bg-white opacity-[0.12] blur-[70px] pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-[240px] h-[240px] rounded-full bg-white opacity-[0.08] blur-[60px] pointer-events-none" />
+
+          <div className="relative p-7 sm:p-9 flex flex-col h-full">
+            <div className="flex items-start justify-between mb-8">
+              <div className="h-14 w-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-[10px] font-bold text-white bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-full tracking-[0.1em]">
+                YAKINDA
+              </span>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                Pro Üyelik
+              </h2>
+              <p className="text-sm text-white/80 leading-relaxed">
+                Her ay 15 MindTest kredisi ve yapay zekâ destekli danışan takip
+                ekosistemi ile çalışın.
+              </p>
+            </div>
+
+            <div className="space-y-2.5 mb-8 flex-1">
+              {[
+                { icon: Gift, text: "Her ay 15 kredi otomatik tanımlanır" },
+                { icon: BrainCircuit, text: "Seans asistanı ve ödev sistemi" },
+                { icon: TrendingUp, text: "Danışan bazlı ilerleme analizi" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <div className="h-6 w-6 rounded-md bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
+                    <item.icon className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <span className="text-sm text-white/85">{item.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="inline-flex items-center gap-2 text-white font-semibold text-sm group-hover:gap-3 transition-all">
+              Üyeliği incele
+              <ArrowRight className="h-4 w-4" />
+            </div>
           </div>
-        </div>
+        </button>
       </div>
 
-      {/* Her pakette ortak olan analiz içeriği — bir kez listelenir */}
-      <Card padding="lg" variant="elevated">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="h-8 w-8 rounded-lg bg-pro-primary-light flex items-center justify-center shrink-0">
-            <Check className="h-4 w-4 text-pro-primary" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-pro-text">Her MindTest analizinde neler yer alır?</p>
-            <p className="text-xs text-pro-text-tertiary mt-0.5">Her iki paket de birebir aynı içerikle sunulur.</p>
-          </div>
-        </div>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-3 border-t border-pro-border">
-          {PACKAGE_FEATURES.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-pro-text-secondary">
-              <Check className="h-4 w-4 text-pro-success shrink-0 mt-0.5" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </Card>
+      {/* Alt link */}
+      <div className="flex justify-center pt-2">
+        <a
+          href="/engines"
+          className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pro-border bg-white hover:border-pro-primary/50 hover:shadow-sm transition-all text-sm text-pro-text-secondary hover:text-pro-primary"
+        >
+          <Sparkles className="h-4 w-4 text-pro-primary" />
+          Nasıl analiz ediyoruz?
+          <ArrowRight className="h-3.5 w-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+        </a>
+      </div>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Pro view: tek hero kart — eski modalın içeriği inline
+// Credits detay: 3 paket + içerik + güven bandı
 // ─────────────────────────────────────────────────────────────────────────
-function ProView({ onBack }: { onBack: () => void }) {
+
+function CreditsView({ onBack }: { onBack: () => void }) {
+  const handlePurchase = (plan: Plan) => {
+    toast.info(
+      `${plan.name} paketi (${plan.credits} kredi): Ödeme sistemi yakında devreye alınacak.`,
+    );
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-10 sm:space-y-12">
+      {/* Geri navigasyonu */}
       <button
         type="button"
         onClick={onBack}
         className="inline-flex items-center gap-2 text-sm font-medium text-pro-text-secondary hover:text-pro-primary transition-colors"
-        aria-label="Geri"
       >
         <ArrowLeft className="h-4 w-4" />
         Geri
       </button>
 
-      <div className="rounded-2xl overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
-        <div className="absolute top-0 right-0 w-[260px] h-[260px] rounded-full bg-white opacity-[0.08] blur-[60px]" />
-        <div className="absolute bottom-0 left-0 w-[180px] h-[180px] rounded-full bg-white opacity-[0.05] blur-[50px]" />
-
-        {/* Yakında rozeti */}
-        <div className="absolute -right-[30px] top-[18px] z-10 rotate-45 bg-white shadow-md px-8 py-1">
-          <span className="text-[11px] font-bold text-[#7C3AED] tracking-wide">Yakında</span>
+      {/* Başlık */}
+      <section className="text-center max-w-2xl mx-auto space-y-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pro-primary-light">
+          <ShoppingCart className="h-3.5 w-3.5 text-pro-primary" />
+          <span className="text-[11px] font-semibold text-pro-primary tracking-[0.14em] uppercase">
+            Test Kredisi Paketleri
+          </span>
         </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-pro-text leading-[1.1] tracking-tight">
+          İhtiyacınız kadar kredi alın
+        </h1>
+        <p className="text-sm sm:text-base text-pro-text-secondary leading-relaxed">
+          Süresiz geçerli, abonelik gerektirmez. Paket büyüdükçe analiz başına
+          maliyet düşer.
+        </p>
+      </section>
 
-        <div className="relative p-6 sm:p-8">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm mb-4">
-            <Sparkles className="h-7 w-7 text-white" />
+      {/* Fiyat kartları */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 md:items-stretch">
+        {PLANS.map((plan) => (
+          <PricingCard
+            key={plan.id}
+            plan={plan}
+            onPurchase={() => handlePurchase(plan)}
+          />
+        ))}
+      </section>
+
+      {/* Güven bandı */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {TRUST_SIGNALS.map((s, i) => (
+          <div
+            key={i}
+            className="bg-white border border-pro-border rounded-xl px-4 py-3.5 flex items-start gap-3"
+          >
+            <div className="h-9 w-9 rounded-lg bg-pro-primary-light flex items-center justify-center shrink-0">
+              <s.icon className="h-[17px] w-[17px] text-pro-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-semibold text-pro-text leading-tight">
+                {s.title}
+              </p>
+              <p className="text-[11px] sm:text-xs text-pro-text-tertiary mt-0.5 leading-snug">
+                {s.desc}
+              </p>
+            </div>
           </div>
+        ))}
+      </section>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Pro Üyelik</h2>
-          <p className="text-white/75 mb-6 max-w-xl leading-relaxed">
-            Danışan ilişkinizi güçlendiren, seanslarınızı zenginleştiren yapay zekâ destekli bir çözüm.
-            Yalnızca tek seferlik bir analiz değil; sürecin her aşamasında yanınızda olan bütünleşik bir sistem.
+      {/* Her analizde ne var */}
+      <section>
+        <div className="text-center mb-6 sm:mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-pro-text">
+            Her analizde neler yer alır?
+          </h2>
+          <p className="text-sm text-pro-text-tertiary mt-2 leading-relaxed">
+            Paket büyüklüğünden bağımsız olarak her MindTest analizi birebir aynı
+            kalite ve içerikle sunulur.
           </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            {PRO_FEATURES.map((f, i) => (
-              <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-start gap-3">
-                <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                  <f.icon className="h-4 w-4 text-white" />
+        </div>
+        <Card padding="lg" variant="elevated">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+            {ANALYSIS_INCLUDES.map((item, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="h-9 w-9 rounded-lg bg-pro-primary-light flex items-center justify-center shrink-0 mt-0.5">
+                  <item.icon className="h-[16px] w-[16px] text-pro-primary" />
                 </div>
-                <div>
-                  <p className="text-white font-medium text-sm">{f.title}</p>
-                  <p className="text-white/60 text-xs mt-0.5 leading-relaxed">{f.desc}</p>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-pro-text">{item.title}</p>
+                  <p className="text-xs text-pro-text-tertiary mt-0.5 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* Fiyat çapası */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5 mb-4">
-            <div className="flex items-baseline justify-center gap-2 mb-1">
-              <span className="text-3xl font-bold text-white">~₺19,93</span>
-              <span className="text-white/60 text-sm">/ analiz</span>
-            </div>
-            <p className="text-center text-xs text-white/60">
-              Aylık 15 MindTest · istediğiniz zaman iptal
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              toast.success("Lansman bildirim listesine eklendiniz. Teşekkür ederiz.")
-            }
-            className="w-full min-h-[52px] py-3 rounded-xl bg-white text-[#7C3AED] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98]"
-          >
-            Lansmanda bilgilendirilmek istiyorum
-          </button>
-
-          <p className="text-center text-xs text-white/50 mt-3">
-            Mevcut kredileriniz üyelik başladıktan sonra da geçerliliğini korur.
-          </p>
-        </div>
-      </div>
+        </Card>
+      </section>
     </div>
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Pro Üyelik detay: konsept odaklı, fiyat karşılaştırması yok
+// ─────────────────────────────────────────────────────────────────────────
+
+function ProView({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="space-y-10 sm:space-y-12">
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center gap-2 text-sm font-medium text-pro-text-secondary hover:text-pro-primary transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Geri
+      </button>
+
+      {/* Mor premium hero */}
+      <section className="relative rounded-3xl overflow-hidden shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
+        <div className="absolute -top-24 -right-24 w-[400px] h-[400px] rounded-full bg-white opacity-[0.10] blur-[80px]" />
+        <div className="absolute -bottom-24 -left-24 w-[320px] h-[320px] rounded-full bg-white opacity-[0.06] blur-[60px]" />
+
+        <div className="relative p-7 sm:p-10 md:p-14 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm mb-6">
+            <Sparkles className="h-3.5 w-3.5 text-white" />
+            <span className="text-[11px] font-bold text-white tracking-[0.14em] uppercase">
+              Yakında · Pro Üyelik
+            </span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-4">
+            Her ay 15 kredi.
+            <br />
+            Her danışanınız için yanınızda.
+          </h1>
+          <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl mx-auto">
+            Pro Üyelik bir fiyatlandırma planı değil; danışan süreçlerinizi
+            uçtan uca destekleyen bir ekosistemdir. Her ay 15 MindTest kredisi
+            hesabınıza tanımlanır; yanında yapay zekâ destekli araçlar gelir.
+          </p>
+        </div>
+      </section>
+
+      {/* 4 özellik kartı */}
+      <section>
+        <div className="text-center mb-6 sm:mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-pro-text">
+            Üyelikte neler var?
+          </h2>
+          <p className="text-sm text-pro-text-tertiary mt-2 leading-relaxed">
+            Pro Üyelik; krediyle birlikte, danışan takibinizi bütünsel hâle
+            getiren dört temel modülü içerir.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          {PRO_FEATURES.map((f, i) => (
+            <div
+              key={i}
+              className="relative bg-white border border-pro-border rounded-2xl p-5 sm:p-6 hover:border-[#7C3AED]/30 hover:shadow-md transition-all"
+            >
+              <div className="flex items-start gap-4">
+                <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#7C3AED]/10 to-[#8B5CF6]/5 flex items-center justify-center shrink-0 ring-1 ring-[#7C3AED]/15">
+                  <f.icon className="h-5 w-5 text-[#7C3AED]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-semibold text-pro-text">
+                    {f.title}
+                  </p>
+                  <p className="text-sm text-pro-text-tertiary mt-1 leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Lansman CTA */}
+      <section className="relative rounded-2xl overflow-hidden border border-pro-border bg-white">
+        <div className="relative p-6 sm:p-8 text-center max-w-xl mx-auto">
+          <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#7C3AED]/15 to-[#8B5CF6]/5 flex items-center justify-center mx-auto mb-4 ring-1 ring-[#7C3AED]/15">
+            <Clock className="h-5 w-5 text-[#7C3AED]" />
+          </div>
+          <h3 className="text-lg sm:text-xl font-bold text-pro-text mb-2">
+            Pro Üyelik yakında açılıyor
+          </h3>
+          <p className="text-sm text-pro-text-secondary mb-5 leading-relaxed">
+            Lansman listesine katılın, üyelik açıldığında ilk siz haberdar olun.
+            Mevcut kredileriniz üyelik başladıktan sonra da geçerliliğini korur.
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              toast.success(
+                "Lansman bildirim listesine eklendiniz. Teşekkür ederiz.",
+              )
+            }
+            className="inline-flex items-center gap-2 bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
+          >
+            Lansmanda haber ver
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Fiyat kartı (credits detay içinde)
+// ─────────────────────────────────────────────────────────────────────────
+
+function PricingCard({
+  plan,
+  onPurchase,
+}: {
+  plan: Plan;
+  onPurchase: () => void;
+}) {
+  if (plan.highlight) {
+    return (
+      <div className="relative rounded-2xl overflow-hidden md:-my-3 shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C] via-[#E8C963] to-[#A67C34]" />
+        <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-white opacity-[0.10] blur-[55px]" />
+        <div className="absolute bottom-0 left-0 w-[160px] h-[160px] rounded-full bg-white opacity-[0.06] blur-[45px]" />
+
+        {plan.badge && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-white rounded-full px-3.5 py-1.5 shadow-lg">
+            <span className="text-[10px] font-bold text-[#8B6914] tracking-[0.1em]">
+              {plan.badge}
+            </span>
+          </div>
+        )}
+
+        <div className="relative p-6 sm:p-7 pt-16 flex flex-col h-full">
+          <div className="space-y-1 mb-4">
+            <p className="text-[11px] font-semibold text-white/85 uppercase tracking-[0.14em]">
+              {plan.name}
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-6xl font-bold text-white leading-none">
+                {plan.credits}
+              </span>
+              <span className="text-base font-semibold text-white/75">
+                kredi
+              </span>
+            </div>
+            <p className="text-xs text-white/75 leading-relaxed pt-1">
+              {plan.tagline}
+            </p>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3.5 mb-4 border border-white/20">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-2xl font-bold text-white leading-none">
+                  ₺{fmt(plan.total)}
+                </p>
+                <p className="text-[11px] text-white/75 mt-1.5">
+                  Analiz başına ₺{fmt(plan.pricePerCredit)}
+                </p>
+              </div>
+              {plan.savings && (
+                <span className="inline-flex items-center gap-1 bg-white text-[#8B6914] px-2 py-1 rounded-md text-[11px] font-bold shrink-0">
+                  <Zap className="h-3 w-3" />
+                  {plan.savings}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onPurchase}
+            className="mt-auto w-full min-h-[48px] py-3.5 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
+          >
+            Satın Al
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative rounded-2xl border-2 border-pro-border bg-white p-6 sm:p-7 hover:border-pro-primary/50 hover:shadow-lg transition-all flex flex-col">
+      {plan.badge && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-pro-primary text-white rounded-full px-3 py-1 shadow-sm">
+          <span className="text-[10px] font-bold tracking-[0.1em]">
+            {plan.badge}
+          </span>
+        </div>
+      )}
+
+      <div className="space-y-1 mb-4">
+        <p className="text-[11px] font-semibold text-pro-text-tertiary uppercase tracking-[0.14em]">
+          {plan.name}
+        </p>
+        <div className="flex items-baseline gap-2">
+          <span className="text-6xl font-bold text-pro-text leading-none">
+            {plan.credits}
+          </span>
+          <span className="text-base font-semibold text-pro-text-secondary">
+            kredi
+          </span>
+        </div>
+        <p className="text-xs text-pro-text-tertiary leading-relaxed pt-1">
+          {plan.tagline}
+        </p>
+      </div>
+
+      <div className="bg-pro-primary-light/40 rounded-xl px-4 py-3.5 mb-4 border border-pro-border">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="text-2xl font-bold text-pro-text leading-none">
+              ₺{fmt(plan.total)}
+            </p>
+            <p className="text-[11px] text-pro-text-tertiary mt-1.5">
+              Analiz başına ₺{fmt(plan.pricePerCredit)}
+            </p>
+          </div>
+          {plan.savings && (
+            <span className="inline-flex items-center gap-1 bg-pro-success/10 text-pro-success px-2 py-1 rounded-md text-[11px] font-bold shrink-0">
+              <Zap className="h-3 w-3" />
+              {plan.savings}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onPurchase}
+        className="mt-auto w-full min-h-[48px] py-3.5 rounded-xl border-2 border-pro-primary text-pro-primary font-semibold hover:bg-pro-primary hover:text-white transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
+      >
+        Satın Al
+        <ArrowRight className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
