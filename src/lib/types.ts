@@ -292,6 +292,14 @@ export interface AnalysisResults {
   inferences: Insight[];
   profile_summary?: ProfileSummary;
   blind_spots?: BlindSpotItem[];
+  // Motor tarafından üretilen ek alanlar — Orbiramind `full` preset
+  // alıyor, bu yüzden run-time'da var. UI duruma göre bazılarını kullanır.
+  crisis_alerts?: CrisisAlert[];
+  flags?: Array<{ core_question: string; gap: number; detail: string }>;
+  risk_signals?: Array<Record<string, unknown>>;
+  candidate_interventions?: Array<Record<string, unknown>>;
+  confidence_band?: "high" | "medium" | "low" | "minimal";
+  bmi_context?: { bmi_raw: number; bmi_category: string; requires_cross_check: boolean } | null;
 }
 
 export interface BlindSpot {

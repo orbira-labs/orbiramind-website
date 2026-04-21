@@ -49,7 +49,22 @@ interface TraitItem {
 interface LastTest {
   id: string;
   completed_at: string | null;
+  /**
+   * Motor `results_snapshot` yapısı:
+   * `{ analysis: { wellness_score, top_strengths, top_risks, ... }, report, metadata }`
+   *
+   * Eski (kök seviyede yazılmış) snapshot'lar için fallback run-time kontrolü
+   * `results_snapshot?.analysis ?? results_snapshot` ile yapılır. Orada
+   * üretilmiş randevu özetleri kırılmaz.
+   */
   results_snapshot: {
+    analysis?: {
+      wellness_score?: number;
+      top_strengths?: TraitItem[];
+      top_risks?: TraitItem[];
+      [key: string]: unknown;
+    };
+    // Geri uyum: çok eski snapshot'lar bu alanları kök seviyede tutmuş olabilir.
     wellness_score?: number;
     top_strengths?: TraitItem[];
     top_risks?: TraitItem[];
@@ -220,9 +235,16 @@ export function AppointmentDetailModal({
   const dayName = format(dateObj, "EEEE", { locale: tr });
   const timeLabel = format(dateObj, "HH:mm", { locale: tr });
 
-  const wellnessScore = lastTest?.results_snapshot?.wellness_score;
-  const strengths = (lastTest?.results_snapshot?.top_strengths ?? []).slice(0, 3).map(s => s.label ?? s.trait);
-  const risks = (lastTest?.results_snapshot?.top_risks ?? []).slice(0, 2).map(r => r.label ?? r.trait);
+  // Motor `results_snapshot` = { analysis: {...}, report: {...}, metadata } şeklinde
+  // saklanıyor. wellness_score ve top_strengths/top_risks `analysis.*` altında.
+  // Eski (kök seviyeden okuyan) versiyonla geriye uyumluluk için fallback.
+  const resultsSnap = lastTest?.results_snapshot as Record<string, unknown> | undefined;
+  const analysis = (resultsSnap?.analysis ?? resultsSnap ?? {}) as Record<string, unknown>;
+  const wellnessScore = analysis.wellness_score as number | undefined;
+  const strengthsRaw = (analysis.top_strengths ?? []) as Array<{ label?: string; trait?: string }>;
+  const risksRaw = (analysis.top_risks ?? []) as Array<{ label?: string; trait?: string }>;
+  const strengths = strengthsRaw.slice(0, 3).map((s) => s.label ?? s.trait);
+  const risks = risksRaw.slice(0, 2).map((r) => r.label ?? r.trait);
 
   const scoreColor =
     wellnessScore === undefined

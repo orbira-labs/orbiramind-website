@@ -465,10 +465,22 @@ export default function TestResultPage() {
             </Card>
           </motion.div>
 
-          {/* Crisis alerts — critical tier patternler ve yüksek şiddetli inference'lar */}
-          {report.crisis_alerts && report.crisis_alerts.length > 0 && (
-            <CrisisAlertBanner alerts={report.crisis_alerts} />
-          )}
+          {/* Crisis alerts — critical tier patternler ve yüksek şiddetli inference'lar.
+              Motor iki yere yazıyor: report.crisis_alerts (Phase 2 rapor üretildikten
+              sonra) ve analysis.crisis_alerts (senkron, rapor hazır değilse de
+              terapist görsün diye). İkisini de birleştirip unique title ile gösteriyoruz. */}
+          {(() => {
+            const fromReport = report.crisis_alerts ?? [];
+            const fromAnalysis = (analysis as { crisis_alerts?: typeof fromReport }).crisis_alerts ?? [];
+            const seen = new Set<string>();
+            const merged = [...fromReport, ...fromAnalysis].filter((alert) => {
+              const key = alert?.title ?? "";
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+            return merged.length > 0 ? <CrisisAlertBanner alerts={merged} /> : null;
+          })()}
 
           {/* Premium tab bar - sticky on mobile */}
           <motion.div
