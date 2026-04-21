@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, Eye, RefreshCw, ChevronDown, Compass, BookOpen } from "lucide-react";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 import type { BlindSpot, BlindSpotItem, Insight, TherapeuticGuidance, SessionGuideItem } from "@/lib/types";
+import { ClinicalHypothesisSection } from "./ClinicalHypothesisSection";
 
 interface ClinicianInsightsProps {
   sessionGuide?: SessionGuideItem[];
@@ -318,6 +319,10 @@ export function ClinicianInsights({
           inferences={inferences}
         />
       )}
+      {/* v3: Klinik hipotezler — inference'larda `clinical_hypothesis` varsa
+          her iki görünümün altında gösterilir. Mevcutsa terapistin en çok
+          değer vereceği bölüm. */}
+      <ClinicalHypothesisSection inferences={inferences} />
     </div>
   );
 }

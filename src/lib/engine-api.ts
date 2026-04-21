@@ -167,11 +167,45 @@ export interface PatternResult {
   description: string;
 }
 
+/**
+ * v3: klinik hipotez — opsiyonel.
+ * Orbira-engines inference engine v3 tarafından üretilir.
+ */
+export interface ClinicalHypothesis {
+  statement: string;
+  null_alternative: string;
+  testable_in_session: string[];
+  disconfirmation_signals: string[];
+}
+
 export interface InsightResult {
   title: string;
   insight: string;
   severity: string;
   suggestion?: string;
+  /** Inference tipi. v3 ile yeni klinik kategoriler eklendi. */
+  type?:
+    | "cross_domain"
+    | "profile_signal"
+    | "absence_signal"
+    | "cascade"
+    | "hidden_strength"
+    | "contradiction"
+    | "temporal_pattern"
+    | "defense_hypothesis"
+    | "alliance_signal"
+    | "attachment_dynamic"
+    | "intervention_priority"
+    | "readiness_mismatch"
+    | "inconsistency";
+  /** Terapötik yönelim. */
+  therapeutic_implication?: string;
+  session_exploration?: string[];
+  countertransference_alert?: string;
+  intervention_timing?: "immediate" | "early" | "mid_therapy" | "ongoing";
+  client_language?: string;
+  /** v3: Klinik hipotez (opsiyonel). */
+  clinical_hypothesis?: ClinicalHypothesis;
 }
 
 export interface AnalysisResults {

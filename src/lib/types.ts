@@ -197,12 +197,58 @@ export interface Pattern {
   description: string;
 }
 
+/**
+ * Klinik hipotez — bir inference'ın "körü körüne doğru" olduğu varsayımını
+ * reddeder. Terapiste hem ana hipotezi hem rakip (null) hipotezi, hem de
+ * seansta test etme yöntemlerini sunar.
+ *
+ * Orbira-engines inference engine v3 tarafından opsiyonel olarak üretilir.
+ */
+export interface ClinicalHypothesis {
+  statement: string;
+  null_alternative: string;
+  testable_in_session: string[];
+  disconfirmation_signals: string[];
+}
+
+export type InferenceType =
+  // Orijinal tipler
+  | "cross_domain"
+  | "profile_signal"
+  | "absence_signal"
+  | "cascade"
+  | "hidden_strength"
+  | "contradiction"
+  // v3 klinik katmanları
+  | "temporal_pattern"
+  | "defense_hypothesis"
+  | "alliance_signal"
+  | "attachment_dynamic"
+  | "intervention_priority"
+  | "readiness_mismatch"
+  // Legacy/özel
+  | "inconsistency";
+
+export type InterventionTiming = "immediate" | "early" | "mid_therapy" | "ongoing";
+
 export interface Insight {
   title: string;
   insight: string;
   severity: string;
   suggestion?: string;
-  type?: "hidden_strength" | "absence_signal" | "inconsistency";
+  type?: InferenceType;
+  /** Terapötik yönelim — terapistin ne yapması gerektiği. */
+  therapeutic_implication?: string;
+  /** Seansta sorulacak sorular. */
+  session_exploration?: string[];
+  /** Karşı-aktarım uyarısı — terapistin kendi tepkisini fark etmesi için. */
+  countertransference_alert?: string;
+  /** Müdahale zamanlaması. */
+  intervention_timing?: InterventionTiming;
+  /** Danışana söylenebilecek dil örneği. */
+  client_language?: string;
+  /** v3: Klinik hipotez + rakip hipotez + seansta test yöntemi. */
+  clinical_hypothesis?: ClinicalHypothesis;
 }
 
 export interface ProfileSummary {

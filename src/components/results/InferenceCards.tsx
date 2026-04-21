@@ -47,11 +47,20 @@ const SEVERITY_CONFIG: Record<string, {
 };
 
 const TYPE_LABELS: Record<string, string> = {
+  // Orijinal tipler
   cross_domain: "Çapraz Analiz",
   profile_signal: "Profil Sinyali",
   absence_signal: "Eksiklik Sinyali",
   cascade: "Zincirleme Etki",
   hidden_strength: "Gizli Güç",
+  contradiction: "Çelişki",
+  // v3 klinik katmanları (orbira-engines inference engine v3)
+  temporal_pattern: "Zamansal Örüntü",
+  defense_hypothesis: "Savunma Hipotezi",
+  alliance_signal: "Terapötik İttifak",
+  attachment_dynamic: "Bağlanma Dinamiği",
+  intervention_priority: "Müdahale Önceliği",
+  readiness_mismatch: "Hazırlık Uyumsuzluğu",
 };
 
 export function InferenceCards({ inferences }: InferenceCardsProps) {
