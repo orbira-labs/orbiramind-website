@@ -55,10 +55,10 @@ const OUTPUTS = [
 // ve Pro Üyelik'te birebir aynıdır, bu yüzden tek bir yerde gösterilir.
 const PACKAGE_FEATURES = [
   "Karaktere özel adaptif sorular (AQE)",
-  "HAE + AQE hibrit analiz",
+  "HAE + AQE hibrit analiz motoru",
   "Tam kapsamlı hibrit rapor",
   "350+ özellikli karakter haritası",
-  "Kör nokta & tutarsızlık tespiti",
+  "Kör nokta ve tutarsızlık tespiti",
   "Koçluk yol haritası",
 ];
 
@@ -66,21 +66,21 @@ const PRO_FEATURES: { icon: typeof FlaskConical; title: string; desc: string }[]
   {
     icon: FlaskConical,
     title: "Aylık 15 MindTest Kredisi",
-    desc: "Her ay otomatik yenilenen analiz hakkı ile portföyünüzü sürekli güncel tutun",
+    desc: "Her ay otomatik yenilenen analiz hakkıyla danışan portföyünüzü güncel tutun",
   },
   {
     icon: ClipboardList,
     title: "Danışana Özel Ödevler",
-    desc: "Analiz sonuçlarına göre AI'ın oluşturduğu bireysel gelişim görevleri",
+    desc: "Analiz sonuçlarına göre yapay zekânın önerdiği bireysel gelişim görevleri",
   },
   {
     icon: TrendingUp,
     title: "İlerleme Analizi",
-    desc: "Danışanın süreç boyunca gösterdiği değişimi görselleştiren detaylı raporlar",
+    desc: "Danışanın süreç boyunca gösterdiği değişimi ölçümleyen detaylı raporlar",
   },
   {
     icon: BrainCircuit,
-    title: "AI Seans Asistanı",
+    title: "Seans Asistanı",
     desc: "Görüşme öncesi hazırlanan brifing: geçmiş notlar, ödev durumu ve odak önerileri",
   },
 ];
@@ -171,8 +171,8 @@ function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
   return (
     <div>
       <div className="mb-4 text-center">
-        <h2 className="text-base sm:text-lg font-bold text-pro-text">Nasıl devam etmek istiyorsunuz?</h2>
-        <p className="text-xs sm:text-sm text-pro-text-tertiary mt-1">Tek seferlik test kredisi mi, aylık Pro Üyelik mi?</p>
+        <h2 className="text-base sm:text-lg font-bold text-pro-text">Planınızı seçin</h2>
+        <p className="text-xs sm:text-sm text-pro-text-tertiary mt-1">Kullanım şeklinize en uygun seçeneği belirleyin</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -183,10 +183,10 @@ function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
               <ShoppingCart className="h-5 w-5 text-pro-primary" />
             </div>
           </div>
-          <h3 className="text-lg font-bold text-pro-text mb-1">Test Satın Al</h3>
-          <p className="text-xs font-medium text-pro-text-tertiary mb-3 uppercase tracking-wide">Tek seferlik · kullandıkça öde</p>
+          <h3 className="text-lg font-bold text-pro-text mb-1">Kredi Paketleri</h3>
+          <p className="text-xs font-medium text-pro-text-tertiary mb-3 uppercase tracking-wide">Tek seferlik ödeme · üyeliksiz</p>
           <p className="text-sm text-pro-text-secondary leading-relaxed mb-5 flex-1">
-            5&apos;lik veya 20&apos;lik MindTest paketi. Kredi süresiz geçerlidir, üyelik gerekmez.
+            5 veya 20 analizlik MindTest paketleri. Krediler süresiz geçerlidir, abonelik gerektirmez.
           </p>
           <button
             type="button"
@@ -212,9 +212,9 @@ function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
             </span>
           </div>
           <h3 className="relative text-lg font-bold text-white mb-1">Pro Üyelik</h3>
-          <p className="relative text-xs font-medium text-white/70 mb-3 uppercase tracking-wide">Aylık abonelik · AI asistanlı</p>
+          <p className="relative text-xs font-medium text-white/70 mb-3 uppercase tracking-wide">Aylık abonelik · yapay zekâ destekli</p>
           <p className="relative text-sm text-white/80 leading-relaxed mb-5 flex-1">
-            Otomatik yenilenen kredi, danışan ödevleri, ilerleme analizi ve AI seans asistanı.
+            Otomatik yenilenen krediler, danışana özel ödevler, ilerleme analizi ve seans asistanı bir arada.
           </p>
           <button
             type="button"
@@ -240,16 +240,16 @@ function CreditsView({ onBack }: { onBack: () => void }) {
         type="button"
         onClick={onBack}
         className="inline-flex items-center gap-2 text-sm font-medium text-pro-text-secondary hover:text-pro-primary transition-colors"
-        aria-label="Geri dön"
+        aria-label="Geri"
       >
         <ArrowLeft className="h-4 w-4" />
-        Geri dön
+        Geri
       </button>
 
       <div>
-        <h2 className="text-lg font-bold text-pro-text">Test Kredisi Paketleri</h2>
+        <h2 className="text-lg font-bold text-pro-text">MindTest Kredi Paketleri</h2>
         <p className="text-xs text-pro-text-tertiary mt-0.5">
-          Tek seferlik ödeme · kredi süresiz geçerli · istediğin zaman kullan
+          Tek seferlik ödeme · süresiz geçerlilik · abonelik gerektirmez
         </p>
       </div>
 
@@ -258,14 +258,14 @@ function CreditsView({ onBack }: { onBack: () => void }) {
         <div className="rounded-2xl border-2 border-pro-border bg-white overflow-hidden flex flex-col">
           <div className="bg-gradient-to-br from-[#EDF5F0] to-[#E0EDE4] px-6 py-5 border-b border-pro-border">
             <MindTestBadge count={5} size="lg" variant="primary" />
-            <p className="text-xs text-pro-text-tertiary mt-1">analiz başına ₺32,99</p>
+            <p className="text-xs text-pro-text-tertiary mt-1">Analiz başına ₺32,99</p>
           </div>
           <div className="px-6 py-5 flex-1 flex flex-col">
             <div className="text-3xl font-bold text-pro-text leading-none">₺164,95</div>
-            <p className="text-xs text-pro-text-tertiary mt-1 mb-5">tek ödeme</p>
+            <p className="text-xs text-pro-text-tertiary mt-1 mb-5">Tek seferlik ödeme</p>
             <button
               type="button"
-              onClick={() => toast.info("Ödeme sistemi yakında aktif olacak")}
+              onClick={() => toast.info("Ödeme sistemi yakında devreye alınacak")}
               className="mt-auto w-full min-h-[48px] py-3 rounded-xl border-2 border-pro-primary text-pro-primary font-semibold hover:bg-pro-primary hover:text-white transition-all active:scale-[0.98]"
             >
               Satın Al
@@ -290,14 +290,14 @@ function CreditsView({ onBack }: { onBack: () => void }) {
 
           <div className="relative px-6 py-5 border-b border-white/20">
             <MindTestBadge count={20} size="lg" variant="white" />
-            <p className="text-xs text-white/70 mt-1">analiz başına ₺27,00</p>
+            <p className="text-xs text-white/70 mt-1">Analiz başına ₺27,00</p>
           </div>
           <div className="relative px-6 py-5 flex-1 flex flex-col">
             <div className="text-3xl font-bold text-white leading-none">₺540,00</div>
-            <p className="text-xs text-white/70 mt-1 mb-5">tek ödeme</p>
+            <p className="text-xs text-white/70 mt-1 mb-5">Tek seferlik ödeme</p>
             <button
               type="button"
-              onClick={() => toast.info("Ödeme sistemi yakında aktif olacak")}
+              onClick={() => toast.info("Ödeme sistemi yakında devreye alınacak")}
               className="mt-auto w-full min-h-[48px] py-3 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98]"
             >
               Satın Al
@@ -313,8 +313,8 @@ function CreditsView({ onBack }: { onBack: () => void }) {
             <Check className="h-4 w-4 text-pro-primary" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-pro-text">Her MindTest analizinde ne var?</p>
-            <p className="text-xs text-pro-text-tertiary mt-0.5">İki paket de birebir aynı içerikle gelir</p>
+            <p className="text-sm font-semibold text-pro-text">Her MindTest analizinde neler yer alır?</p>
+            <p className="text-xs text-pro-text-tertiary mt-0.5">Her iki paket de birebir aynı içerikle sunulur.</p>
           </div>
         </div>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-3 border-t border-pro-border">
@@ -340,10 +340,10 @@ function ProView({ onBack }: { onBack: () => void }) {
         type="button"
         onClick={onBack}
         className="inline-flex items-center gap-2 text-sm font-medium text-pro-text-secondary hover:text-pro-primary transition-colors"
-        aria-label="Geri dön"
+        aria-label="Geri"
       >
         <ArrowLeft className="h-4 w-4" />
-        Geri dön
+        Geri
       </button>
 
       <div className="rounded-2xl overflow-hidden relative">
@@ -363,8 +363,8 @@ function ProView({ onBack }: { onBack: () => void }) {
 
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Pro Üyelik</h2>
           <p className="text-white/75 mb-6 max-w-xl leading-relaxed">
-            Danışanlarınızla aranızdaki bağı güçlendiren, seanslarınızı zenginleştiren AI destekli asistanınız.
-            Tek seferlik analiz değil; sürecin her aşamasında sizinle olan bir sistem.
+            Danışan ilişkinizi güçlendiren, seanslarınızı zenginleştiren yapay zekâ destekli bir çözüm.
+            Yalnızca tek seferlik bir analiz değil; sürecin her aşamasında yanınızda olan bütünleşik bir sistem.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
@@ -388,22 +388,22 @@ function ProView({ onBack }: { onBack: () => void }) {
               <span className="text-white/60 text-sm">/ analiz</span>
             </div>
             <p className="text-center text-xs text-white/60">
-              Aylık 15 MindTest · istediğin zaman iptal
+              Aylık 15 MindTest · istediğiniz zaman iptal
             </p>
           </div>
 
           <button
             type="button"
             onClick={() =>
-              toast.success("Lansmandan haberdar olmanız için listeye aldık. Teşekkürler!")
+              toast.success("Lansman bildirim listesine eklendiniz. Teşekkür ederiz.")
             }
             className="w-full min-h-[52px] py-3 rounded-xl bg-white text-[#7C3AED] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98]"
           >
-            Lansmandan haberim olsun
+            Lansmanda bilgilendirilmek istiyorum
           </button>
 
           <p className="text-center text-xs text-white/50 mt-3">
-            Mevcut test kredileriniz üyelik başladıktan sonra da geçerli kalır.
+            Mevcut kredileriniz üyelik başladıktan sonra da geçerliliğini korur.
           </p>
         </div>
       </div>
