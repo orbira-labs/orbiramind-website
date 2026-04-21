@@ -15,9 +15,6 @@ import {
   TrendingUp,
   BrainCircuit,
   FlaskConical,
-  X,
-  ChevronDown,
-  ChevronUp,
   ArrowLeft,
   ArrowRight,
   ShoppingCart,
@@ -88,31 +85,10 @@ const PRO_FEATURES: { icon: typeof FlaskConical; title: string; desc: string }[]
   },
 ];
 
-// Karşılaştırma artık "Test Kredisi vs Pro Üyelik" ekseninde; aynı analiz
-// özellikleri iki tarafta da geçerli olduğu için satır sayısı küçüldü.
-const COMPARISON_ROWS: {
-  feature: string;
-  credits: boolean | string;
-  pro: boolean | string;
-}[] = [
-  { feature: "Ödeme şekli", credits: "Tek seferlik", pro: "Aylık abonelik" },
-  { feature: "Kredi yenilenmesi", credits: "—", pro: "Her ay 15 MindTest" },
-  { feature: "Analiz başına maliyet", credits: "₺27 – ₺32,99", pro: "~₺19,93" },
-  { feature: "Karaktere özel adaptif sorular (AQE)", credits: true, pro: true },
-  { feature: "HAE + AQE hibrit analiz", credits: true, pro: true },
-  { feature: "Tam kapsamlı hibrit rapor", credits: true, pro: true },
-  { feature: "Kör nokta & tutarsızlık tespiti", credits: true, pro: true },
-  { feature: "Koçluk yol haritası", credits: true, pro: true },
-  { feature: "Danışana özel ödevler", credits: false, pro: true },
-  { feature: "İlerleme analizi", credits: false, pro: true },
-  { feature: "AI seans asistanı", credits: false, pro: true },
-];
-
 type BillingView = "root" | "credits" | "pro";
 
 export default function BillingPage() {
   const [view, setView] = useState<BillingView>("root");
-  const [showComparison, setShowComparison] = useState(false);
 
   return (
     <>
@@ -169,28 +145,6 @@ export default function BillingPage() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Karşılaştırma — sadece kök ekranda, karar öncesi referans */}
-            {view === "root" && (
-              <>
-                <div className="flex flex-col items-center gap-3">
-                  <button
-                    onClick={() => setShowComparison((s) => !s)}
-                    aria-expanded={showComparison}
-                    className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-pro-border bg-white hover:border-pro-primary/50 hover:shadow-sm transition-all text-sm text-pro-text-secondary hover:text-pro-primary"
-                  >
-                    {showComparison ? (
-                      <ChevronUp className="h-4 w-4 text-pro-primary" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-pro-primary" />
-                    )}
-                    Paket mi, Üyelik mi? Farkı gör
-                  </button>
-                </div>
-
-                {showComparison && <ComparisonTable />}
-              </>
-            )}
-
             {/* Nasıl analiz ediyoruz — tüm görünümlerde sabit alt CTA */}
             <div className="flex justify-center">
               <a
@@ -223,11 +177,7 @@ function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Test Satın Al */}
-        <button
-          type="button"
-          onClick={() => onSelect("credits")}
-          className="group text-left rounded-2xl border-2 border-pro-border bg-white p-5 sm:p-6 hover:border-pro-primary hover:shadow-lg transition-all active:scale-[0.99] min-h-[180px] flex flex-col"
-        >
+        <div className="rounded-2xl border-2 border-pro-border bg-white p-5 sm:p-6 hover:border-pro-primary/60 hover:shadow-lg transition-all min-h-[180px] flex flex-col">
           <div className="flex items-start justify-between mb-4">
             <div className="h-11 w-11 rounded-xl bg-pro-primary-light flex items-center justify-center">
               <ShoppingCart className="h-5 w-5 text-pro-primary" />
@@ -238,18 +188,18 @@ function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
           <p className="text-sm text-pro-text-secondary leading-relaxed mb-5 flex-1">
             5&apos;lik veya 20&apos;lik MindTest paketi. Kredi süresiz geçerlidir, üyelik gerekmez.
           </p>
-          <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-pro-primary group-hover:gap-2.5 transition-all">
-            Paketleri gör
+          <button
+            type="button"
+            onClick={() => onSelect("credits")}
+            className="mt-auto w-full min-h-[48px] py-3 rounded-xl bg-pro-primary text-white font-semibold shadow-sm hover:bg-pro-primary/90 hover:shadow-md transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
+          >
+            Paketleri Gör
             <ArrowRight className="h-4 w-4" />
-          </div>
-        </button>
+          </button>
+        </div>
 
         {/* Pro Üyelik */}
-        <button
-          type="button"
-          onClick={() => onSelect("pro")}
-          className="group text-left rounded-2xl overflow-hidden relative p-5 sm:p-6 hover:shadow-xl transition-all active:scale-[0.99] min-h-[180px] flex flex-col"
-        >
+        <div className="rounded-2xl overflow-hidden relative p-5 sm:p-6 hover:shadow-xl transition-all min-h-[180px] flex flex-col">
           <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#6D28D9]" />
           <div className="absolute top-0 right-0 w-[140px] h-[140px] rounded-full bg-white opacity-[0.08] blur-[50px]" />
 
@@ -266,11 +216,15 @@ function RootView({ onSelect }: { onSelect: (v: BillingView) => void }) {
           <p className="relative text-sm text-white/80 leading-relaxed mb-5 flex-1">
             Otomatik yenilenen kredi, danışan ödevleri, ilerleme analizi ve AI seans asistanı.
           </p>
-          <div className="relative inline-flex items-center gap-1.5 text-sm font-semibold text-white group-hover:gap-2.5 transition-all">
-            Detayları gör
+          <button
+            type="button"
+            onClick={() => onSelect("pro")}
+            className="relative mt-auto w-full min-h-[48px] py-3 rounded-xl bg-white text-[#7C3AED] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
+          >
+            Detayları Gör
             <ArrowRight className="h-4 w-4" />
-          </div>
-        </button>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -457,62 +411,3 @@ function ProView({ onBack }: { onBack: () => void }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Comparison: Test Kredisi vs Pro Üyelik (2 sütun)
-// ─────────────────────────────────────────────────────────────────────────
-function ComparisonTable() {
-  return (
-    <Card padding="none" variant="elevated">
-      <div className="relative">
-        {/* Mobilde scroll affordance */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 md:hidden" />
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-pro-border">
-                <th className="text-left px-4 py-3 text-pro-text-tertiary font-medium sticky left-0 bg-white z-20 min-w-[160px]">
-                  Özellik
-                </th>
-                <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
-                  <span className="inline-block px-2.5 py-1 bg-pro-primary-light rounded-md text-pro-primary text-xs">
-                    Test Kredisi
-                  </span>
-                </th>
-                <th className="text-center px-3 py-3 text-pro-text font-semibold whitespace-nowrap">
-                  <span className="inline-block px-2.5 py-1 bg-[#8B5CF6]/10 rounded-md text-[#7C3AED] text-xs">
-                    Pro Üyelik
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {COMPARISON_ROWS.map((row, i) => (
-                <tr key={i} className={i % 2 === 0 ? "bg-pro-primary-light/30" : ""}>
-                  <td
-                    className={`px-4 py-2.5 text-pro-text-secondary sticky left-0 z-20 ${
-                      i % 2 === 0 ? "bg-[#f5f9f6]" : "bg-white"
-                    }`}
-                  >
-                    {row.feature}
-                  </td>
-                  {(["credits", "pro"] as const).map((plan) => (
-                    <td key={plan} className="text-center px-3 py-2.5">
-                      {row[plan] === true ? (
-                        <Check className="h-4 w-4 text-pro-success mx-auto" />
-                      ) : row[plan] === false ? (
-                        <X className="h-4 w-4 text-pro-text-tertiary/40 mx-auto" />
-                      ) : (
-                        <span className="text-xs font-semibold text-pro-text">{row[plan]}</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </Card>
-  );
-}
