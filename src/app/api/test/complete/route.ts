@@ -195,19 +195,32 @@ async function runBackgroundCompletion({
       }
     }
 
-    if (
-      !resultsSnapshot ||
-      !isValidReport(
-        isRecord(resultsSnapshot) ? resultsSnapshot.report : undefined
-      )
-    ) {
+    // Engine artık AI raporu kapalıyken "disabled" ya da HAE çalışmadığında
+    // "skipped" döndürüyor. Bu durumlarda temel analiz (AQE skorları, HAE
+    // trait'leri) yine tamamlanmış sayılır — completed işaretlenmeli.
+    const analysisOnly = reportStatus === "disabled" || reportStatus === "skipped";
+
+    const report = isRecord(resultsSnapshot) ? resultsSnapshot.report : undefined;
+    const reportIsValid = isValidReport(report);
+
+    if (!resultsSnapshot) {
+      console.error(`[test-complete] Empty results snapshot for session ${sessionId}`);
+      await updateInvitationStatus(supabase, {
+        token,
+        status: "error",
+      });
+      return;
+    }
+
+    if (!analysisOnly && !reportIsValid) {
       const reportError =
-        isRecord(resultsSnapshot) &&
-        isRecord(resultsSnapshot.report) &&
-        typeof resultsSnapshot.report.error === "string"
-          ? resultsSnapshot.report.error
+        isRecord(report) && typeof report.error === "string"
+          ? report.error
           : "Report generation returned incomplete data";
-      console.error("Invalid report in engine response:", reportError);
+      console.error(
+        `[test-complete] Invalid report for session ${sessionId} (report_status=${reportStatus ?? "unknown"}):`,
+        reportError
+      );
 
       await updateInvitationStatus(supabase, {
         token,
@@ -215,6 +228,12 @@ async function runBackgroundCompletion({
         resultsSnapshot,
       });
       return;
+    }
+
+    if (analysisOnly) {
+      console.log(
+        `[test-complete] Session ${sessionId} completed without AI report (report_status=${reportStatus}). Marking as completed.`
+      );
     }
 
     await updateInvitationStatus(supabase, {
