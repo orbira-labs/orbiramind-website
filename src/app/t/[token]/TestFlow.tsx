@@ -188,6 +188,14 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
+  // Refs to avoid stale closures in setTimeout callbacks (rapid-tap skip fix)
+  const currentIndexRef = useRef(0);
+  const totalPagesRef = useRef(0);
+  const isTransitioningRef = useRef(false);
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
   // Stage tracking
   const [currentStage, setCurrentStage] = useState(0);
 
@@ -230,6 +238,10 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   const totalPages = pages.length;
 
   useEffect(() => {
+    totalPagesRef.current = totalPages;
+  }, [totalPages]);
+
+  useEffect(() => {
     initSession();
   }, []);
 
@@ -246,20 +258,16 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     }
   }
 
-  // Navigation helpers
+  // Navigation helpers (use refs so rapid taps don't leak stale indices)
   const goNext = useCallback(() => {
-    if (currentIndex < totalPages - 1) {
-      setDirection(1);
-      setCurrentIndex((i) => i + 1);
-    }
-  }, [currentIndex, totalPages]);
+    setDirection(1);
+    setCurrentIndex((i) => (i < totalPagesRef.current - 1 ? i + 1 : i));
+  }, []);
 
   const goPrev = useCallback(() => {
-    if (currentIndex > 0) {
-      setDirection(-1);
-      setCurrentIndex((i) => i - 1);
-    }
-  }, [currentIndex]);
+    setDirection(-1);
+    setCurrentIndex((i) => (i > 0 ? i - 1 : i));
+  }, []);
 
   // Stage transition handlers
   function handlePreparationContinue() {
@@ -341,43 +349,53 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   function handleProfileAnswerAndNext(fieldId: string, value: unknown) {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+
     handleProfileAnswer(fieldId, value);
     setTimeout(() => {
-      if (currentIndex < totalPages - 1) {
+      if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
         // Profile complete
         setPhase("stage_complete");
       }
+      isTransitioningRef.current = false;
     }, 300);
   }
 
   function handleCoreAnswer(questionId: string, value: number) {
-    const newAnswers = { ...coreAnswers, [questionId]: value };
-    setCoreAnswers(newAnswers);
+    // Guard: hızlı çift dokunmada iki setTimeout çakışıp soruyu atlatmasın
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
 
-    // Midway motivation removed - continue directly to next question
+    setCoreAnswers((prev) => ({ ...prev, [questionId]: value }));
 
     setTimeout(() => {
-      if (currentIndex < totalPages - 1) {
+      if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
         // Core complete
         setPhase("stage_complete");
       }
+      isTransitioningRef.current = false;
     }, 400);
   }
 
   function handleDeepDiveAnswer(questionId: string, value: number | string | string[]) {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+
     setDeepDiveAnswers((prev) => ({ ...prev, [questionId]: value }));
 
     setTimeout(() => {
-      if (currentIndex < totalPages - 1) {
+      if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
         // Deep dive complete
         setPhase("stage_complete");
       }
+      isTransitioningRef.current = false;
     }, 400);
   }
 
@@ -410,6 +428,23 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     // Bu fonksiyon Stage 2 (core) tamamlandığında çağrılır
     // Profil + Core cevaplarını birlikte gönderir
     if (!sessionId || !sessionData) return;
+
+    // Client-side guard: backend "Eksik temel sorular" hatasına düşmeden önce
+    // kullanıcıyı cevaplanmamış soruya geri götür.
+    const submittedCore = coreAnswersRef.current;
+    const missingCoreIdx = sessionData.core_questions.findIndex(
+      (q) => !(q.id in submittedCore)
+    );
+    if (missingCoreIdx >= 0) {
+      const missing = sessionData.core_questions[missingCoreIdx];
+      console.warn("[TestFlow] submit öncesi eksik core cevap:", missing.id);
+      setCurrentStage(2);
+      setCurrentIndex(missingCoreIdx);
+      setDirection(1);
+      setPhase("core");
+      setError("Lütfen tüm soruları cevaplayın. Atlanan bir soruya yönlendirildiniz.");
+      return;
+    }
 
     setError(null);
     setPhase("loading");
@@ -444,6 +479,24 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   async function handleFinalAnalysis() {
     if (!sessionId) return;
+
+    // Client-side guard: atlanmış deep-dive sorusu varsa kullanıcıyı oraya yönlendir.
+    // NOT: deep_dive soruları backend tarafında required flag'i taşımıyor olabilir;
+    // yine de UI'da bütün soruları gezmesi beklenir. Eksik olanları yakala.
+    const submittedDd = deepDiveAnswersRef.current;
+    const missingDdIdx = deepDiveQuestions.findIndex(
+      (q) => !(q.id in submittedDd)
+    );
+    if (missingDdIdx >= 0) {
+      const missing = deepDiveQuestions[missingDdIdx];
+      console.warn("[TestFlow] final submit öncesi eksik deep-dive cevap:", missing.id);
+      setCurrentStage(3);
+      setCurrentIndex(missingDdIdx);
+      setDirection(1);
+      setPhase("deep_dive");
+      setError("Lütfen tüm soruları cevaplayın. Atlanan bir soruya yönlendirildiniz.");
+      return;
+    }
 
     setPhase("submitting");
     setError(null);
