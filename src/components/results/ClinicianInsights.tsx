@@ -162,8 +162,16 @@ function LegacyView({
   analysisBlindSpots,
   inferences,
 }: Omit<ClinicianInsightsProps, "sessionGuide">) {
+  // Hipotez bölümünde detaylı gösterilen inference'ları "Sürdürücü Örüntüler"
+  // blokunda tekrar etmemek için filtrele — bilişsel yük azaltılır.
+  const hypothesisTitles = new Set(
+    (inferences ?? []).filter((i) => i.clinical_hypothesis).map((i) => i.title),
+  );
   const filteredInferences = (inferences ?? []).filter(
-    (item) => item.type !== "hidden_strength" && item.type !== "absence_signal",
+    (item) =>
+      item.type !== "hidden_strength" &&
+      item.type !== "absence_signal" &&
+      !hypothesisTitles.has(item.title),
   );
 
   const sortedInferences = [...filteredInferences].sort((left, right) => {
@@ -291,6 +299,71 @@ function LegacyView({
   );
 }
 
+// v3 klinik kategoriler — SessionGuide varken özet olarak gösterilir.
+// Bu tipler SessionGuide'da terapiste yönelik eyleme dönüşmeyen ama
+// klinik açıdan kayda değer ham dinamiklerdir.
+const V3_CLINICAL_TYPES = new Set([
+  "temporal_pattern",
+  "defense_hypothesis",
+  "attachment_dynamic",
+  "alliance_signal",
+  "readiness_mismatch",
+  "intervention_priority",
+]);
+
+function filterV3ClinicalInferences(list: Insight[]): Insight[] {
+  const hypothesisIds = new Set(
+    list.filter((i) => i.clinical_hypothesis).map((i) => i.title),
+  );
+  return list.filter(
+    (i) =>
+      i.type &&
+      V3_CLINICAL_TYPES.has(i.type as string) &&
+      // Hipotez bölümünde zaten detaylı gösterilenler burada tekrar etmesin
+      !hypothesisIds.has(i.title),
+  );
+}
+
+function V3ClinicalSummary({ inferences }: { inferences: Insight[] }) {
+  const v3List = filterV3ClinicalInferences(inferences);
+  if (v3List.length === 0) return null;
+
+  const sorted = [...v3List].sort((left, right) => {
+    const order = { critical: 0, warning: 1, info: 2 };
+    return (order[left.severity as keyof typeof order] ?? 2) -
+      (order[right.severity as keyof typeof order] ?? 2);
+  });
+
+  return (
+    <div className="rounded-xl border border-slate-100 bg-white p-4 sm:p-5">
+      <div className="flex items-center gap-2.5 sm:gap-3 mb-3">
+        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
+          <RefreshCw className="h-4 w-4 text-slate-500" />
+        </div>
+        <div>
+          <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900">Klinik Gözlemler</h3>
+          <p className="text-[11px] sm:text-[12px] text-gray-400 leading-snug">
+            Seans rehberinin altında yatan örüntü ve dinamikler
+          </p>
+        </div>
+      </div>
+      <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-2">
+        {sorted.slice(0, 6).map((item, index) => (
+          <ExpandableCard
+            key={`v3-${index}`}
+            index={index + 1}
+            title={item.title}
+            description={item.insight}
+            severity={SEVERITY_CONFIG[item.severity] ?? SEVERITY_CONFIG.info}
+            actionLabel={item.suggestion || item.therapeutic_implication ? "Seans yönelimi" : undefined}
+            actionContent={item.therapeutic_implication ?? item.suggestion ?? undefined}
+          />
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
 export function ClinicianInsights({
   sessionGuide = [],
   reportBlindSpots = [],
@@ -310,7 +383,13 @@ export function ClinicianInsights({
   return (
     <div className="space-y-4 p-3 sm:p-5 -m-3 sm:-m-5">
       {hasSessionGuide ? (
-        <SessionGuideSection items={sessionGuide} />
+        <>
+          <SessionGuideSection items={sessionGuide} />
+          {/* v3: Session rehberi varken klinik kategorilerdeki inference'ların
+              özet görünümü. Legacy "Sürdürücü Örüntüler"i tekrar etmez —
+              sadece v3 klinik katmanları (temporal, defense, attachment...). */}
+          <V3ClinicalSummary inferences={inferences} />
+        </>
       ) : (
         <LegacyView
           reportBlindSpots={reportBlindSpots}

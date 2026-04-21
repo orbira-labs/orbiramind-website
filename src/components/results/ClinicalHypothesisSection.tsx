@@ -106,14 +106,16 @@ function HypothesisCard({ inf, index }: { inf: Insight; index: number }) {
             className="overflow-hidden"
           >
             <div className="px-3 pb-4 pl-9 sm:px-4 sm:pl-12 space-y-3">
-              {/* Rakip hipotez */}
-              <HypothesisBlock
-                icon={<Scale className="h-3.5 w-3.5 text-gray-500" />}
-                label="Rakip açıklama"
-                tone="neutral"
-              >
-                {hypothesis.null_alternative}
-              </HypothesisBlock>
+              {/* Rakip hipotez — sadece dolu ise göster */}
+              {hypothesis.null_alternative?.trim() && (
+                <HypothesisBlock
+                  icon={<Scale className="h-3.5 w-3.5 text-gray-500" />}
+                  label="Rakip açıklama"
+                  tone="neutral"
+                >
+                  {hypothesis.null_alternative}
+                </HypothesisBlock>
+              )}
 
               {/* Seansta test */}
               {hypothesis.testable_in_session.length > 0 && (
