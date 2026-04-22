@@ -291,12 +291,12 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   function handleStageCompleteContinue() {
+    // Stages 1 and 2 now skip stage_complete and go directly to next stage
+    // This is kept as a fallback but shouldn't be called
     if (currentStage === 1) {
-      // Stage 1 (profil) bitti, Stage 2'ye (core) geç
       setCurrentStage(2);
       setPhase("stage_intro");
     } else if (currentStage === 2) {
-      // Stage 2 (core) bitti, şimdi profil + core cevaplarını gönder
       handleProfileSubmit();
     }
   }
@@ -357,8 +357,9 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
-        // Profile complete
-        setPhase("stage_complete");
+        // Profile complete - go directly to stage 2 intro
+        setCurrentStage(2);
+        setPhase("stage_intro");
       }
       isTransitioningRef.current = false;
     }, 300);
@@ -375,8 +376,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
-        // Core complete
-        setPhase("stage_complete");
+        // Core complete - submit profile+core and go to deep dive
+        handleProfileSubmit();
       }
       isTransitioningRef.current = false;
     }, 400);
@@ -420,7 +421,9 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     if (currentIndex < totalPages - 1) {
       goNext();
     } else {
-      setPhase("stage_complete");
+      // Profile complete - go directly to stage 2 intro
+      setCurrentStage(2);
+      setPhase("stage_intro");
     }
   }
 
