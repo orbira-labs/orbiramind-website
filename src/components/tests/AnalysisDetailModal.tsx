@@ -88,16 +88,20 @@ export function AnalysisDetailModal({
   const handleDelete = async () => {
     if (!analysis) return;
     setDeleting(true);
-    const { error } = await supabase.current
-      .from("test_invitations")
-      .delete()
-      .eq("id", analysis.id);
+    // Atomic silme: hem pro.test_invitations satırını hem (varsa) ilgili
+    // shared.api_sessions + hae.analysis_snapshots + yardımcı logları temizler.
+    // GDPR/KVKK: silme sonrası orbira-engines'da kullanıcıya ait veri kalmaz.
+    const { data, error } = await supabase.current.rpc(
+      "delete_test_invitation_with_session",
+      { p_invitation_id: analysis.id }
+    );
     setDeleting(false);
-    if (!error) {
+    if (!error && data) {
       toast.success("Analiz başarıyla silindi");
       onDeleted?.();
       onClose();
     } else {
+      console.error("Analiz silme hatası:", error);
       toast.error("Analiz silinirken bir hata oluştu");
     }
   };
