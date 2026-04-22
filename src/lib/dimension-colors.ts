@@ -126,8 +126,41 @@ const POOL_LABELS: Record<string, string> = {
   caregiving: "Bakım Verme",
   hobbies_leisure: "Hobiler",
   support: "Destek",
+  // Additional pools
+  change_readiness: "Değişime Hazırlık",
+  intimacy: "Yakınlık",
+  motivation: "Motivasyon",
+  self_esteem: "Öz Güven",
+  anxiety: "Kaygı",
+  depression: "Depresyon",
+  energy: "Enerji",
+  productivity: "Verimlilik",
+  creativity: "Yaratıcılık",
+  mindfulness: "Farkındalık",
+  resilience: "Dayanıklılık",
+  boundaries: "Sınırlar",
+  conflict: "Çatışma",
+  trust: "Güven",
+  attachment: "Bağlanma",
+  sexuality: "Cinsellik",
+  body_image: "Beden Algısı",
+  addiction: "Bağımlılık",
+  trauma: "Travma",
+  grief: "Yas",
+  loneliness: "Yalnızlık",
+  purpose: "Amaç",
+  spirituality: "Maneviyat",
+  values: "Değerler",
+  identity: "Kimlik",
+  growth: "Gelişim",
 };
 
+function formatPoolName(pool: string): string {
+  return pool
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function getPoolLabel(pool: string): string {
-  return POOL_LABELS[pool] ?? pool;
+  return POOL_LABELS[pool] ?? formatPoolName(pool);
 }
