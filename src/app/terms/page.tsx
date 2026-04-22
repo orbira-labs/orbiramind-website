@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText, ArrowLeft } from "lucide-react";
+import { SELLER, SELLER_DISPLAY, LEGAL_LAST_UPDATED } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Kullanım Koşulları",
+  description:
+    "OrbiraMind platformunun kullanımına ilişkin şartlar, kullanıcı yükümlülükleri ve hizmet koşulları.",
 };
 
 const sections = [
@@ -12,12 +15,12 @@ const sections = [
     title: "Taraflar ve Kapsam",
     content: (
       <p className="text-pro-text-secondary">
-        Bu Kullanım Koşulları, <strong className="text-pro-text">Orbira Labs</strong>{" "}
-        tarafından işletilen <strong className="text-pro-text">OrbiraMind</strong>{" "}
-        platformunun kullanımına ilişkin şartları düzenler. Platformu kullanarak
-        bu koşulları okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan etmiş
-        olursunuz. Koşulları kabul etmiyorsanız platformu kullanmamanız
-        gerekmektedir.
+        Bu Kullanım Koşulları, <strong className="text-pro-text">{SELLER.legalName}</strong>{" "}
+        (bireysel satıcı) tarafından işletilen{" "}
+        <strong className="text-pro-text">OrbiraMind</strong> platformunun kullanımına
+        ilişkin şartları düzenler. Platformu kullanarak bu koşulları okuduğunuzu,
+        anladığınızı ve kabul ettiğinizi beyan etmiş olursunuz. Koşulları kabul
+        etmiyorsanız platformu kullanmamanız gerekmektedir.
       </p>
     ),
   },
@@ -35,7 +38,7 @@ const sections = [
           <li>Danışan ilerleme ve oturum notları</li>
         </ul>
         <p>
-          Orbira Labs, hizmet kapsamını önceden bildirim yaparak değiştirme
+          İşletici, hizmet kapsamını önceden bildirim yaparak değiştirme
           hakkını saklı tutar.
         </p>
       </div>
@@ -77,7 +80,7 @@ const sections = [
           yükümlülüklerinden <strong className="text-pro-text">münhasıran sorumludur</strong>.
         </p>
         <p>
-          Orbira Labs bu verilerde <strong className="text-pro-text">veri işleyen</strong>{" "}
+          OrbiraMind bu verilerde <strong className="text-pro-text">veri işleyen</strong>{" "}
           konumundadır ve verileri yalnızca hizmet sunumu amacıyla işler.
           Danışan verilerinin herhangi bir üçüncü tarafla paylaşılması,
           satılması veya pazarlama amacıyla kullanılması kesinlikle yasaktır.
@@ -93,10 +96,10 @@ const sections = [
         Hesabınız ve hesabınız üzerinden gerçekleştirilen tüm işlemlerden
         yalnızca siz sorumlusunuz. Yetkisiz erişim veya güvenlik ihlali
         şüpheniz durumunda derhal{" "}
-        <a href="mailto:info@orbiralabs.com" className="text-pro-primary underline">
-          info@orbiralabs.com
+        <a href={SELLER_DISPLAY.emailHref} className="text-pro-primary underline">
+          {SELLER_DISPLAY.emailDisplay}
         </a>{" "}
-        adresine bildirmeniz gerekmektedir. Orbira Labs, yetkisiz erişimden
+        adresine bildirmeniz gerekmektedir. İşletici, yetkisiz erişimden
         kaynaklanan zararlardan sorumlu tutulamaz.
       </p>
     ),
@@ -120,7 +123,7 @@ const sections = [
         <p>
           Platform; arayüz tasarımı, kaynak kodu, algoritmalar, motor
           mimarileri (HAE, AQE), analiz şablonları ve tüm içerikler dahil
-          olmak üzere Orbira Labs&apos;in münhasır fikri mülkiyetindedir.
+          olmak üzere işleticinin münhasır fikri mülkiyetindedir.
         </p>
         <p>
           Kullanıcıya yalnızca kişisel mesleki kullanım amacıyla sınırlı,
@@ -175,10 +178,20 @@ const sections = [
       <div className="space-y-2 text-pro-text-secondary">
         <p>
           Platformun bazı özellikleri kredi veya abonelik sistemiyle sunulabilir.
-          Ücretlendirme koşulları ilgili ekranlarda ayrıca belirtilir. Orbira
-          Labs, fiyatlandırmayı önceden bildirerek değiştirme hakkını saklı
-          tutar; aktif abonelikler dönem sonuna kadar mevcut koşullardan devam
-          eder.
+          Ücretlendirme koşulları ilgili ekranlarda ayrıca belirtilir. İşletici,
+          fiyatlandırmayı önceden bildirerek değiştirme hakkını saklı tutar;
+          aktif abonelikler dönem sonuna kadar mevcut koşullardan devam eder.
+        </p>
+        <p>
+          Satın alma işlemlerine ilişkin taraf hak ve yükümlülükleri{" "}
+          <Link href="/mesafeli-satis-sozlesmesi" className="text-pro-primary underline">
+            Mesafeli Satış Sözleşmesi
+          </Link>
+          , iade ve cayma hakkı kuralları ise{" "}
+          <Link href="/iade-iptal" className="text-pro-primary underline">
+            İade, İptal ve Cayma Hakkı
+          </Link>
+          {" "}sayfasında düzenlenir.
         </p>
       </div>
     ),
@@ -189,7 +202,7 @@ const sections = [
     content: (
       <p className="text-pro-text-secondary">
         Bu koşulların ihlali, şüpheli aktivite veya yasal zorunluluklar
-        halinde Orbira Labs hesabınızı önceden bildirim yapmaksızın askıya
+        halinde işletici, hesabınızı önceden bildirim yapmaksızın askıya
         alabilir veya sonlandırabilir. Hesap silme talebinde danışan verileri
         dahil tüm veriler KVKK kapsamında belirlenen süreler içinde imha
         edilir.
@@ -201,7 +214,7 @@ const sections = [
     title: "Sorumluluğun Sınırlandırılması",
     content: (
       <p className="text-pro-text-secondary">
-        Platform &quot;olduğu gibi&quot; sunulur. Orbira Labs; kesintisiz hizmet,
+        Platform &quot;olduğu gibi&quot; sunulur. İşletici; kesintisiz hizmet,
         hatasız çalışma veya analiz sonuçlarının belirli bir amaca
         uygunluğuna dair garanti vermez. Yürürlükteki hukukun izin verdiği
         azami ölçüde, dolaylı veya arızi zararlardan sorumlu tutulamaz.
@@ -229,9 +242,11 @@ const sections = [
       <p className="text-pro-text-secondary">
         Bu koşullar <strong className="text-pro-text">Türkiye Cumhuriyeti hukuku</strong>{" "}
         kapsamında yorumlanır. Bu koşullardan doğan uyuşmazlıklarda{" "}
-        <strong className="text-pro-text">İstanbul Mahkemeleri ve İcra Daireleri</strong>{" "}
-        münhasır yetkiye sahiptir. AB vatandaşları için GDPR hükümleri
-        uygulanabildiği ölçüde saklıdır.
+        <strong className="text-pro-text">Muğla Mahkemeleri ve İcra Daireleri</strong>{" "}
+        yetkilidir. 6502 sayılı Tüketicinin Korunması Hakkında Kanun kapsamındaki
+        tüketici uyuşmazlıklarında, Ticaret Bakanlığı&apos;nca ilan edilen parasal
+        sınıra göre Tüketici Hakem Heyetleri veya Tüketici Mahkemeleri yetkilidir.
+        AB vatandaşları için GDPR hükümleri uygulanabildiği ölçüde saklıdır.
       </p>
     ),
   },
@@ -251,12 +266,29 @@ const sections = [
     id: "16",
     title: "İletişim",
     content: (
-      <p className="text-pro-text-secondary">
-        Kullanım koşullarına ilişkin soru ve talepleriniz için:{" "}
-        <a href="mailto:info@orbiralabs.com" className="text-pro-primary underline">
-          info@orbiralabs.com
-        </a>
-      </p>
+      <div className="space-y-1 text-pro-text-secondary">
+        <p>Kullanım koşullarına ilişkin soru ve talepleriniz için:</p>
+        <ul className="space-y-0.5">
+          <li>
+            <strong className="text-pro-text">İşletici:</strong> {SELLER.legalName}
+          </li>
+          <li>
+            <strong className="text-pro-text">Adres:</strong> {SELLER_DISPLAY.addressSingle}
+          </li>
+          <li>
+            <strong className="text-pro-text">Telefon:</strong>{" "}
+            <a href={SELLER_DISPLAY.phoneHref} className="text-pro-primary underline">
+              {SELLER_DISPLAY.phoneDisplay}
+            </a>
+          </li>
+          <li>
+            <strong className="text-pro-text">E-posta:</strong>{" "}
+            <a href={SELLER_DISPLAY.emailHref} className="text-pro-primary underline">
+              {SELLER_DISPLAY.emailDisplay}
+            </a>
+          </li>
+        </ul>
+      </div>
     ),
   },
 ];
@@ -267,11 +299,11 @@ export default function TermsPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         {/* Back */}
         <Link
-          href="/auth/login"
+          href="/"
           className="inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
-          Geri dön
+          Ana sayfa
         </Link>
 
         {/* Header */}
@@ -285,7 +317,7 @@ export default function TermsPage() {
                 Kullanım Koşulları
               </h1>
               <p className="text-sm text-pro-text-tertiary">
-                Son güncelleme: Nisan 2026
+                Son güncelleme: {LEGAL_LAST_UPDATED}
               </p>
             </div>
           </div>
@@ -320,23 +352,35 @@ export default function TermsPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-10 pt-8 border-t border-pro-border text-center space-y-2">
+        <div className="mt-10 pt-8 border-t border-pro-border text-center space-y-3">
           <p className="text-sm text-pro-text-secondary">
             Sorularınız için:{" "}
             <a
-              href="mailto:info@orbiralabs.com"
+              href={SELLER_DISPLAY.emailHref}
               className="text-pro-primary underline"
             >
-              info@orbiralabs.com
+              {SELLER_DISPLAY.emailDisplay}
             </a>
           </p>
-          <div className="flex items-center justify-center gap-4 text-xs text-pro-text-tertiary">
+          <div className="flex items-center justify-center flex-wrap gap-x-4 gap-y-2 text-xs text-pro-text-tertiary">
             <Link href="/privacy" className="hover:text-pro-text transition-colors">
-              Gizlilik Politikası
+              Gizlilik
             </Link>
             <span>·</span>
-            <Link href="/auth/login" className="hover:text-pro-text transition-colors">
-              OrbiraMind&apos;a Giriş Yap
+            <Link href="/kvkk" className="hover:text-pro-text transition-colors">
+              KVKK
+            </Link>
+            <span>·</span>
+            <Link href="/mesafeli-satis-sozlesmesi" className="hover:text-pro-text transition-colors">
+              Mesafeli Satış
+            </Link>
+            <span>·</span>
+            <Link href="/iade-iptal" className="hover:text-pro-text transition-colors">
+              İade ve İptal
+            </Link>
+            <span>·</span>
+            <Link href="/iletisim" className="hover:text-pro-text transition-colors">
+              İletişim
             </Link>
           </div>
         </div>

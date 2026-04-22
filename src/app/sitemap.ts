@@ -2,15 +2,22 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbiramind.com'
-  
+
   // Sadece public sayfalar (panel sayfaları hariç)
   const publicPages = [
     '',
     '/how-it-works',
+    '/hakkimizda',
+    '/iletisim',
     '/auth/login',
     '/auth/register',
     '/privacy',
     '/terms',
+    '/kvkk',
+    '/cerez-politikasi',
+    '/mesafeli-satis-sozlesmesi',
+    '/iade-iptal',
+    '/teslimat',
   ]
 
   return publicPages.map((route) => ({

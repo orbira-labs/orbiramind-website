@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Shield, ArrowLeft } from "lucide-react";
+import { SELLER, SELLER_DISPLAY, LEGAL_LAST_UPDATED } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Gizlilik Politikası & KVKK Aydınlatma Metni",
+  title: "Gizlilik Politikası",
+  description:
+    "OrbiraMind gizlilik politikası — kişisel verilerinizin nasıl toplandığı, işlendiği ve korunduğu hakkında özet bilgi.",
 };
 
 const sections = [
@@ -11,20 +14,32 @@ const sections = [
     id: "01",
     title: "Veri Sorumlusu",
     content: (
-      <p>
-        Bu platform, <strong>Orbira Labs</strong> tarafından işletilmektedir.{" "}
-        <strong>OrbiraMind</strong>, psikologlar, koçlar ve danışmanlar için
-        tasarlanmış bir danışan yönetim ve analiz platformudur. Kişisel
-        verilerinizin işlenmesinden sorumlu veri sorumlusu Orbira Labs olup
-        iletişim adresi{" "}
-        <a
-          href="mailto:info@orbiralabs.com"
-          className="text-pro-primary underline"
-        >
-          info@orbiralabs.com
-        </a>
-        &apos;dur.
-      </p>
+      <div className="space-y-2">
+        <p>
+          <strong>OrbiraMind</strong>, psikologlar, koçlar ve danışmanlar için
+          tasarlanmış bir danışan yönetim ve kişilik analizi platformudur.
+          Kişisel verilerinizin işlenmesinden sorumlu veri sorumlusu, platformu
+          işleten <strong>{SELLER.legalName}</strong> (bireysel satıcı)&apos;dir.
+        </p>
+        <p>
+          İletişim: {SELLER_DISPLAY.addressSingle} — Telefon{" "}
+          <a href={SELLER_DISPLAY.phoneHref} className="text-pro-primary underline">
+            {SELLER_DISPLAY.phoneDisplay}
+          </a>{" "}
+          — E-posta{" "}
+          <a href={SELLER_DISPLAY.emailHref} className="text-pro-primary underline">
+            {SELLER_DISPLAY.emailDisplay}
+          </a>
+          .
+        </p>
+        <p className="text-xs text-pro-text-tertiary">
+          KVKK kapsamındaki detaylı aydınlatma metni için:{" "}
+          <Link href="/kvkk" className="text-pro-primary underline">
+            KVKK Aydınlatma Metni
+          </Link>
+          .
+        </p>
+      </div>
     ),
   },
   {
@@ -142,7 +157,7 @@ const sections = [
           <li>
             Bu işlemenin amacı ve hukuki dayanağı
           </li>
-          <li>Verilerin Orbira Labs altyapısında saklandığı</li>
+          <li>Verilerin Supabase ve Vercel altyapısında saklandığı</li>
           <li>Danışanın sahip olduğu KVKK hakları</li>
         </ul>
       </div>
@@ -155,8 +170,8 @@ const sections = [
       <div className="space-y-3 text-pro-text-secondary">
         <p>
           OrbiraMind, kişilik analizi için <strong className="text-pro-text">HAE (Human Analysis Engine)</strong> ve{" "}
-          <strong className="text-pro-text">AQE (Adaptive Question Engine)</strong> adlı Orbira Labs
-          proprietary hybrid motorlarını kullanmaktadır.
+          <strong className="text-pro-text">AQE (Adaptive Question Engine)</strong> adlı
+          proprietary hibrit motorları kullanmaktadır.
         </p>
         <ul className="list-disc list-inside space-y-1.5">
           <li>
@@ -201,8 +216,8 @@ const sections = [
           </li>
         </ul>
         <p className="font-medium text-pro-text mt-3">
-          Orbira Labs, kişisel verilerinizi asla satmaz ve pazarlama amacıyla
-          üçüncü taraflarla paylaşmaz.
+          Kişisel verileriniz asla satılmaz ve pazarlama amacıyla üçüncü
+          taraflarla paylaşılmaz.
         </p>
       </div>
     ),
@@ -254,12 +269,13 @@ const sections = [
         <p className="text-pro-text-secondary mt-2">
           Bu haklarınızı kullanmak için{" "}
           <a
-            href="mailto:info@orbiralabs.com"
+            href={SELLER_DISPLAY.emailHref}
             className="text-pro-primary underline"
           >
-            info@orbiralabs.com
+            {SELLER_DISPLAY.emailDisplay}
           </a>{" "}
-          adresine başvurabilirsiniz. Talebiniz 30 gün içinde yanıtlanacaktır.
+          adresine ya da <Link href="/iletisim" className="text-pro-primary underline">iletişim sayfası</Link>
+          {" "}üzerinden başvurabilirsiniz. Talebiniz 30 gün içinde yanıtlanacaktır.
         </p>
       </div>
     ),
@@ -308,11 +324,11 @@ export default function PrivacyPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         {/* Back */}
         <Link
-          href="/auth/login"
+          href="/"
           className="inline-flex items-center gap-1.5 text-sm text-pro-text-secondary hover:text-pro-text transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
-          Geri dön
+          Ana sayfa
         </Link>
 
         {/* Header */}
@@ -326,7 +342,7 @@ export default function PrivacyPage() {
                 Gizlilik Politikası
               </h1>
               <p className="text-sm text-pro-text-tertiary">
-                KVKK Aydınlatma Metni · Son güncelleme: Nisan 2026
+                Son güncelleme: {LEGAL_LAST_UPDATED}
               </p>
             </div>
           </div>
@@ -362,23 +378,31 @@ export default function PrivacyPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-10 pt-8 border-t border-pro-border text-center space-y-2">
+        <div className="mt-10 pt-8 border-t border-pro-border text-center space-y-3">
           <p className="text-sm text-pro-text-secondary">
             Sorularınız için:{" "}
             <a
-              href="mailto:info@orbiralabs.com"
+              href={SELLER_DISPLAY.emailHref}
               className="text-pro-primary underline"
             >
-              info@orbiralabs.com
+              {SELLER_DISPLAY.emailDisplay}
             </a>
           </p>
-          <div className="flex items-center justify-center gap-4 text-xs text-pro-text-tertiary">
+          <div className="flex items-center justify-center flex-wrap gap-x-4 gap-y-2 text-xs text-pro-text-tertiary">
+            <Link href="/kvkk" className="hover:text-pro-text transition-colors">
+              KVKK Aydınlatma Metni
+            </Link>
+            <span>·</span>
+            <Link href="/cerez-politikasi" className="hover:text-pro-text transition-colors">
+              Çerez Politikası
+            </Link>
+            <span>·</span>
             <Link href="/terms" className="hover:text-pro-text transition-colors">
               Kullanım Koşulları
             </Link>
             <span>·</span>
-            <Link href="/auth/login" className="hover:text-pro-text transition-colors">
-              OrbiraMind&apos;a Giriş Yap
+            <Link href="/iletisim" className="hover:text-pro-text transition-colors">
+              İletişim
             </Link>
           </div>
         </div>

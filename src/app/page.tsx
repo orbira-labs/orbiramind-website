@@ -11,9 +11,13 @@ import {
   CheckCircle2,
   TrendingUp,
   Lock,
-  Palette
+  Palette,
+  MapPin,
+  Phone,
+  Mail
 } from "lucide-react";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
+import { SELLER, SELLER_DISPLAY } from "@/lib/legal";
 
 const PsychologyIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1062,38 +1066,88 @@ export default function HomePage() {
           ============================================================ */}
 
       {/* Desktop Footer */}
-      <footer className="desktop-only py-12 px-8 lg:px-12 border-t border-[#eee]">
+      <footer className="desktop-only py-12 px-8 lg:px-12 border-t border-[#eee] bg-[#FAFAF8]">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-row items-center justify-between gap-8 mb-12">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-lg">
-                <span className="text-white text-2xl font-bold">O</span>
+          {/* Main grid */}
+          <div className="grid grid-cols-12 gap-8 mb-10">
+            {/* Brand + Seller Info */}
+            <div className="col-span-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-lg">
+                  <span className="text-white text-2xl font-bold">O</span>
+                </div>
+                <div>
+                  <span className="text-xl font-bold text-[#1a1a1a]">OrbiraMind</span>
+                  <p className="text-xs text-[#999]">Psikologlar için danışan yönetim platformu</p>
+                </div>
               </div>
-              <div>
-                <span className="text-xl font-bold text-[#1a1a1a]">OrbiraMind</span>
-                <p className="text-xs text-[#999]">by Orbira Labs</p>
+              <div className="text-xs text-[#666] leading-relaxed space-y-1.5">
+                <p className="font-semibold text-[#1a1a1a]">Satıcı: {SELLER.legalName}</p>
+                <p className="flex items-start gap-2">
+                  <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-[#999]" />
+                  <span>{SELLER_DISPLAY.addressSingle}</span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-[#999]" />
+                  <a href={SELLER_DISPLAY.phoneHref} className="hover:text-[#1a1a1a] transition-colors">
+                    {SELLER_DISPLAY.phoneDisplay}
+                  </a>
+                </p>
+                <p className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-[#999]" />
+                  <a href={SELLER_DISPLAY.emailHref} className="hover:text-[#1a1a1a] transition-colors">
+                    {SELLER_DISPLAY.emailDisplay}
+                  </a>
+                </p>
               </div>
             </div>
-            
-            <div className="flex items-center gap-8 text-sm">
-              <Link href="/#features" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</Link>
-              <Link href="/#for-who" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</Link>
-              <Link href="/privacy" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Gizlilik</Link>
-              <Link href="/terms" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kullanım Koşulları</Link>
-              <a href="mailto:destek@orbiramind.com" className="text-[#D4856A] hover:text-[#C97B5D] font-medium transition-colors">Destek</a>
+
+            {/* Platform */}
+            <div className="col-span-3">
+              <h4 className="text-xs font-bold text-[#1a1a1a] uppercase tracking-wider mb-4">
+                Platform
+              </h4>
+              <ul className="space-y-2.5 text-sm">
+                <li><Link href="/#features" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Özellikler</Link></li>
+                <li><Link href="/#for-who" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kimler İçin</Link></li>
+                <li><Link href="/how-it-works" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Nasıl Çalışır</Link></li>
+                <li><Link href="/hakkimizda" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Hakkımızda</Link></li>
+                <li><Link href="/iletisim" className="text-[#666] hover:text-[#1a1a1a] transition-colors">İletişim</Link></li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div className="col-span-4">
+              <h4 className="text-xs font-bold text-[#1a1a1a] uppercase tracking-wider mb-4">
+                Yasal Bilgiler
+              </h4>
+              <ul className="space-y-2.5 text-sm">
+                <li><Link href="/mesafeli-satis-sozlesmesi" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Mesafeli Satış Sözleşmesi</Link></li>
+                <li><Link href="/iade-iptal" className="text-[#666] hover:text-[#1a1a1a] transition-colors">İade, İptal ve Cayma Hakkı</Link></li>
+                <li><Link href="/teslimat" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Teslimat ve Hizmet Koşulları</Link></li>
+                <li><Link href="/kvkk" className="text-[#666] hover:text-[#1a1a1a] transition-colors">KVKK Aydınlatma Metni</Link></li>
+                <li><Link href="/cerez-politikasi" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Çerez Politikası</Link></li>
+                <li><Link href="/privacy" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Gizlilik Politikası</Link></li>
+                <li><Link href="/terms" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kullanım Koşulları</Link></li>
+              </ul>
             </div>
           </div>
-          
-          <div className="pt-8 border-t border-[#eee] flex flex-row items-center justify-between gap-4 text-sm text-[#999]">
-            <p>© 2026 Orbira Labs. Tüm hakları saklıdır.</p>
-            <div className="flex items-center gap-6">
+
+          {/* Bottom bar */}
+          <div className="pt-8 border-t border-[#eee] flex flex-row items-center justify-between gap-4 text-xs text-[#999]">
+            <p>© {new Date().getFullYear()} {SELLER.legalName}. Tüm hakları saklıdır.</p>
+            <div className="flex items-center gap-5">
               <span className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
+                <Shield className="h-3.5 w-3.5" />
                 KVKK Uyumlu
               </span>
               <span className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                Veriler Türkiye&apos;de
+                <Lock className="h-3.5 w-3.5" />
+                TLS/SSL Şifreli
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                Güvenli Ödeme (iyzico / Shopier)
               </span>
             </div>
           </div>
@@ -1101,43 +1155,88 @@ export default function HomePage() {
       </footer>
 
       {/* Mobile Footer */}
-      <footer className="mobile-only py-10 px-5 border-t border-[#eee] pb-safe">
+      <footer className="mobile-only py-10 px-5 border-t border-[#eee] pb-safe bg-[#FAFAF8]">
         <div className="max-w-lg mx-auto">
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#5B7B6A] to-[#3D5A4C] flex items-center justify-center shadow-md">
               <span className="text-white text-lg font-bold">O</span>
             </div>
-            <div>
+            <div className="text-center">
               <span className="text-lg font-bold text-[#1a1a1a]">OrbiraMind</span>
-              <p className="text-[10px] text-[#999]">by Orbira Labs</p>
             </div>
           </div>
-          
-          {/* Links - Two Rows */}
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm mb-6">
-            <Link href="/#features-mobile" className="text-[#666]">Özellikler</Link>
-            <Link href="/#for-who-mobile" className="text-[#666]">Kimler İçin</Link>
-            <Link href="/privacy" className="text-[#666]">Gizlilik</Link>
-            <Link href="/terms" className="text-[#666]">Koşullar</Link>
-            <a href="mailto:destek@orbiramind.com" className="text-[#D4856A] font-medium">Destek</a>
+
+          {/* Platform Links */}
+          <div className="mb-5">
+            <p className="text-[10px] font-bold text-[#1a1a1a] uppercase tracking-wider text-center mb-2.5">
+              Platform
+            </p>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
+              <Link href="/#features-mobile" className="text-[#666]">Özellikler</Link>
+              <Link href="/#for-who-mobile" className="text-[#666]">Kimler İçin</Link>
+              <Link href="/how-it-works" className="text-[#666]">Nasıl Çalışır</Link>
+              <Link href="/hakkimizda" className="text-[#666]">Hakkımızda</Link>
+              <Link href="/iletisim" className="text-[#666]">İletişim</Link>
+            </div>
           </div>
-          
+
+          {/* Legal Links */}
+          <div className="mb-6">
+            <p className="text-[10px] font-bold text-[#1a1a1a] uppercase tracking-wider text-center mb-2.5">
+              Yasal
+            </p>
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs">
+              <Link href="/mesafeli-satis-sozlesmesi" className="text-[#666]">Mesafeli Satış</Link>
+              <Link href="/iade-iptal" className="text-[#666]">İade ve İptal</Link>
+              <Link href="/teslimat" className="text-[#666]">Teslimat</Link>
+              <Link href="/kvkk" className="text-[#666]">KVKK</Link>
+              <Link href="/cerez-politikasi" className="text-[#666]">Çerezler</Link>
+              <Link href="/privacy" className="text-[#666]">Gizlilik</Link>
+              <Link href="/terms" className="text-[#666]">Koşullar</Link>
+            </div>
+          </div>
+
+          {/* Seller info */}
+          <div className="bg-white border border-[#eee] rounded-xl p-4 mb-5 text-xs text-[#666] space-y-1.5">
+            <p className="font-semibold text-[#1a1a1a]">Satıcı: {SELLER.legalName}</p>
+            <p className="flex items-start gap-2">
+              <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-[#999]" />
+              <span className="leading-relaxed">{SELLER_DISPLAY.addressSingle}</span>
+            </p>
+            <p className="flex items-center gap-2">
+              <Phone className="h-3.5 w-3.5 shrink-0 text-[#999]" />
+              <a href={SELLER_DISPLAY.phoneHref} className="text-[#1a1a1a]">
+                {SELLER_DISPLAY.phoneDisplay}
+              </a>
+            </p>
+            <p className="flex items-center gap-2">
+              <Mail className="h-3.5 w-3.5 shrink-0 text-[#999]" />
+              <a href={SELLER_DISPLAY.emailHref} className="text-[#1a1a1a] break-all">
+                {SELLER_DISPLAY.emailDisplay}
+              </a>
+            </p>
+          </div>
+
           {/* Trust Badges */}
-          <div className="flex justify-center gap-4 mb-6">
+          <div className="flex justify-center gap-4 mb-4">
             <span className="flex items-center gap-1.5 text-xs text-[#999]">
               <Shield className="h-3.5 w-3.5" />
               KVKK
             </span>
             <span className="flex items-center gap-1.5 text-xs text-[#999]">
               <Lock className="h-3.5 w-3.5" />
-              TR Sunucu
+              TLS/SSL
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-[#999]">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Güvenli Ödeme
             </span>
           </div>
-          
+
           {/* Copyright */}
           <p className="text-center text-xs text-[#999]">
-            © 2026 Orbira Labs
+            © {new Date().getFullYear()} {SELLER.legalName}
           </p>
         </div>
       </footer>

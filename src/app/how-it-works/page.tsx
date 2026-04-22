@@ -689,32 +689,37 @@ export default function HowItWorksPage() {
 
       {/* Footer - Desktop */}
       <footer className="desktop-only py-8 px-6 border-t border-[#eee]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-[#999]">© 2026 OrbiraMind. Tüm hakları saklıdır.</p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">
-              Gizlilik
-            </Link>
-            <Link href="/terms" className="text-sm text-[#666] hover:text-[#1a1a1a] transition-colors">
-              Kullanım Koşulları
-            </Link>
+        <div className="max-w-6xl mx-auto space-y-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+            <Link href="/hakkimizda" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Hakkımızda</Link>
+            <Link href="/iletisim" className="text-[#666] hover:text-[#1a1a1a] transition-colors">İletişim</Link>
+            <Link href="/mesafeli-satis-sozlesmesi" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Mesafeli Satış</Link>
+            <Link href="/iade-iptal" className="text-[#666] hover:text-[#1a1a1a] transition-colors">İade ve İptal</Link>
+            <Link href="/teslimat" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Teslimat</Link>
+            <Link href="/kvkk" className="text-[#666] hover:text-[#1a1a1a] transition-colors">KVKK</Link>
+            <Link href="/cerez-politikasi" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Çerezler</Link>
+            <Link href="/privacy" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Gizlilik</Link>
+            <Link href="/terms" className="text-[#666] hover:text-[#1a1a1a] transition-colors">Kullanım Koşulları</Link>
           </div>
+          <p className="text-center text-xs text-[#999]">© {new Date().getFullYear()} Seyyit Ali Perse · OrbiraMind. Tüm hakları saklıdır.</p>
         </div>
       </footer>
 
       {/* Footer - Mobile */}
       <footer className="mobile-only py-6 px-4 border-t border-[#eee] pb-safe">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-sm text-[#666] active:text-[#1a1a1a] transition-colors touch-manipulation">
-              Gizlilik
-            </Link>
-            <span className="text-[#ccc]">·</span>
-            <Link href="/terms" className="text-sm text-[#666] active:text-[#1a1a1a] transition-colors touch-manipulation">
-              Kullanım Koşulları
-            </Link>
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs">
+            <Link href="/hakkimizda" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">Hakkımızda</Link>
+            <Link href="/iletisim" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">İletişim</Link>
+            <Link href="/mesafeli-satis-sozlesmesi" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">Mesafeli Satış</Link>
+            <Link href="/iade-iptal" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">İade</Link>
+            <Link href="/teslimat" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">Teslimat</Link>
+            <Link href="/kvkk" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">KVKK</Link>
+            <Link href="/cerez-politikasi" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">Çerezler</Link>
+            <Link href="/privacy" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">Gizlilik</Link>
+            <Link href="/terms" className="text-[#666] active:text-[#1a1a1a] touch-manipulation">Koşullar</Link>
           </div>
-          <p className="text-xs text-[#999]">© 2026 OrbiraMind. Tüm hakları saklıdır.</p>
+          <p className="text-[11px] text-[#999]">© {new Date().getFullYear()} Seyyit Ali Perse · OrbiraMind</p>
         </div>
       </footer>
     </div>

@@ -359,12 +359,12 @@ export default function SettingsPage() {
                     <ExternalLink className="h-4 w-4 text-pro-text-tertiary" />
                   </Link>
                   <Link
-                    href="/support"
+                    href="/iletisim"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between p-3 rounded-xl hover:bg-pro-surface-alt transition-colors group"
                   >
-                    <span className="text-sm text-pro-text-secondary group-hover:text-pro-text">Destek</span>
+                    <span className="text-sm text-pro-text-secondary group-hover:text-pro-text">Destek & İletişim</span>
                     <ExternalLink className="h-4 w-4 text-pro-text-tertiary" />
                   </Link>
                   <div className="p-3 rounded-xl bg-pro-info-light/50 border border-pro-info/10">
