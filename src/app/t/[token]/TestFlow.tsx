@@ -760,7 +760,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
             <div className="flex-1 text-center">
               <h1 className="text-sm font-bold text-gray-900 tracking-tight">
-                {clientName || "Karakter Analizi"}
+                Karakter Analizi
               </h1>
             </div>
 
