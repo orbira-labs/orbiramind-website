@@ -393,8 +393,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
       if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
-        // Deep dive complete
-        setPhase("stage_complete");
+        // Deep dive complete - go directly to final analysis (skip stage_complete screen)
+        handleFinalAnalysis();
       }
       isTransitioningRef.current = false;
     }, 400);
@@ -925,7 +925,8 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
                         if (currentIndex < totalPages - 1) {
                           goNext();
                         } else {
-                          setPhase("stage_complete");
+                          // Deep dive complete - go directly to final analysis
+                          handleFinalAnalysis();
                         }
                       }}
                     />
