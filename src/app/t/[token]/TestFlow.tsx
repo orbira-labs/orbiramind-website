@@ -628,11 +628,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
 
   if (phase === "journey_map" && sessionData) {
     return (
-      <JourneyMap
-        profileGroupCount={sessionData.profile_fields.length}
-        coreQuestionCount={sessionData.core_questions.length}
-        onStart={handleJourneyMapStart}
-      />
+      <JourneyMap onStart={handleJourneyMapStart} />
     );
   }
 

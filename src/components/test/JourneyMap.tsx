@@ -1,11 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Brain, Compass, Clock, Bookmark } from "lucide-react";
+import { User, Brain, Compass } from "lucide-react";
 
 interface JourneyMapProps {
-  profileGroupCount: number;
-  coreQuestionCount: number;
   onStart: () => void;
 }
 
@@ -34,13 +32,8 @@ const STAGES = [
 ];
 
 export function JourneyMap({
-  profileGroupCount,
-  coreQuestionCount,
   onStart,
 }: JourneyMapProps) {
-  const totalQuestions = profileGroupCount + coreQuestionCount + 15;
-  const estimatedMinutes = Math.ceil(totalQuestions / 5);
-
   return (
     <>
       {/* ========== MOBILE VIEW ========== */}
@@ -58,13 +51,7 @@ export function JourneyMap({
 
           {/* Compact Mobile Stages - Minimal vertical design */}
           <div className="space-y-2 mb-4">
-            {STAGES.map((stage, index) => {
-              const questionCount =
-                stage.number === 1 ? `~${profileGroupCount}` :
-                stage.number === 2 ? `~${coreQuestionCount}` :
-                "~15";
-
-              return (
+            {STAGES.map((stage, index) => (
                 <motion.div
                   key={stage.number}
                   initial={{ opacity: 0, x: -15 }}
@@ -90,46 +77,10 @@ export function JourneyMap({
                       <p className="text-[11px] text-gray-500 line-clamp-1">{stage.subtitle}</p>
                     </div>
 
-                    {/* Question Count Badge */}
-                    <div
-                      className="px-2 py-0.5 rounded-md text-[10px] font-semibold flex-shrink-0 ml-2"
-                      style={{ backgroundColor: `${stage.color}10`, color: stage.color }}
-                    >
-                      {questionCount}
-                    </div>
                   </div>
                 </motion.div>
-              );
-            })}
+            ))}
           </div>
-
-          {/* Compact Time & Info Row */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.2 }}
-            className="flex items-center gap-2 mb-3"
-          >
-            <div className="flex-1 flex items-center justify-center gap-1.5 bg-[#5B7B6A]/5 rounded-lg px-2.5 py-2">
-              <Clock className="w-3.5 h-3.5 text-[#5B7B6A]" />
-              <span className="text-[11px] font-medium text-[#5B7B6A]">
-                ~{totalQuestions} soru · ~{estimatedMinutes} dk
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Compact Resume Note */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.55, duration: 0.2 }}
-            className="flex items-center gap-2 bg-white border border-gray-150 rounded-lg px-2.5 py-2"
-          >
-            <Bookmark className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-            <p className="text-[10px] text-gray-500">
-              Yarıda kalırsan kaldığın yerden devam edebilirsin.
-            </p>
-          </motion.div>
         </div>
 
         {/* Mobile CTA - Fixed bottom */}
@@ -166,14 +117,7 @@ export function JourneyMap({
 
           {/* Desktop Stages - Full vertical layout */}
           <div className="space-y-3 mb-6">
-            {STAGES.map((stage, index) => {
-              const Icon = stage.icon;
-              const questionCount =
-                stage.number === 1 ? `~${profileGroupCount}` :
-                stage.number === 2 ? `~${coreQuestionCount}` :
-                "~15";
-
-              return (
+            {STAGES.map((stage, index) => (
                 <motion.div
                   key={stage.number}
                   initial={{ opacity: 0, x: -20 }}
@@ -199,13 +143,6 @@ export function JourneyMap({
                       <p className="text-xs text-gray-500 line-clamp-1">{stage.subtitle}</p>
                     </div>
 
-                    {/* Question Count */}
-                    <div
-                      className="px-2.5 py-1 rounded-lg text-xs font-semibold flex-shrink-0 ml-2"
-                      style={{ backgroundColor: `${stage.color}10`, color: stage.color }}
-                    >
-                      {questionCount}
-                    </div>
                   </div>
 
                   {/* Connector Line */}
@@ -213,35 +150,8 @@ export function JourneyMap({
                     <div className="h-3 ml-9 border-l-2 border-dashed border-gray-200" />
                   )}
                 </motion.div>
-              );
-            })}
+            ))}
           </div>
-
-          {/* Time Estimate */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="flex items-center justify-center gap-2 bg-[#5B7B6A]/5 rounded-xl px-4 py-3 mb-4"
-          >
-            <Clock className="w-4 h-4 text-[#5B7B6A]" />
-            <span className="text-sm font-medium text-[#5B7B6A]">
-              ~{totalQuestions} soru · ~{estimatedMinutes} dakika
-            </span>
-          </motion.div>
-
-          {/* Resume Note */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-6"
-          >
-            <Bookmark className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <p className="text-xs text-gray-500">
-              Yarıda kalırsan kaldığın yerden devam edebilirsin, cevapların kaybolmaz.
-            </p>
-          </motion.div>
 
           {/* Start Button */}
           <motion.button
