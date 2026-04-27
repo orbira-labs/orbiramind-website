@@ -55,7 +55,7 @@ export default async function TestPage({ params }: TestPageProps) {
 
   const { data: invitation, error } = await supabase
     .from("test_invitations")
-    .select("*, client:clients(first_name, last_name)")
+    .select("*, client:clients(first_name, last_name), professional:professionals(first_name, last_name)")
     .eq("token", token)
     .single();
 
@@ -169,5 +169,9 @@ export default async function TestPage({ params }: TestPageProps) {
     ? `${invitation.client.first_name} ${invitation.client.last_name}`
     : undefined;
 
-  return <TestFlow token={token} clientName={clientName} />;
+  const professionalName = invitation.professional
+    ? `${invitation.professional.first_name ?? ""} ${invitation.professional.last_name ?? ""}`.trim() || undefined
+    : undefined;
+
+  return <TestFlow token={token} clientName={clientName} professionalName={professionalName} />;
 }

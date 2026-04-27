@@ -421,13 +421,13 @@ export function NotesCard() {
   return (
     <>
       <Card padding="lg" variant="elevated" className="h-full">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-pro-border">
           <h3 className="font-semibold text-pro-text">Notlarım</h3>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 text-sm text-pro-primary hover:text-pro-primary-hover font-semibold min-h-[44px] min-w-[44px] px-2 -mr-2 rounded-lg transition-colors touch-manipulation active:bg-pro-primary-light"
+            className="flex items-center gap-1 text-sm text-pro-primary hover:text-pro-primary-hover font-semibold"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5" />
             Ekle
           </button>
         </div>

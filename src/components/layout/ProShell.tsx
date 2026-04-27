@@ -35,7 +35,7 @@ export function ProShell({
         <div className="flex-1 flex flex-col min-w-0 relative z-[1] lg:overflow-y-auto lg:overscroll-contain">
           {/* Mobile safe-area top padding handled by TopBar */}
           {children}
-          <TrustFooter showBadges={false} showDate={true} />
+          <TrustFooter showBadges={true} showDate={true} />
           
           {/* Mobile bottom spacer for BottomNav + safe area */}
           <div className="h-20 pb-[env(safe-area-inset-bottom)] lg:hidden" />

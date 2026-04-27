@@ -67,6 +67,7 @@ type Phase =
 interface TestFlowProps {
   token: string;
   clientName?: string;
+  professionalName?: string;
 }
 
 // Page types for unified navigation
@@ -163,7 +164,7 @@ function CompletionScreen() {
   );
 }
 
-export function TestFlow({ token, clientName }: TestFlowProps) {
+export function TestFlow({ token, clientName, professionalName }: TestFlowProps) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [error, setError] = useState<string | null>(null);
 
@@ -178,12 +179,16 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   // Refs to always have latest answers for submit (React state batching fix)
   const coreAnswersRef = useRef<Record<string, number>>({});
   const deepDiveAnswersRef = useRef<Record<string, number | string | string[]>>({});
+  const profileRef = useRef<Record<string, unknown>>({});
   useEffect(() => {
     coreAnswersRef.current = coreAnswers;
   }, [coreAnswers]);
   useEffect(() => {
     deepDiveAnswersRef.current = deepDiveAnswers;
   }, [deepDiveAnswers]);
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -315,7 +320,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
         };
       case 3:
         return {
-          title: "Derinlemesine Keşif",
+          title: "Akıllı Keşif",
           subtitle: "Son aşama! Sana özel detaylı sorularla bitiriyoruz.",
         };
       default:
@@ -401,8 +406,9 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
   }
 
   function handleProfileNext() {
-    const currentField = sessionData?.profile_fields[currentIndex];
-    if (!currentField) return;
+    const currentItem = pages[currentIndex];
+    if (!currentItem || currentItem.type !== "profile") return;
+    const currentField = currentItem.field;
 
     const val = profile[currentField.id];
     if (currentField.required !== false) {
@@ -432,7 +438,32 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     // Profil + Core cevaplarını birlikte gönderir
     if (!sessionId || !sessionData) return;
 
-    // Client-side guard: backend "Eksik temel sorular" hatasına düşmeden önce
+    // Client-side guard 1: profil tarafında, koşullu olarak görünür ve required olan
+    // bir alan cevaplanmadıysa kullanıcıyı oraya geri götür. Backend'in
+    // "Eksik profil alanları" 422 hatasına düşmeden önce yakalar.
+    const latestProfile = profileRef.current;
+    const visibleProfileFields = sessionData.profile_fields.filter((field) =>
+      shouldShowProfileField(field, latestProfile)
+    );
+    const missingProfileIdx = visibleProfileFields.findIndex((field) => {
+      if (field.required === false) return false;
+      const val = latestProfile[field.id];
+      if (val == null) return true;
+      if (field.answer_type === "multi_select" && Array.isArray(val) && val.length === 0) return true;
+      return false;
+    });
+    if (missingProfileIdx >= 0) {
+      const missing = visibleProfileFields[missingProfileIdx];
+      console.warn("[TestFlow] submit öncesi eksik profil alanı:", missing.id);
+      setCurrentStage(1);
+      setCurrentIndex(missingProfileIdx);
+      setDirection(1);
+      setPhase("profile");
+      setError("Lütfen tüm profil sorularını cevaplayın. Atlanan bir soruya yönlendirildiniz.");
+      return;
+    }
+
+    // Client-side guard 2: backend "Eksik temel sorular" hatasına düşmeden önce
     // kullanıcıyı cevaplanmamış soruya geri götür.
     const submittedCore = coreAnswersRef.current;
     const missingCoreIdx = sessionData.core_questions.findIndex(
@@ -624,6 +655,7 @@ export function TestFlow({ token, clientName }: TestFlowProps) {
     return (
       <PreparationScreen
         clientName={clientName}
+        professionalName={professionalName}
         onContinue={handlePreparationContinue}
       />
     );

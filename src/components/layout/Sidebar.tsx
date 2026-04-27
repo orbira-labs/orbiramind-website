@@ -350,7 +350,7 @@ export function Sidebar() {
       <div className="relative z-[1] shrink-0 bg-[#4A5D52]">
         {/* Subtle top border */}
         <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
-        {/* Abonelik link - highlighted */}
+        {/* Satın Al link - highlighted */}
         <div className="p-2.5 pb-1">
           <Link
             href="/billing"
@@ -362,10 +362,10 @@ export function Sidebar() {
                 ? "bg-[#D4856A]/30 text-white" 
                 : "text-[#D4856A] hover:bg-[#D4856A]/20 hover:text-white"
             )}
-            title={collapsed ? "Abonelik" : undefined}
+            title={collapsed ? "Satın Al" : undefined}
           >
             <CreditCard className="h-5 w-5 shrink-0" />
-            {!collapsed && <span className="text-sm font-medium">Abonelik</span>}
+            {!collapsed && <span className="text-sm font-medium">Satın Al</span>}
           </Link>
         </div>
         {/* Settings link */}

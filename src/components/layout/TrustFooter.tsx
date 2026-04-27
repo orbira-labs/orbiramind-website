@@ -19,25 +19,28 @@ interface TrustFooterProps {
 export function TrustFooter({ showBadges = true, showDate = true }: TrustFooterProps) {
   return (
     <footer className="mt-auto border-t border-pro-border bg-pro-surface-alt/50">
-      <div className="px-4 sm:px-6 lg:px-8 py-3">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between">
-            {showBadges && (
-              <div className="flex items-center gap-2 text-xs text-pro-text-tertiary">
-                <Smartphone className="h-3.5 w-3.5" />
-                <span>Mobil Uygulama</span>
-                <span className="px-1.5 py-0.5 bg-pro-accent/10 text-pro-accent text-[10px] font-medium rounded">
-                  Yakında
-                </span>
-              </div>
-            )}
-            
+      <div className="px-3 sm:px-4 py-3">
+        <div className="grid grid-cols-3 items-center gap-2">
+          <div className="justify-self-start">
             {showDate && (
               <span className="text-xs text-pro-text-tertiary">
                 {formatDateTurkish()}
               </span>
             )}
           </div>
+
+          <div className="justify-self-center">
+            {showBadges && (
+              <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-pro-accent/10 text-pro-accent rounded">
+                <Smartphone className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">
+                  Mobil uygulamamız çok yakında!
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div />
         </div>
       </div>
     </footer>

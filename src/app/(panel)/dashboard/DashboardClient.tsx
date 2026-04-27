@@ -283,7 +283,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card padding="lg" variant="elevated">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-pro-border">
                   <h3 className="font-semibold text-pro-text">
                     Yaklaşan Randevular
                   </h3>
@@ -360,7 +360,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
               <NotesCard />
 
               <Card padding="lg" variant="elevated">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-pro-border">
                   <h3 className="font-semibold text-pro-text">
                     Bekleyen Analizler
                   </h3>
@@ -430,46 +430,53 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                             <p className="text-sm font-medium text-pro-text truncate">
                               {test.client?.first_name} {test.client?.last_name}
                             </p>
-                            <p className="text-xs text-pro-text-tertiary">
+                            <p className="text-xs text-pro-text-tertiary truncate">
                               {formatRelative(test.created_at)}
                             </p>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <Badge variant={s.variant} size="sm" dot>
+                          <div className="flex items-center gap-1.5 h-7">
+                            <Badge
+                              variant={s.variant}
+                              size="sm"
+                              dot
+                              className="w-[140px] h-6 justify-center"
+                            >
                               {s.label}
                             </Badge>
-                            {canViewResults && (
-                              <span
-                                className="p-1 rounded-lg text-pro-primary"
-                                title="Sonuçları Gör"
-                              >
-                                <Eye className="h-3.5 w-3.5" />
-                              </span>
-                            )}
-                            {isPending && (
-                              <div className="relative">
+                            <div className="relative h-7 w-7 flex items-center justify-center shrink-0">
+                              {canViewResults && (
                                 <span
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShareOpenId(
-                                      shareOpenId === test.id ? null : test.id
-                                    );
-                                  }}
-                                  className="p-1 rounded-lg text-pro-text-tertiary hover:text-pro-primary hover:bg-pro-primary-light transition-colors cursor-pointer"
-                                  title="Analizi Paylaş"
+                                  className="h-7 w-7 rounded-lg text-pro-primary flex items-center justify-center"
+                                  title="Sonuçları Gör"
                                 >
-                                  <Share2 className="h-3.5 w-3.5" />
+                                  <Eye className="h-3.5 w-3.5" />
                                 </span>
-                                {shareOpenId === test.id && (
-                                  <SharePopover
-                                    testToken={test.token}
-                                    clientName={test.client?.first_name || ""}
-                                    professionalName={profName}
-                                    onClose={() => setShareOpenId(null)}
-                                  />
-                                )}
-                              </div>
-                            )}
+                              )}
+                              {isPending && (
+                                <>
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setShareOpenId(
+                                        shareOpenId === test.id ? null : test.id
+                                      );
+                                    }}
+                                    className="h-7 w-7 rounded-lg text-pro-text-tertiary hover:text-pro-primary hover:bg-pro-primary-light transition-colors cursor-pointer flex items-center justify-center"
+                                    title="Analizi Paylaş"
+                                  >
+                                    <Share2 className="h-3.5 w-3.5" />
+                                  </span>
+                                  {shareOpenId === test.id && (
+                                    <SharePopover
+                                      testToken={test.token}
+                                      clientName={test.client?.first_name || ""}
+                                      professionalName={profName}
+                                      onClose={() => setShareOpenId(null)}
+                                    />
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
                         </button>
                       );
@@ -648,12 +655,17 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                             <p className="text-sm font-medium text-pro-text line-clamp-1">
                               {test.client?.first_name} {test.client?.last_name}
                             </p>
-                            <p className="text-xs text-pro-text-tertiary">
+                            <p className="text-xs text-pro-text-tertiary truncate">
                               {formatRelative(test.created_at)}
                             </p>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <Badge variant={s.variant} size="sm" dot>
+                            <Badge
+                              variant={s.variant}
+                              size="sm"
+                              dot
+                              className="w-[140px] h-6 justify-center"
+                            >
                               {s.label}
                             </Badge>
                             {canViewResults && (

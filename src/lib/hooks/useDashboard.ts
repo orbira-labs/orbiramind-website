@@ -128,6 +128,9 @@ export function useDashboard(initialData?: DashboardInitialData) {
       client: Array.isArray(a.client) ? a.client[0] || null : a.client,
     })) as DashboardAppointment[];
 
+    const COMPLETED_TTL_MS = 5 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
     const newTests = ((testsRes.data || []) as Array<Record<string, unknown>>)
       .map((t) => ({
         id: t.id as string,
@@ -140,6 +143,11 @@ export function useDashboard(initialData?: DashboardInitialData) {
           ? (t.client[0] as { first_name: string; last_name: string } | null) || null 
           : (t.client as { first_name: string; last_name: string } | null),
       }))
+      .filter((t) => {
+        if (t.status !== "completed") return true;
+        const ref = t.completed_at ?? t.created_at;
+        return now - new Date(ref).getTime() < COMPLETED_TTL_MS;
+      })
       .sort((a, b) => {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });

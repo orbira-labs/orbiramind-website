@@ -67,7 +67,15 @@ async function getDashboardData(userId: string): Promise<DashboardInitialData> {
     })
   );
 
+  const COMPLETED_TTL_MS = 5 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
   const pendingTests = (testsRes.data as TestRow[] || [])
+    .filter((t) => {
+      if (t.status !== "completed") return true;
+      const ref = t.completed_at ?? t.created_at;
+      return now - new Date(ref).getTime() < COMPLETED_TTL_MS;
+    })
     .map((t) => ({
       ...t,
       client: Array.isArray(t.client) ? t.client[0] || null : t.client,

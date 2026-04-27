@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   Infinity as InfinityIcon,
   Zap,
-  Lock,
   Fingerprint,
   ShieldAlert,
   Eye,
@@ -41,7 +40,7 @@ type Plan = {
   total: number;
   savings?: string;
   badge?: string;
-  highlight?: boolean;
+  variant?: "gold" | "diamond";
 };
 
 const PLANS: Plan[] = [
@@ -55,14 +54,14 @@ const PLANS: Plan[] = [
   },
   {
     id: "popular",
-    name: "Popüler",
+    name: "Dengeli",
     tagline: "Düzenli kullanan uzmanlar için en dengeli seçim",
     credits: 15,
     pricePerCredit: 27.99,
     total: 419.85,
     savings: "%15 tasarruf",
-    badge: "EN ÇOK TERCİH EDİLEN",
-    highlight: true,
+    badge: "POPÜLER",
+    variant: "gold",
   },
   {
     id: "pro-pack",
@@ -73,6 +72,7 @@ const PLANS: Plan[] = [
     total: 1079.55,
     savings: "%27 tasarruf",
     badge: "EN AVANTAJLI",
+    variant: "diamond",
   },
 ];
 
@@ -112,8 +112,8 @@ const ANALYSIS_INCLUDES = [
 const PRO_FEATURES = [
   {
     icon: Gift,
-    title: "Aylık 15 MindTest Kredisi",
-    desc: "Her ay otomatik olarak hesabınıza tanımlanır, birikir.",
+    title: "Aylık 10 MindTest Hediye",
+    desc: "Her ay 10 test kredisi otomatik olarak hesabınıza tanımlanır, birikir.",
   },
   {
     icon: ClipboardList,
@@ -130,21 +130,6 @@ const PRO_FEATURES = [
     title: "Seans Asistanı",
     desc: "Görüşme öncesi hazırlanan brifing: geçmiş notlar, ödev durumu ve odak önerileri.",
   },
-];
-
-const TRUST_SIGNALS = [
-  {
-    icon: InfinityIcon,
-    title: "Süresiz krediler",
-    desc: "İstediğiniz zaman kullanın",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Güvenli ödeme",
-    desc: "256-bit SSL şifreleme",
-  },
-  { icon: Zap, title: "Anında kullanım", desc: "Ödeme sonrası hemen aktif" },
-  { icon: Lock, title: "KVKK uyumlu", desc: "Verileriniz yasal güvence altında" },
 ];
 
 const fmt = (n: number) =>
@@ -308,14 +293,14 @@ function RootView({ onSelect }: { onSelect: (v: View) => void }) {
                 Pro Üyelik
               </h2>
               <p className="text-sm text-white/80 leading-relaxed">
-                Her ay 15 MindTest kredisi ve yapay zekâ destekli danışan takip
-                ekosistemi ile çalışın.
+                Her ay 10 MindTest kredisi hediye ve yapay zekâ destekli danışan
+                takip ekosistemi ile çalışın.
               </p>
             </div>
 
             <div className="space-y-2.5 mb-8 flex-1">
               {[
-                { icon: Gift, text: "Her ay 15 kredi otomatik tanımlanır" },
+                { icon: Gift, text: "Her ay 10 kredi hediye olarak tanımlanır" },
                 { icon: BrainCircuit, text: "Seans asistanı ve ödev sistemi" },
                 { icon: TrendingUp, text: "Danışan bazlı ilerleme analizi" },
               ].map((item, i) => (
@@ -402,28 +387,6 @@ function CreditsView({ onBack }: { onBack: () => void }) {
         ))}
       </section>
 
-      {/* Güven bandı */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {TRUST_SIGNALS.map((s, i) => (
-          <div
-            key={i}
-            className="bg-white border border-pro-border rounded-xl px-4 py-3.5 flex items-start gap-3"
-          >
-            <div className="h-9 w-9 rounded-lg bg-pro-primary-light flex items-center justify-center shrink-0">
-              <s.icon className="h-[17px] w-[17px] text-pro-primary" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs sm:text-sm font-semibold text-pro-text leading-tight">
-                {s.title}
-              </p>
-              <p className="text-[11px] sm:text-xs text-pro-text-tertiary mt-0.5 leading-snug">
-                {s.desc}
-              </p>
-            </div>
-          </div>
-        ))}
-      </section>
-
       {/* Her analizde ne var */}
       <section>
         <div className="text-center mb-6 sm:mb-8 max-w-2xl mx-auto">
@@ -488,15 +451,23 @@ function ProView({ onBack }: { onBack: () => void }) {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-4">
-            Her ay 15 kredi.
+            Her ay 10 kredi hediye.
             <br />
             Her danışanınız için yanınızda.
           </h1>
-          <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl mx-auto mb-6">
             Pro Üyelik bir fiyatlandırma planı değil; danışan süreçlerinizi
-            uçtan uca destekleyen bir ekosistemdir. Her ay 15 MindTest kredisi
-            hesabınıza tanımlanır; yanında yapay zekâ destekli araçlar gelir.
+            uçtan uca destekleyen bir ekosistemdir. Her ay 10 MindTest kredisi
+            hesabınıza hediye olarak tanımlanır; yanında yapay zekâ destekli
+            araçlar gelir.
           </p>
+
+          <div className="inline-flex items-baseline gap-2 px-5 py-3 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25">
+            <span className="text-3xl sm:text-4xl font-bold text-white leading-none">
+              ₺339
+            </span>
+            <span className="text-sm font-medium text-white/85">/ ay</span>
+          </div>
         </div>
       </section>
 
@@ -578,73 +549,152 @@ function PricingCard({
   plan: Plan;
   onPurchase: () => void;
 }) {
-  if (plan.highlight) {
+  if (plan.variant === "gold") {
     return (
-      <div className="relative rounded-2xl overflow-hidden md:-my-3 shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C] via-[#E8C963] to-[#A67C34]" />
-        <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-white opacity-[0.10] blur-[55px]" />
-        <div className="absolute bottom-0 left-0 w-[160px] h-[160px] rounded-full bg-white opacity-[0.06] blur-[45px]" />
-
+      <div className="relative rounded-2xl overflow-visible h-full">
         {plan.badge && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-white rounded-full px-3.5 py-1.5 shadow-lg">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 bg-white rounded-full px-3 py-1 shadow-md ring-1 ring-[#C9A84C]/30">
             <span className="text-[10px] font-bold text-[#8B6914] tracking-[0.1em]">
               {plan.badge}
             </span>
           </div>
         )}
+        <div className="relative rounded-2xl overflow-hidden shadow-xl h-full flex">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C] via-[#E8C963] to-[#A67C34]" />
+          <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-white opacity-[0.10] blur-[55px]" />
+          <div className="absolute bottom-0 left-0 w-[160px] h-[160px] rounded-full bg-white opacity-[0.06] blur-[45px]" />
 
-        <div className="relative p-6 sm:p-7 pt-16 flex flex-col h-full">
-          <div className="space-y-1 mb-4">
-            <p className="text-[11px] font-semibold text-white/85 uppercase tracking-[0.14em]">
-              {plan.name}
-            </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-6xl font-bold text-white leading-none">
-                {plan.credits}
-              </span>
-              <span className="text-base font-semibold text-white/75">
-                kredi
-              </span>
-            </div>
-            <p className="text-xs text-white/75 leading-relaxed pt-1">
-              {plan.tagline}
-            </p>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3.5 mb-4 border border-white/20">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="text-2xl font-bold text-white leading-none">
-                  ₺{fmt(plan.total)}
-                </p>
-                <p className="text-[11px] text-white/75 mt-1.5">
-                  Analiz başına ₺{fmt(plan.pricePerCredit)}
-                </p>
-              </div>
-              {plan.savings && (
-                <span className="inline-flex items-center gap-1 bg-white text-[#8B6914] px-2 py-1 rounded-md text-[11px] font-bold shrink-0">
-                  <Zap className="h-3 w-3" />
-                  {plan.savings}
+          <div className="relative p-6 sm:p-7 flex flex-col h-full w-full">
+            <div className="space-y-1 mb-4">
+              <p className="text-[11px] font-semibold text-white/85 uppercase tracking-[0.14em]">
+                {plan.name}
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-6xl font-bold text-white leading-none">
+                  {plan.credits}
                 </span>
-              )}
+                <span className="text-base font-semibold text-white/75">
+                  kredi
+                </span>
+              </div>
+              <p className="text-xs text-white/75 leading-relaxed pt-1">
+                {plan.tagline}
+              </p>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={onPurchase}
-            className="mt-auto w-full min-h-[48px] py-3.5 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
-          >
-            Satın Al
-            <ArrowRight className="h-4 w-4" />
-          </button>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3.5 mb-4 border border-white/20">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-2xl font-bold text-white leading-none">
+                    ₺{fmt(plan.total)}
+                  </p>
+                  <p className="text-[11px] text-white/75 mt-1.5">
+                    Analiz başına ₺{fmt(plan.pricePerCredit)}
+                  </p>
+                </div>
+                {plan.savings && (
+                  <span className="inline-flex items-center gap-1 bg-white text-[#8B6914] px-2 py-1 rounded-md text-[11px] font-bold shrink-0">
+                    <Zap className="h-3 w-3" />
+                    {plan.savings}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onPurchase}
+              className="mt-auto w-full min-h-[48px] py-3.5 rounded-xl bg-white text-[#8B6914] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
+            >
+              Satın Al
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (plan.variant === "diamond") {
+    return (
+      <div className="relative rounded-2xl overflow-visible h-full">
+        {plan.badge && (
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 rounded-full px-3 py-1 bg-white shadow-md ring-1 ring-[#6D28D9]/30">
+            <span className="text-[10px] font-bold tracking-[0.1em] text-[#4C1D95]">
+              {plan.badge}
+            </span>
+          </div>
+        )}
+        {/* Outer iridescent glow */}
+        <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-br from-[#22D3EE] via-[#8B5CF6] to-[#EC4899] opacity-90 blur-[2px]" aria-hidden />
+        <div
+          className="relative rounded-2xl overflow-hidden h-full flex shadow-[0_25px_60px_-20px_rgba(99,102,241,0.65)]"
+          style={{
+            background:
+              "linear-gradient(135deg, #0F172A 0%, #1E1B4B 18%, #3730A3 38%, #6D28D9 58%, #2563EB 78%, #0EA5E9 100%)",
+          }}
+        >
+          {/* Iridescent shimmer overlays */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(34,211,238,0.35),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(236,72,153,0.25),transparent_55%)]" />
+          <div className="absolute -top-16 -right-16 w-[220px] h-[220px] rounded-full bg-cyan-300 opacity-[0.18] blur-[60px]" />
+          <div className="absolute -bottom-16 -left-16 w-[200px] h-[200px] rounded-full bg-fuchsia-400 opacity-[0.14] blur-[55px]" />
+          {/* Subtle diagonal sheen */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
+
+          <div className="relative p-6 sm:p-7 flex flex-col h-full w-full">
+            <div className="space-y-1 mb-4">
+              <p className="text-[11px] font-semibold text-white/90 uppercase tracking-[0.14em]">
+                {plan.name}
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-6xl font-bold text-white leading-none drop-shadow-[0_2px_8px_rgba(34,211,238,0.35)]">
+                  {plan.credits}
+                </span>
+                <span className="text-base font-semibold text-white/80">
+                  kredi
+                </span>
+              </div>
+              <p className="text-xs text-white/80 leading-relaxed pt-1">
+                {plan.tagline}
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-xl px-4 py-3.5 mb-4 border border-white/25">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-2xl font-bold text-white leading-none">
+                    ₺{fmt(plan.total)}
+                  </p>
+                  <p className="text-[11px] text-white/80 mt-1.5">
+                    Analiz başına ₺{fmt(plan.pricePerCredit)}
+                  </p>
+                </div>
+                {plan.savings && (
+                  <span className="inline-flex items-center gap-1 bg-white text-[#1E1B4B] px-2 py-1 rounded-md text-[11px] font-bold shrink-0 shadow-md">
+                    <Zap className="h-3 w-3" />
+                    {plan.savings}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onPurchase}
+              className="mt-auto w-full min-h-[48px] py-3.5 rounded-xl bg-white text-[#1E1B4B] font-semibold shadow-lg hover:bg-white/95 transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2"
+            >
+              Satın Al
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative rounded-2xl border-2 border-pro-border bg-white p-6 sm:p-7 hover:border-pro-primary/50 hover:shadow-lg transition-all flex flex-col">
+    <div className="relative rounded-2xl border-2 border-pro-border bg-white p-6 sm:p-7 hover:border-pro-primary/50 hover:shadow-lg transition-all flex flex-col h-full">
       {plan.badge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-pro-primary text-white rounded-full px-3 py-1 shadow-sm">
           <span className="text-[10px] font-bold tracking-[0.1em]">

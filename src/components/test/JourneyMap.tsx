@@ -11,7 +11,7 @@ const STAGES = [
   {
     number: 1,
     title: "Temel Bilgiler",
-    subtitle: "Demografik ve yaşam tarzı bilgileri (boy, kilo dahil)",
+    subtitle: "Demografik ve yaşam tarzı bilgileri",
     icon: User,
     color: "#E8915A",
   },
@@ -24,7 +24,7 @@ const STAGES = [
   },
   {
     number: 3,
-    title: "Derinlemesine Keşif",
+    title: "Akıllı Keşif",
     subtitle: "Sana özel detaylı sorular",
     icon: Compass,
     color: "#059669",
