@@ -80,6 +80,12 @@ export default function SessionsPage() {
   const hasBasePrice = currentBasePriceCents !== null && currentBasePriceCents > 0;
   const [singleChecked, setSingleChecked] = useState(false);
 
+  // Tek seans şablonları danışana seans tanımlanırken kullanılır,
+  // ama paket listesinde gösterilmez (seans ücreti zaten yukarıda var).
+  const packageTemplates = templates.filter(
+    (t) => t.type !== "single" && t.session_count > 1
+  );
+
   // Eğer seans ücreti var ama Tek Seans şablonu yoksa otomatik oluştur (sadece bir kez)
   useEffect(() => {
     async function ensureSingleSessionTemplate() {
@@ -475,7 +481,7 @@ export default function SessionsPage() {
           <motion.div variants={staggerItem}>
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
-                <StepIndicator step={2} completed={hasBasePrice && templates.length > 0} />
+                <StepIndicator step={2} completed={hasBasePrice && packageTemplates.length > 0} />
                 <div>
                   <h3 className="text-sm font-semibold text-pro-text">
                     Paket Şablonlarınız
@@ -528,7 +534,7 @@ export default function SessionsPage() {
                     </div>
                   ))}
                 </motion.div>
-              ) : templates.length === 0 ? (
+              ) : packageTemplates.length === 0 ? (
                 <motion.div
                   key="empty"
                   initial={{ opacity: 0, y: 10 }}
@@ -553,7 +559,7 @@ export default function SessionsPage() {
                   animate="animate"
                   className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
-                  {templates.map((tpl) => {
+                  {packageTemplates.map((tpl) => {
                     const indirimsizToplam = tpl.price_per_session_cents * tpl.session_count;
                     const indirimliFiyat = tpl.session_count > 0 ? tpl.total_price_cents / tpl.session_count : 0;
                     const isSingleSession = tpl.type === "single" || tpl.session_count === 1;
