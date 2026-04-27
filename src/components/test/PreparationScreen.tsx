@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface PreparationScreenProps {
   clientName?: string;
@@ -9,156 +9,134 @@ interface PreparationScreenProps {
   onContinue: () => void;
 }
 
-function getInitials(name?: string) {
-  if (!name) return "";
-  const parts = name.trim().split(/\s+/);
-  const first = parts[0]?.[0] ?? "";
-  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
-  return (first + last).toUpperCase();
-}
-
-interface ContentProps {
-  clientFirstName: string;
-  professionalName?: string;
-  onContinue: () => void;
-  size: "mobile" | "desktop";
-}
-
-function PreparationContent({ clientFirstName, professionalName, onContinue, size }: ContentProps) {
-  const isMobile = size === "mobile";
-  const initials = getInitials(professionalName);
+export function PreparationScreen({
+  clientName,
+  professionalName,
+  onContinue,
+}: PreparationScreenProps) {
+  const firstName = clientName ? clientName.split(" ")[0] : "";
 
   return (
-    <>
-      {/* Invitation card — gönderen uzmanı öne çıkarır */}
-      {professionalName && (
+    <div className="relative min-h-[100dvh] overflow-hidden bg-[#F7FAF8] text-gray-900 flex items-center justify-center px-6 pt-safe pb-safe">
+      {/* Aurora background */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className={`mx-auto flex items-center gap-2.5 rounded-full bg-white/70 backdrop-blur border border-[#5B7B6A]/15 shadow-sm shadow-[#5B7B6A]/5 ${
-            isMobile ? "px-3 py-1.5 mb-5" : "px-3.5 py-2 mb-7"
-          }`}
-        >
-          <div
-            className={`bg-gradient-to-br from-[#5B7B6A] to-[#4A6A59] text-white rounded-full flex items-center justify-center font-semibold flex-shrink-0 ${
-              isMobile ? "w-6 h-6 text-[10px]" : "w-7 h-7 text-[11px]"
-            }`}
-          >
-            {initials || <Sparkles className="w-3 h-3" />}
-          </div>
-          <div className={`leading-tight ${isMobile ? "text-[11px]" : "text-xs"}`}>
-            <span className="text-gray-500">Davet eden</span>{" "}
-            <span className="font-semibold text-gray-900">{professionalName}</span>
-          </div>
-        </motion.div>
-      )}
+          className="absolute -top-40 -left-32 w-[520px] h-[520px] rounded-full blur-[110px]"
+          style={{
+            background:
+              "radial-gradient(circle at 30% 30%, #B6D4C5 0%, rgba(91,123,106,0.0) 70%)",
+          }}
+          animate={{
+            x: [0, 60, -20, 0],
+            y: [0, 30, 60, 0],
+            scale: [1, 1.08, 0.95, 1],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-32 w-[560px] h-[560px] rounded-full blur-[120px]"
+          style={{
+            background:
+              "radial-gradient(circle at 70% 70%, #D9E8E0 0%, rgba(91,123,106,0.0) 70%)",
+          }}
+          animate={{
+            x: [0, -40, 20, 0],
+            y: [0, -30, -50, 0],
+            scale: [1, 1.05, 1.1, 1],
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-[100px] opacity-70"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(182,212,197,0.55) 0%, rgba(247,250,248,0) 70%)",
+          }}
+          animate={{ scale: [1, 1.12, 0.96, 1] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Subtle grain via radial dots */}
+        <div
+          className="absolute inset-0 opacity-[0.18] mix-blend-multiply"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgba(91,123,106,0.18) 1px, transparent 1px)",
+            backgroundSize: "26px 26px",
+          }}
+        />
+      </div>
 
-      {/* Title */}
-      <motion.h1
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className={`font-bold text-gray-900 text-center tracking-tight ${
-          isMobile ? "text-[22px] mb-2" : "text-3xl mb-3"
-        }`}
-      >
-        {clientFirstName ? `Merhaba, ${clientFirstName}` : "Hoş geldin"}
-      </motion.h1>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.35 }}
-        className={`text-gray-500 text-center leading-relaxed ${
-          isMobile ? "text-[13.5px] mb-6 px-1" : "text-[15px] mb-8 px-2"
-        }`}
-      >
-        Bu kısa değerlendirme, sana özel bir analiz hazırlamak için
-        alışkanlıklarını ve hedeflerini anlamamıza yardımcı olur.
-      </motion.p>
-
-      {/* Tip — single line, calmer */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45 }}
-        className={`bg-[#5B7B6A]/[0.06] border border-[#5B7B6A]/15 rounded-2xl ${
-          isMobile ? "p-3.5 mb-6" : "p-4 mb-8"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className={`bg-[#5B7B6A]/10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-              isMobile ? "w-9 h-9" : "w-10 h-10"
-            }`}
-          >
-            <ShieldCheck className={`text-[#5B7B6A] ${isMobile ? "w-4 h-4" : "w-5 h-5"}`} />
-          </div>
-          <p className={`text-gray-600 leading-relaxed ${isMobile ? "text-xs" : "text-sm"}`}>
-            İçten ve doğal cevapla — doğru ya da yanlış cevap yok.
-          </p>
-        </div>
-      </motion.div>
-    </>
-  );
-}
-
-export function PreparationScreen({ clientName, professionalName, onContinue }: PreparationScreenProps) {
-  const clientFirstName = clientName ? clientName.split(" ")[0] : "";
-
-  return (
-    <>
-      {/* ========== MOBILE VIEW ========== */}
-      <div className="md:hidden min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] flex flex-col pt-safe pb-safe">
-        <div className="flex-1 flex flex-col justify-center px-5 py-6">
-          <PreparationContent
-            clientFirstName={clientFirstName}
-            professionalName={professionalName}
-            onContinue={onContinue}
-            size="mobile"
-          />
-        </div>
-
-        <div className="px-5 pb-5">
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-[520px] flex flex-col items-center text-center">
+        {/* Inviter eyebrow */}
+        {professionalName && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            onClick={onContinue}
-            className="w-full min-h-[56px] py-4 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#5B7B6A]/25 active:scale-[0.98] touch-manipulation"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8 flex items-center gap-2 text-[11px] font-medium tracking-[0.18em] uppercase text-[#5B7B6A]/80"
           >
-            Teste Başla
-          </motion.button>
-        </div>
-      </div>
+            <span className="h-px w-8 bg-[#5B7B6A]/30" />
+            <span>{professionalName} · Davet</span>
+            <span className="h-px w-8 bg-[#5B7B6A]/30" />
+          </motion.div>
+        )}
 
-      {/* ========== DESKTOP VIEW ========== */}
-      <div className="hidden md:flex min-h-[100dvh] bg-gradient-to-br from-[#F5F9F7] via-white to-[#E8F0EC] items-center justify-center p-4 pt-safe pb-safe">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+        {/* Greeting */}
+        <motion.h1
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-md w-full"
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="font-bold tracking-[-0.02em] text-[44px] sm:text-[64px] leading-[1.02] text-gray-900"
         >
-          <PreparationContent
-            clientFirstName={clientFirstName}
-            professionalName={professionalName}
-            onContinue={onContinue}
-            size="desktop"
-          />
+          {firstName ? (
+            <>
+              Merhaba,
+              <br />
+              <span className="bg-gradient-to-br from-[#3D5A4A] via-[#5B7B6A] to-[#7FA08C] bg-clip-text text-transparent">
+                {firstName}.
+              </span>
+            </>
+          ) : (
+            "Hoş geldin."
+          )}
+        </motion.h1>
 
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.55 }}
-            onClick={onContinue}
-            className="w-full min-h-[52px] py-4 bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white rounded-2xl font-semibold text-base shadow-xl shadow-[#5B7B6A]/20 hover:shadow-2xl hover:shadow-[#5B7B6A]/30 transition-all active:scale-95 touch-manipulation"
-          >
-            Teste Başla
-          </motion.button>
-        </motion.div>
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.45 }}
+          className="mt-6 text-[15px] sm:text-[17px] text-gray-500 leading-relaxed max-w-[420px]"
+        >
+          Sana özel bir analiz hazırlayabilmek için seni biraz tanımak
+          istiyoruz. İçten cevap vermen yeterli.
+        </motion.p>
+
+        {/* CTA */}
+        <motion.button
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          onClick={onContinue}
+          className="group relative mt-12 inline-flex items-center justify-center gap-3 min-h-[56px] px-9 rounded-full bg-gray-900 text-white font-medium text-[15px] tracking-wide shadow-[0_20px_50px_-15px_rgba(17,24,39,0.55)] hover:shadow-[0_25px_60px_-15px_rgba(17,24,39,0.65)] transition-all active:scale-[0.98] touch-manipulation"
+        >
+          <span>Başlayalım</span>
+          <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-white/15 group-hover:bg-white/25 transition-colors">
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </motion.button>
+
+        {/* Microcopy under button */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.95 }}
+          className="mt-6 text-[12px] text-gray-400 tracking-wide"
+        >
+          Yaklaşık 10 dakika · Doğru ya da yanlış cevap yok
+        </motion.p>
       </div>
-    </>
+    </div>
   );
 }
