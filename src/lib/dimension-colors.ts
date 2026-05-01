@@ -60,6 +60,26 @@ const DIMENSION_THEMES: Record<string, DimensionTheme> = {
 
 const DEFAULT_THEME: DimensionTheme = DIMENSION_THEMES.general;
 
+/**
+ * Pool ui_category.id (8 design token) → tema eşlemesi.
+ *
+ * Token'lar DB'de `aqe.deep_dive_pools.ui_category.id` olarak yaşar:
+ *   body, character, lifestyle, mind, movement, nutrition, sleep, social
+ *
+ * Yeni pool eklemek = mevcut token'lardan birini seç (DB'de SQL only).
+ * Bilinmeyen token gelirse hash-based fallback kullanılır (graceful).
+ */
+const POOL_TOKEN_THEMES: Record<string, DimensionTheme> = {
+  body: DIMENSION_THEMES.physical,
+  movement: DIMENSION_THEMES.functional,
+  sleep: DIMENSION_THEMES.physical,
+  nutrition: DIMENSION_THEMES.nutrition,
+  mind: DIMENSION_THEMES.mental,
+  character: DIMENSION_THEMES.self_care,
+  social: DIMENSION_THEMES.social,
+  lifestyle: DIMENSION_THEMES.functional,
+};
+
 const POOL_COLOR_PALETTE: DimensionTheme[] = [
   DIMENSION_THEMES.physical,
   DIMENSION_THEMES.mental,
@@ -81,8 +101,15 @@ export function getDimensionTheme(dimension: string): DimensionTheme {
   return DIMENSION_THEMES[dimension] ?? DEFAULT_THEME;
 }
 
-export function getPoolTheme(pool: string): DimensionTheme {
-  const idx = hashString(pool) % POOL_COLOR_PALETTE.length;
+/**
+ * @param key — tercihen DB'den gelen `ui_category.id` (8 sabit token).
+ *              Eski client / eksik veri durumunda pool string'i de geçerli;
+ *              hash-based fallback kullanılır.
+ */
+export function getPoolTheme(key: string): DimensionTheme {
+  const tokenTheme = POOL_TOKEN_THEMES[key];
+  if (tokenTheme) return tokenTheme;
+  const idx = hashString(key) % POOL_COLOR_PALETTE.length;
   return POOL_COLOR_PALETTE[idx];
 }
 
@@ -100,67 +127,20 @@ export function getDimensionLabel(dimension: string): string {
   return DIMENSION_LABELS[dimension] ?? dimension;
 }
 
-const POOL_LABELS: Record<string, string> = {
-  _general: "Genel",
-  sleep: "Uyku",
-  stress: "Stres",
-  emotional: "Duygusal",
-  focus: "Odaklanma",
-  routine: "Düzen",
-  nutrition: "Beslenme",
-  physical_activity: "Fiziksel Aktivite",
-  social_life: "Sosyal Yaşam",
-  self_care: "Öz Bakım",
-  relationship: "İlişki",
-  family: "Aile",
-  communication: "İletişim",
-  financial: "Finansal",
-  work_life_balance: "İş-Yaşam Dengesi",
-  life_satisfaction: "Yaşam Memnuniyeti",
-  parenting: "Ebeveynlik",
-  chronic_health: "Kronik Sağlık",
-  disability: "Engel Durumu",
-  hormonal: "Hormonal",
-  digital_habits: "Dijital Alışkanlıklar",
-  cognitive_style: "Düşünce Tarzı",
-  caregiving: "Bakım Verme",
-  hobbies_leisure: "Hobiler",
-  support: "Destek",
-  // Additional pools
-  change_readiness: "Değişime Hazırlık",
-  intimacy: "Yakınlık",
-  motivation: "Motivasyon",
-  self_esteem: "Öz Güven",
-  anxiety: "Kaygı",
-  depression: "Depresyon",
-  energy: "Enerji",
-  productivity: "Verimlilik",
-  creativity: "Yaratıcılık",
-  mindfulness: "Farkındalık",
-  resilience: "Dayanıklılık",
-  boundaries: "Sınırlar",
-  conflict: "Çatışma",
-  trust: "Güven",
-  attachment: "Bağlanma",
-  sexuality: "Cinsellik",
-  body_image: "Beden Algısı",
-  addiction: "Bağımlılık",
-  trauma: "Travma",
-  grief: "Yas",
-  loneliness: "Yalnızlık",
-  purpose: "Amaç",
-  spirituality: "Maneviyat",
-  values: "Değerler",
-  identity: "Kimlik",
-  growth: "Gelişim",
-};
-
+/**
+ * Pool için kullanıcıya gösterilecek başlık.
+ *
+ * Önce backend'den gelen `ui_category.label` (DB tek source of truth) kullanılır.
+ * Eski release / eksik veri durumunda pool ID'si snake_case → Title Case'e çevrilir.
+ *
+ * Yeni pool eklendiğinde DB'de `ui_category` doluyorsa client değişikliği gerekmez.
+ */
 function formatPoolName(pool: string): string {
   return pool
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function getPoolLabel(pool: string): string {
-  return POOL_LABELS[pool] ?? formatPoolName(pool);
+export function getPoolLabel(pool: string, uiCategoryLabel?: string): string {
+  return uiCategoryLabel ?? formatPoolName(pool);
 }

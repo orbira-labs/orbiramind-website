@@ -1,0 +1,343 @@
+{
+  "$schema_doc": "../spec/conditional-logic.md",
+  "version": 1,
+  "description": "Kanonik test corpusu — backend (Deno), orbiramind (Vitest), mobile (flutter test) hepsinde aynı sonucu vermek zorunda.",
+  "cases": [
+    {
+      "name": "no_conditions__always_show",
+      "field": { "id": "x", "conditions": null, "skip_conditions": null },
+      "profile": {},
+      "expected_visible": true
+    },
+    {
+      "name": "empty_conditions_object__always_show",
+      "field": { "id": "x", "conditions": {}, "skip_conditions": {} },
+      "profile": {},
+      "expected_visible": true
+    },
+    {
+      "name": "empty_conditions_profile__always_show",
+      "field": { "id": "x", "conditions": { "profile": {} }, "skip_conditions": null },
+      "profile": {},
+      "expected_visible": true
+    },
+    {
+      "name": "in__match_string",
+      "field": { "id": "youngest_child_age", "conditions": { "profile": { "children_status_in": ["has_children"] } } },
+      "profile": { "children_status": "has_children" },
+      "expected_visible": true
+    },
+    {
+      "name": "in__no_match_string",
+      "field": { "id": "youngest_child_age", "conditions": { "profile": { "children_status_in": ["has_children"] } } },
+      "profile": { "children_status": "no_children" },
+      "expected_visible": false
+    },
+    {
+      "name": "in__parent_undefined__hide",
+      "field": { "id": "youngest_child_age", "conditions": { "profile": { "children_status_in": ["has_children"] } } },
+      "profile": {},
+      "expected_visible": false
+    },
+    {
+      "name": "in__parent_null__hide",
+      "field": { "id": "youngest_child_age", "conditions": { "profile": { "children_status_in": ["has_children"] } } },
+      "profile": { "children_status": null },
+      "expected_visible": false
+    },
+    {
+      "name": "in__parent_zero_number__match_when_zero_in_list",
+      "field": { "id": "child", "conditions": { "profile": { "score_in": [0, 1, 2] } } },
+      "profile": { "score": 0 },
+      "expected_visible": true
+    },
+    {
+      "name": "in__parent_zero_number__no_coercion_to_string",
+      "field": { "id": "child", "conditions": { "profile": { "score_in": ["0", "1"] } } },
+      "profile": { "score": 0 },
+      "expected_visible": false
+    },
+    {
+      "name": "in__parent_false_boolean__match",
+      "field": { "id": "child", "conditions": { "profile": { "smoker_in": [false] } } },
+      "profile": { "smoker": false },
+      "expected_visible": true
+    },
+    {
+      "name": "in__parent_empty_string__match_when_in_list",
+      "field": { "id": "child", "conditions": { "profile": { "note_in": [""] } } },
+      "profile": { "note": "" },
+      "expected_visible": true
+    },
+    {
+      "name": "not__match_hides",
+      "field": { "id": "child", "conditions": { "profile": { "children_status_not": ["no_children"] } } },
+      "profile": { "children_status": "no_children" },
+      "expected_visible": false
+    },
+    {
+      "name": "not__no_match_shows",
+      "field": { "id": "child", "conditions": { "profile": { "children_status_not": ["no_children"] } } },
+      "profile": { "children_status": "has_children" },
+      "expected_visible": true
+    },
+    {
+      "name": "not__parent_undefined__shows_vacuously_true",
+      "field": { "id": "child", "conditions": { "profile": { "children_status_not": ["no_children"] } } },
+      "profile": {},
+      "expected_visible": true
+    },
+    {
+      "name": "not__parent_null__shows_vacuously_true",
+      "field": { "id": "child", "conditions": { "profile": { "children_status_not": ["no_children"] } } },
+      "profile": { "children_status": null },
+      "expected_visible": true
+    },
+    {
+      "name": "not__parent_zero__hide_when_zero_in_list",
+      "field": { "id": "child", "conditions": { "profile": { "score_not": [0] } } },
+      "profile": { "score": 0 },
+      "expected_visible": false
+    },
+    {
+      "name": "not__parent_false__hide_when_false_in_list",
+      "field": { "id": "child", "conditions": { "profile": { "flag_not": [false] } } },
+      "profile": { "flag": false },
+      "expected_visible": false
+    },
+    {
+      "name": "exact__match",
+      "field": { "id": "child", "conditions": { "profile": { "gender": "female" } } },
+      "profile": { "gender": "female" },
+      "expected_visible": true
+    },
+    {
+      "name": "exact__no_match",
+      "field": { "id": "child", "conditions": { "profile": { "gender": "female" } } },
+      "profile": { "gender": "male" },
+      "expected_visible": false
+    },
+    {
+      "name": "exact__parent_undefined__hide",
+      "field": { "id": "child", "conditions": { "profile": { "gender": "female" } } },
+      "profile": {},
+      "expected_visible": false
+    },
+    {
+      "name": "exact__no_coercion_string_to_number",
+      "field": { "id": "child", "conditions": { "profile": { "score": "5" } } },
+      "profile": { "score": 5 },
+      "expected_visible": false
+    },
+    {
+      "name": "exact__no_coercion_boolean_to_string",
+      "field": { "id": "child", "conditions": { "profile": { "flag": "true" } } },
+      "profile": { "flag": true },
+      "expected_visible": false
+    },
+    {
+      "name": "skip_in__match_skips",
+      "field": { "id": "smoking_status", "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": "13_18" },
+      "expected_visible": false
+    },
+    {
+      "name": "skip_in__no_match_shows",
+      "field": { "id": "smoking_status", "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": "26_40" },
+      "expected_visible": true
+    },
+    {
+      "name": "skip_in__parent_undefined__no_skip",
+      "field": { "id": "smoking_status", "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": {},
+      "expected_visible": true
+    },
+    {
+      "name": "skip_in__parent_null__no_skip",
+      "field": { "id": "smoking_status", "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": null },
+      "expected_visible": true
+    },
+    {
+      "name": "skip_in__parent_zero__skip_when_zero_in_list",
+      "field": { "id": "child", "skip_conditions": { "score_in": [0] } },
+      "profile": { "score": 0 },
+      "expected_visible": false
+    },
+    {
+      "name": "skip_not__match_skips",
+      "field": { "id": "child", "skip_conditions": { "age_range_not": ["13_18"] } },
+      "profile": { "age_range": "26_40" },
+      "expected_visible": false
+    },
+    {
+      "name": "skip_not__no_match_shows",
+      "field": { "id": "child", "skip_conditions": { "age_range_not": ["13_18"] } },
+      "profile": { "age_range": "13_18" },
+      "expected_visible": true
+    },
+    {
+      "name": "skip_not__parent_undefined__no_skip",
+      "field": { "id": "child", "skip_conditions": { "age_range_not": ["13_18"] } },
+      "profile": {},
+      "expected_visible": true
+    },
+    {
+      "name": "multi_and__all_satisfied",
+      "field": { "id": "child", "conditions": { "profile": { "age_range_in": ["19_25", "26_40"], "gender_in": ["female"] } } },
+      "profile": { "age_range": "19_25", "gender": "female" },
+      "expected_visible": true
+    },
+    {
+      "name": "multi_and__one_fails",
+      "field": { "id": "child", "conditions": { "profile": { "age_range_in": ["19_25"], "gender_in": ["female"] } } },
+      "profile": { "age_range": "19_25", "gender": "male" },
+      "expected_visible": false
+    },
+    {
+      "name": "multi_and__one_undefined",
+      "field": { "id": "child", "conditions": { "profile": { "age_range_in": ["19_25"], "gender_in": ["female"] } } },
+      "profile": { "age_range": "19_25" },
+      "expected_visible": false
+    },
+    {
+      "name": "multi_and_mixed_in_not__satisfied",
+      "field": { "id": "child", "conditions": { "profile": { "age_range_in": ["26_40"], "smoking_status_not": ["never"] } } },
+      "profile": { "age_range": "26_40", "smoking_status": "active" },
+      "expected_visible": true
+    },
+    {
+      "name": "skip_and_conditions__skip_wins",
+      "field": { "id": "child", "conditions": { "profile": { "x_in": ["yes"] } }, "skip_conditions": { "y_in": ["block"] } },
+      "profile": { "x": "yes", "y": "block" },
+      "expected_visible": false
+    },
+    {
+      "name": "skip_and_conditions__no_skip_then_conditions_check",
+      "field": { "id": "child", "conditions": { "profile": { "x_in": ["yes"] } }, "skip_conditions": { "y_in": ["block"] } },
+      "profile": { "x": "yes", "y": "ok" },
+      "expected_visible": true
+    },
+    {
+      "name": "skip_and_conditions__no_skip_conditions_fail",
+      "field": { "id": "child", "conditions": { "profile": { "x_in": ["yes"] } }, "skip_conditions": { "y_in": ["block"] } },
+      "profile": { "x": "no", "y": "ok" },
+      "expected_visible": false
+    },
+    {
+      "name": "multi_select_parent_in__overlap_shows",
+      "field": { "id": "child", "conditions": { "profile": { "core_values_in": ["family"] } } },
+      "profile": { "core_values": ["family", "career"] },
+      "expected_visible": true
+    },
+    {
+      "name": "multi_select_parent_in__no_overlap_hides",
+      "field": { "id": "child", "conditions": { "profile": { "core_values_in": ["family"] } } },
+      "profile": { "core_values": ["health"] },
+      "expected_visible": false
+    },
+    {
+      "name": "multi_select_parent_not__overlap_hides",
+      "field": { "id": "child", "conditions": { "profile": { "core_values_not": ["family"] } } },
+      "profile": { "core_values": ["family"] },
+      "expected_visible": false
+    },
+    {
+      "name": "multi_select_parent_not__no_overlap_shows",
+      "field": { "id": "child", "conditions": { "profile": { "core_values_not": ["family"] } } },
+      "profile": { "core_values": ["health"] },
+      "expected_visible": true
+    },
+    {
+      "name": "multi_select_parent__empty_array_in__no_match_hides",
+      "field": { "id": "child", "conditions": { "profile": { "core_values_in": ["family"] } } },
+      "profile": { "core_values": [] },
+      "expected_visible": false
+    },
+    {
+      "name": "multi_select_parent__empty_array_not__no_overlap_shows",
+      "field": { "id": "child", "conditions": { "profile": { "core_values_not": ["family"] } } },
+      "profile": { "core_values": [] },
+      "expected_visible": true
+    },
+    {
+      "name": "regression__youngest_child_age_for_parent",
+      "field": { "id": "youngest_child_age", "conditions": { "profile": { "children_status_not": ["no_children"] } }, "skip_conditions": null },
+      "profile": { "children_status": "has_children" },
+      "expected_visible": true
+    },
+    {
+      "name": "regression__youngest_child_age_no_children",
+      "field": { "id": "youngest_child_age", "conditions": { "profile": { "children_status_not": ["no_children"] } }, "skip_conditions": null },
+      "profile": { "children_status": "no_children" },
+      "expected_visible": false
+    },
+    {
+      "name": "regression__smoking_status_teen_skipped",
+      "field": { "id": "smoking_status", "conditions": {}, "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": "13_18" },
+      "expected_visible": false
+    },
+    {
+      "name": "regression__smoking_status_adult_shows",
+      "field": { "id": "smoking_status", "conditions": {}, "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": "26_40" },
+      "expected_visible": true
+    },
+    {
+      "name": "regression__hopelessness_passive",
+      "field": { "id": "hopelessness", "conditions": { "profile": { "suicidal_ideation_in": ["passive", "active", "frequent"] } } },
+      "profile": { "suicidal_ideation": "passive" },
+      "expected_visible": true
+    },
+    {
+      "name": "regression__hopelessness_none",
+      "field": { "id": "hopelessness", "conditions": { "profile": { "suicidal_ideation_in": ["passive", "active", "frequent"] } } },
+      "profile": { "suicidal_ideation": "none" },
+      "expected_visible": false
+    },
+    {
+      "name": "regression__hopelessness_undefined_parent_hidden",
+      "field": { "id": "hopelessness", "conditions": { "profile": { "suicidal_ideation_in": ["passive", "active", "frequent"] } } },
+      "profile": {},
+      "expected_visible": false
+    },
+    {
+      "name": "regression__trauma_symptoms_yes",
+      "field": { "id": "trauma_symptoms", "conditions": { "profile": { "trauma_history_in": ["yes"] } } },
+      "profile": { "trauma_history": "yes" },
+      "expected_visible": true
+    },
+    {
+      "name": "regression__trauma_symptoms_no",
+      "field": { "id": "trauma_symptoms", "conditions": { "profile": { "trauma_history_in": ["yes"] } } },
+      "profile": { "trauma_history": "no" },
+      "expected_visible": false
+    },
+    {
+      "name": "regression__trauma_history_teen_skipped",
+      "field": { "id": "trauma_history", "conditions": null, "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": "13_18", "trauma_history": "yes" },
+      "expected_visible": false
+    },
+    {
+      "name": "regression__alcohol_freq_adult_shows",
+      "field": { "id": "alcohol_frequency", "conditions": {}, "skip_conditions": { "age_range_in": ["13_18"] } },
+      "profile": { "age_range": "41_55" },
+      "expected_visible": true
+    },
+    {
+      "name": "edge__condition_value_as_scalar_not_array",
+      "field": { "id": "child", "conditions": { "profile": { "gender": "female" } } },
+      "profile": { "gender": "female" },
+      "expected_visible": true
+    },
+    {
+      "name": "edge__multi_and_with_skip_first",
+      "field": { "id": "child", "conditions": { "profile": { "x_in": ["yes"], "y_not": ["nope"] } }, "skip_conditions": { "z_in": ["off"] } },
+      "profile": { "x": "yes", "y": "ok", "z": "on" },
+      "expected_visible": true
+    }
+  ]
+}
