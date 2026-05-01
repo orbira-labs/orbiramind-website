@@ -192,6 +192,15 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
   const [coreAnswers, setCoreAnswers] = useState<Record<string, number>>({});
   const [deepDiveAnswers, setDeepDiveAnswers] = useState<Record<string, number | string | string[]>>({});
 
+  // Recovery mode: kullanıcı submit'te eksik soru tespit edilip geri yönlendirildiğinde
+  // bu mod aktif olur. Cevap girildikten sonra normal "ileri" yerine submit'i tekrar
+  // tetikler — diğer cevaplı soruları gezmeye gerek kalmaz, direkt sonraki eksiğe
+  // veya tamamlanmaya gider. 60 soru tekrar geçme bug'ının çözümü.
+  const recoveryModeRef = useRef<{ phase: "profile" | "core" | "deep_dive"; active: boolean }>({
+    phase: "profile",
+    active: false,
+  });
+
   // Refs to always have latest answers for submit (React state batching fix)
   const coreAnswersRef = useRef<Record<string, number>>({});
   const deepDiveAnswersRef = useRef<Record<string, number | string | string[]>>({});
@@ -370,11 +379,31 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
   }
 
   function handleProfileAnswerAndNext(fieldId: string, value: unknown) {
-    if (isTransitioningRef.current) return;
+    if (isTransitioningRef.current) {
+      // Race koruması: 300ms transition lock'u aktifken tıklama drop edilir.
+      // Kullanıcı çift tıklama yaptıysa zararsız; ama bir sonraki soruya
+      // erkenden tıkladıysa drop oluyor → telemetry için warn.
+      console.warn(
+        "[TestFlow] handleProfileAnswerAndNext dropped click (lock active):",
+        { fieldId, value },
+      );
+      return;
+    }
     isTransitioningRef.current = true;
 
     handleProfileAnswer(fieldId, value);
     setTimeout(() => {
+      // Recovery mode: kullanıcı eksik soruya yönlendirilmişti, cevapladı.
+      // Diğer cevaplı soruları tekrar gezdirme — direkt submit'i yeniden tetikle.
+      // Submit içindeki guard, kalan eksik varsa oraya zıplayacak veya
+      // hepsi tamamsa core/deep_dive'a geçecek.
+      if (recoveryModeRef.current.active && recoveryModeRef.current.phase === "profile") {
+        setError(null);
+        isTransitioningRef.current = false;
+        // setProfile async olduğu için bir tick bekleyip submit çağır
+        setTimeout(() => handleProfileSubmit(), 50);
+        return;
+      }
       if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
@@ -394,6 +423,14 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
     setCoreAnswers((prev) => ({ ...prev, [questionId]: value }));
 
     setTimeout(() => {
+      // Recovery mode: aynı mantık — eksik core cevabı verildi, doğrudan
+      // submit'i tekrar tetikle.
+      if (recoveryModeRef.current.active && recoveryModeRef.current.phase === "core") {
+        setError(null);
+        isTransitioningRef.current = false;
+        setTimeout(() => handleProfileSubmit(), 50);
+        return;
+      }
       if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
@@ -411,6 +448,14 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
     setDeepDiveAnswers((prev) => ({ ...prev, [questionId]: value }));
 
     setTimeout(() => {
+      // Recovery mode for deep dive: eksik deep_dive cevabı verildi, final analysis'i
+      // tekrar tetikle (içindeki guard kalan eksik varsa oraya zıplar).
+      if (recoveryModeRef.current.active && recoveryModeRef.current.phase === "deep_dive") {
+        setError(null);
+        isTransitioningRef.current = false;
+        setTimeout(() => handleFinalAnalysis(), 50);
+        return;
+      }
       if (currentIndexRef.current < totalPagesRef.current - 1) {
         goNext();
       } else {
@@ -471,11 +516,14 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
     if (missingProfileIdx >= 0) {
       const missing = visibleProfileFields[missingProfileIdx];
       console.warn("[TestFlow] submit öncesi eksik profil alanı:", missing.id);
+      // Recovery mode: cevap verildikten sonra goNext yerine bu fonksiyonu yeniden
+      // çağıracak ki kullanıcı diğer cevaplı soruları tekrar gezmek zorunda kalmasın.
+      recoveryModeRef.current = { phase: "profile", active: true };
       setCurrentStage(1);
       setCurrentIndex(missingProfileIdx);
       setDirection(1);
       setPhase("profile");
-      setError("Lütfen tüm profil sorularını cevaplayın. Atlanan bir soruya yönlendirildiniz.");
+      setError("Atlanan bir soru bulundu. Lütfen bu soruyu cevaplayın; kaldığınız yerden devam edeceksiniz.");
       return;
     }
 
@@ -488,14 +536,17 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
     if (missingCoreIdx >= 0) {
       const missing = sessionData.core_questions[missingCoreIdx];
       console.warn("[TestFlow] submit öncesi eksik core cevap:", missing.id);
+      recoveryModeRef.current = { phase: "core", active: true };
       setCurrentStage(2);
       setCurrentIndex(missingCoreIdx);
       setDirection(1);
       setPhase("core");
-      setError("Lütfen tüm soruları cevaplayın. Atlanan bir soruya yönlendirildiniz.");
+      setError("Atlanan bir soru bulundu. Lütfen bu soruyu cevaplayın; kaldığınız yerden devam edeceksiniz.");
       return;
     }
 
+    // Tüm guard'lar geçti → recovery mode'u kapat, normal submit akışına devam.
+    recoveryModeRef.current = { phase: "profile", active: false };
     setError(null);
     setPhase("loading");
 
@@ -540,14 +591,16 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
     if (missingDdIdx >= 0) {
       const missing = deepDiveQuestions[missingDdIdx];
       console.warn("[TestFlow] final submit öncesi eksik deep-dive cevap:", missing.id);
+      recoveryModeRef.current = { phase: "deep_dive", active: true };
       setCurrentStage(3);
       setCurrentIndex(missingDdIdx);
       setDirection(1);
       setPhase("deep_dive");
-      setError("Lütfen tüm soruları cevaplayın. Atlanan bir soruya yönlendirildiniz.");
+      setError("Atlanan bir soru bulundu. Lütfen bu soruyu cevaplayın; kaldığınız yerden devam edeceksiniz.");
       return;
     }
 
+    recoveryModeRef.current = { phase: "deep_dive", active: false };
     setPhase("submitting");
     setError(null);
 

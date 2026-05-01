@@ -116,28 +116,28 @@ export default function TestResultPage() {
     scrollTabIntoView(tabId);
   }, [scrollTabIntoView]);
 
-  useEffect(() => {
-    async function fetchTest() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+  const loadTest = useCallback(async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const { data } = await supabase
-        .from("test_invitations")
-        .select("*, client:clients(*)")
-        .eq("id", id)
-        .eq("professional_id", user.id)
-        .single();
+    const { data } = await supabase
+      .from("test_invitations")
+      .select("*, client:clients(*)")
+      .eq("id", id)
+      .eq("professional_id", user.id)
+      .single();
 
-      const testData = data as (TestInvitation & { client: Client }) | null;
-      setTest(testData);
-      setLoading(false);
-    }
-
-    fetchTest();
+    const testData = data as (TestInvitation & { client: Client }) | null;
+    setTest(testData);
+    setLoading(false);
   }, [id]);
+
+  useEffect(() => {
+    loadTest();
+  }, [loadTest]);
 
   async function markAsCompleted() {
     if (!test || markingComplete) return;
@@ -332,10 +332,13 @@ export default function TestResultPage() {
             <EmptyState
               icon={Calendar}
               title="Rapor verileri eksik"
-              description="Analiz tamamlandı ancak rapor verileri beklenen formatta değil"
+              description="Analiz tamamlandı ancak AI raporu üretilmemiş veya geçersiz. Aşağıdaki butona tıklayarak raporu yeniden üretebilirsiniz."
               actionLabel="Analizlere Dön"
               onAction={() => router.push("/tests")}
             />
+            <div className="mt-6 flex justify-center">
+              <RegenerateReportButton testId={id} onRegenerated={() => loadTest()} />
+            </div>
           </div>
         </main>
       </>
@@ -610,5 +613,104 @@ export default function TestResultPage() {
         </div>
       </main>
     </>
+  );
+}
+
+/**
+ * "Raporu Üret" butonu.
+ *
+ * Eski misconfig sebebiyle (yanlış API key → AI rapor devre dışı) tamamlanmış
+ * testlerin AI raporu yok. Bu buton orbiramind backend'in regenerate endpoint'ini
+ * tetikler, arka planda raporu poll eder ve bittiğinde test invitation'ı günceller.
+ * Frontend her 8 saniyede bir loadTest çağırarak otomatik yenilenir.
+ */
+function RegenerateReportButton({
+  testId,
+  onRegenerated,
+}: {
+  testId: string;
+  onRegenerated: () => void | Promise<void>;
+}) {
+  const [pending, setPending] = useState(false);
+  const [polling, setPolling] = useState(false);
+  const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+    };
+  }, []);
+
+  async function startPolling() {
+    setPolling(true);
+    let elapsed = 0;
+    const interval = 8_000;
+    const maxMs = 4 * 60 * 1000; // 4 dakika
+
+    pollTimerRef.current = setInterval(async () => {
+      elapsed += interval;
+      try {
+        await onRegenerated();
+      } catch {
+        /* swallow — bir sonraki tick yeniden dener */
+      }
+      if (elapsed >= maxMs) {
+        if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+        setPolling(false);
+        toast.error("Rapor süresi içinde hazır olmadı. Lütfen birkaç dakika sonra tekrar deneyin.");
+      }
+    }, interval);
+  }
+
+  async function handleClick() {
+    setPending(true);
+    try {
+      const res = await fetch(`/api/tests/${testId}/regenerate-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force: false }),
+      });
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(json?.error ?? `Failed: ${res.status}`);
+      }
+
+      if (json.status === "already_exists") {
+        toast.info("Rapor zaten mevcut. Sayfa yenileniyor...");
+        await onRegenerated();
+        return;
+      }
+
+      toast.success("Rapor üretimi başlatıldı. 30-90 saniye sürebilir.");
+      void startPolling();
+    } catch (err) {
+      toast.error(`Hata: ${err instanceof Error ? err.message : "Bilinmeyen"}`);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const busy = pending || polling;
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={busy}
+      className="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#5B7B6A] to-[#4A6A59] text-white font-medium shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+    >
+      {busy ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {polling ? "Rapor üretiliyor..." : "Başlatılıyor..."}
+        </>
+      ) : (
+        <>
+          <Loader2 className="h-4 w-4" />
+          Raporu Üret
+        </>
+      )}
+    </button>
   );
 }
