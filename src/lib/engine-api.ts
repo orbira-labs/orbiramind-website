@@ -3,8 +3,26 @@
 
 export type ProfileCategory = "demographic" | "physical" | "lifestyle" | "health" | "habit" | "nutrition" | "identity";
 
+/**
+ * Condition value tipleri spec'e göre esnektir:
+ * scalar (string|number|boolean) veya array. Karşılaştırma strict equality.
+ */
+export type ConditionScalar = string | number | boolean;
+export type ConditionValue = ConditionScalar | ConditionScalar[];
+
 export interface ProfileFieldConditions {
-  profile?: Record<string, string | string[] | boolean>;
+  profile?: Record<string, ConditionValue>;
+}
+
+/**
+ * Backend'den dönen kategori UI metadata'sı.
+ * `aqe.profile_fields.category_meta` jsonb'sinden gelir. Aynı kategoriye ait
+ * tüm field'lar aynı meta'yı taşır.
+ */
+export interface ProfileCategoryMeta {
+  label: string;
+  description?: string;
+  order: number;
 }
 
 export interface ProfileField {
@@ -12,74 +30,105 @@ export interface ProfileField {
   answer_type: "single_choice" | "boolean" | "text" | "multi_select" | "numeric";
   text: string;
   category?: ProfileCategory | string;
+  /** Kategori UI metadata (DB tek source of truth). Eski release'lerde olmayabilir. */
+  category_meta?: ProfileCategoryMeta;
+  /** Numeric input suffix birimi (örn. "cm", "kg"). Diğer answer_type'lar için undefined. */
+  unit?: string | null;
   options?: { value: string | boolean; label: string }[];
   numeric_range?: { min: number; max: number } | null;
   required?: boolean;
   stage?: number;
-  conditions?: ProfileFieldConditions;
-  skip_conditions?: Record<string, string[]>;
+  conditions?: ProfileFieldConditions | null;
+  skip_conditions?: Record<string, ConditionValue> | null;
   skip_default_value?: string | null;
 }
 
 /**
- * Evaluates if a profile field should be shown based on conditions and current profile values.
- * Returns true if the field should be shown, false if it should be skipped.
+ * Profile field conditional logic — KANONIK implementasyon.
+ *
+ * Spec: orbira-engines/engines/aqe/spec/conditional-logic.md
+ * Test: src/lib/__tests__/conditional-golden.test.ts (golden corpus, 56+ case)
+ *
+ * Backend (`supabase/functions/_shared/aqe/validators.ts`) ve mobile
+ * (`lib/aqe/models.dart`) ile **birebir aynı davranmak zorundadır**.
+ * Drift'i CI golden test yakalar.
+ *
+ * Kurallar (özet):
+ *   - Strict equality, type coercion YASAK (ASLA `String(value)` kullanma)
+ *   - undefined/null parent: conditions._in → hide, conditions._not → show, exact → hide
+ *   - skip_conditions undefined parent → ATLAMA YOK (her zaman)
+ *   - Multi-condition AND
+ *   - Multi-select parent: `_in` = overlap, `_not` = no overlap
  */
 export function shouldShowProfileField(
   field: ProfileField,
   profile: Record<string, unknown>
 ): boolean {
-  // Check skip_conditions first (format: {age_range_in: ["13_18"]})
-  if (field.skip_conditions && Object.keys(field.skip_conditions).length > 0) {
-    for (const [key, values] of Object.entries(field.skip_conditions)) {
-      if (key.endsWith("_in")) {
-        const fieldId = key.replace("_in", "");
-        const currentValue = profile[fieldId];
-        if (currentValue && values.includes(String(currentValue))) {
-          return false; // Skip this field
-        }
-      } else if (key.endsWith("_not")) {
-        const fieldId = key.replace("_not", "");
-        const currentValue = profile[fieldId];
-        if (currentValue && !values.includes(String(currentValue))) {
-          return false; // Skip this field
-        }
+  if (field.skip_conditions && typeof field.skip_conditions === "object") {
+    for (const [key, value] of Object.entries(field.skip_conditions)) {
+      if (matchesConditionExpression(key, value, profile, "skip")) {
+        return false;
       }
     }
   }
 
-  // Check conditions (format: {profile: {children_status_not: ["no_children"]}})
-  if (!field.conditions || Object.keys(field.conditions).length === 0) {
-    return true; // No conditions = always show
+  if (!field.conditions || typeof field.conditions !== "object") {
+    return true;
   }
-
   const profileConditions = field.conditions.profile;
-  if (!profileConditions || Object.keys(profileConditions).length === 0) {
-    return true; // No profile conditions = always show
+  if (!profileConditions || typeof profileConditions !== "object" || Object.keys(profileConditions).length === 0) {
+    return true;
   }
 
   for (const [key, value] of Object.entries(profileConditions)) {
-    if (key.endsWith("_not")) {
-      const fieldId = key.replace("_not", "");
-      const currentValue = profile[fieldId];
-      if (currentValue && Array.isArray(value) && value.includes(String(currentValue))) {
-        return false; // Condition not met - skip this field
-      }
-    } else if (key.endsWith("_in")) {
-      const fieldId = key.replace("_in", "");
-      const currentValue = profile[fieldId];
-      if (!currentValue || (Array.isArray(value) && !value.includes(String(currentValue)))) {
-        return false; // Condition not met - skip this field
-      }
-    } else {
-      const currentValue = profile[key];
-      if (currentValue !== value) {
-        return false; // Exact match failed - skip this field
-      }
+    if (!matchesConditionExpression(key, value, profile, "conditions")) {
+      return false;
     }
   }
 
-  return true; // All conditions met - show this field
+  return true;
+}
+
+function matchesConditionExpression(
+  key: string,
+  conditionValue: unknown,
+  profile: Record<string, unknown>,
+  channel: "conditions" | "skip"
+): boolean {
+  let parentId: string;
+  let operator: "in" | "not" | "exact";
+  if (key.endsWith("_in")) {
+    parentId = key.slice(0, -3);
+    operator = "in";
+  } else if (key.endsWith("_not")) {
+    parentId = key.slice(0, -4);
+    operator = "not";
+  } else {
+    parentId = key;
+    operator = "exact";
+  }
+
+  const parent = profile[parentId];
+
+  if (parent === undefined || parent === null) {
+    if (channel === "skip") return false;
+    if (operator === "not") return true;
+    return false;
+  }
+
+  if (operator === "exact") {
+    return parent === conditionValue;
+  }
+
+  const valueArray = Array.isArray(conditionValue) ? conditionValue : [conditionValue];
+
+  if (Array.isArray(parent)) {
+    const hasOverlap = parent.some((p) => valueArray.includes(p));
+    return operator === "in" ? hasOverlap : !hasOverlap;
+  }
+
+  const isMember = valueArray.includes(parent);
+  return operator === "in" ? isMember : !isMember;
 }
 
 export interface ProfileGroup {
@@ -89,30 +138,36 @@ export interface ProfileGroup {
   fields: ProfileField[];
 }
 
-const CATEGORY_META: Record<string, { label: string; description: string; order: number }> = {
-  demographic: { label: "Temel Bilgiler", description: "Sizi daha iyi tanımamız için birkaç temel bilgi.", order: 0 },
-  physical: { label: "Fiziksel Bilgiler", description: "Boy ve kilo bilgileriniz.", order: 1 },
-  lifestyle: { label: "Yaşam Tarzı", description: "Günlük yaşamınızı şekillendiren tercihler.", order: 2 },
-  health: { label: "Sağlık Durumu", description: "Genel sağlık profiliniz hakkında.", order: 3 },
-  habit: { label: "Alışkanlıklar", description: "Günlük alışkanlıklarınız.", order: 4 },
-  nutrition: { label: "Beslenme", description: "Beslenme tercihleriniz.", order: 5 },
-  identity: { label: "Kimlik & İlgi Alanları", description: "Sizi tanımlayan özellikler ve tercihleriniz.", order: 6 },
-};
-
+/**
+ * Field'ları kategoriye göre gruplar; her grubun label/description/order'ı
+ * backend'den gelen `category_meta`'dan okunur (DB = source of truth).
+ *
+ * Eski client release'lerinde `category_meta` olmayabilir veya yeni bir
+ * kategori (DB'de var, seed eksik) gelebilir; bu durumda field'ın ham
+ * `category` string'ini başlık olarak göster — kullanıcı stuck olmaz,
+ * developer bug'ı UI'da fark eder.
+ */
 export function groupProfileFields(fields: ProfileField[]): ProfileGroup[] {
-  const grouped = new Map<string, ProfileField[]>();
+  const grouped = new Map<string, { meta: ProfileCategoryMeta | null; items: ProfileField[] }>();
 
   for (const field of fields) {
     const cat = field.category ?? "other";
-    if (!grouped.has(cat)) grouped.set(cat, []);
-    grouped.get(cat)!.push(field);
+    if (!grouped.has(cat)) {
+      grouped.set(cat, { meta: field.category_meta ?? null, items: [] });
+    }
+    const entry = grouped.get(cat)!;
+    if (!entry.meta && field.category_meta) entry.meta = field.category_meta;
+    entry.items.push(field);
   }
 
   return Array.from(grouped.entries())
-    .map(([category, fields]) => {
-      const meta = CATEGORY_META[category] ?? { label: "Diğer", description: "", order: 99 };
-      return { category, label: meta.label, description: meta.description, fields, _order: meta.order };
-    })
+    .map(([category, { meta, items }]) => ({
+      category,
+      label: meta?.label ?? category,
+      description: meta?.description ?? "",
+      fields: items,
+      _order: meta?.order ?? 99,
+    }))
     .sort((a, b) => a._order - b._order)
     .map(({ _order, ...rest }) => rest);
 }
@@ -124,6 +179,17 @@ export interface CoreQuestion {
   scale_labels?: string[];
 }
 
+/**
+ * Pool UI metadata (backend'den gelir). 8 sabit token: body, character,
+ * lifestyle, mind, movement, nutrition, sleep, social. Yeni pool eklemek
+ * = mevcut token seç, client değişikliği gerekmez.
+ */
+export interface PoolUiCategory {
+  id: string;
+  label: string;
+  emoji?: string;
+}
+
 export interface DeepDiveQuestion {
   id: string;
   text: string;
@@ -131,6 +197,8 @@ export interface DeepDiveQuestion {
   answer_type?: "scale" | "single_choice" | "multi_select";
   scale_labels?: string[];
   options?: { value: string; label: string }[];
+  /** DB'deki `aqe.deep_dive_pools.ui_category` jsonb'si. */
+  ui_category?: PoolUiCategory;
 }
 
 /**
@@ -281,6 +349,15 @@ class EngineAPIError extends Error {
 const ENGINE_REQUEST_TIMEOUT_MS = 30_000;
 const ENGINE_COMPLETE_TIMEOUT_MS = 150_000; // 2.5 dakika - AI rapor üretimi uzun sürebilir
 
+// Backend `If-Question-Set-Version` header'ını okuyup outdated client tespiti
+// için kullanır. createSession response'undan dönen `versions.question_set`
+// burada cache'lenir; submitAnswers çağrılarına header olarak iletilir.
+let _lastQuestionSetVersion: string | null = null;
+
+export function setLastQuestionSetVersion(v: string | null): void {
+  _lastQuestionSetVersion = v;
+}
+
 async function secureApiFetch<T>(
   endpoint: string,
   body: Record<string, unknown>,
@@ -291,6 +368,9 @@ async function secureApiFetch<T>(
   };
   if (testToken) {
     headers["x-test-token"] = testToken;
+  }
+  if (_lastQuestionSetVersion && (endpoint === "answers" || endpoint === "complete")) {
+    headers["if-question-set-version"] = _lastQuestionSetVersion;
   }
 
   // Complete endpoint için daha uzun timeout (AI rapor üretimi)
@@ -351,8 +431,21 @@ async function secureApiFetch<T>(
   return (data.data ?? data) as T;
 }
 
+export interface SessionVersions {
+  question_set?: string;
+  routing?: string;
+  engine?: string;
+}
+
+export interface SessionDataWithVersions extends SessionData {
+  versions?: SessionVersions;
+}
+
 export async function createSession(testToken?: string): Promise<SessionData> {
-  return secureApiFetch<SessionData>("session", {}, testToken);
+  const data = await secureApiFetch<SessionDataWithVersions>("session", {}, testToken);
+  // Cache question_set version → submitAnswers/complete header olarak gider
+  setLastQuestionSetVersion(data.versions?.question_set ?? null);
+  return data;
 }
 
 export async function submitAnswers(

@@ -32,13 +32,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // QUESTION_SET_OUTDATED tespiti için client'ın elindeki versiyon header'ı
+    // backend'e iletilir (Faz 4.3).
+    const fwdHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+      "x-api-key": ENGINE_API_KEY,
+    };
+    const clientQuestionSetVersion = request.headers.get("if-question-set-version");
+    if (clientQuestionSetVersion) {
+      fwdHeaders["if-question-set-version"] = clientQuestionSetVersion;
+    }
+
     const response = await fetch(`${ENGINE_API_URL}/v1/sessions/${session_id}/answers`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-        "x-api-key": ENGINE_API_KEY,
-      },
+      headers: fwdHeaders,
       body: JSON.stringify({ profile, core_answers }),
     });
 

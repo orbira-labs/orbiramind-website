@@ -23,6 +23,22 @@ import {
   NumericQuestion,
   TextQuestion,
 } from "@/components/test/QuestionTypes";
+import { UnsupportedQuestionFallback } from "@/components/test/UnsupportedQuestionFallback";
+
+// Render edebildiğimiz answer_type'lar (client kontratı). DB'ye yeni bir tip
+// eklendiğinde önce buraya render dalı ekle, sonra DB'yi güncelle (Altın Kural #7).
+const SUPPORTED_PROFILE_TYPES = new Set([
+  "single_choice",
+  "boolean",
+  "multi_select",
+  "numeric",
+  "text",
+]);
+const SUPPORTED_DEEP_DIVE_TYPES = new Set([
+  "scale",
+  "single_choice",
+  "multi_select",
+]);
 import { AnimatePresence, motion } from "framer-motion";
 import { clsx } from "clsx";
 import { ChevronLeft, Activity, Sparkles } from "lucide-react";
@@ -707,8 +723,10 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
     currentTheme = getDimensionTheme(currentPage.question.dimension);
     dimensionLabel = getDimensionLabel(currentPage.question.dimension);
   } else if (phase === "deep_dive" && currentPage?.type === "deep_dive") {
-    currentTheme = getPoolTheme(currentPage.question.pool);
-    poolLabel = getPoolLabel(currentPage.question.pool);
+    // DB'den gelen ui_category.id pool tema lookup'ı için tercih edilir;
+    // yoksa pool string hash'i fallback olarak kullanılır.
+    currentTheme = getPoolTheme(currentPage.question.ui_category?.id ?? currentPage.question.pool);
+    poolLabel = getPoolLabel(currentPage.question.pool, currentPage.question.ui_category?.label);
   }
 
   return (
@@ -899,7 +917,7 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
                       max={currentPage.field.numeric_range?.max}
                       onAnswer={(val) => handleProfileAnswer(currentPage.field.id, val)}
                       onNext={handleProfileNext}
-                      suffix={currentPage.field.id === "height" ? "cm" : currentPage.field.id === "weight" ? "kg" : undefined}
+                      suffix={currentPage.field.unit ?? undefined}
                     />
                   )}
 
@@ -909,6 +927,22 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
                       value={profile[currentPage.field.id] as string}
                       onAnswer={(val) => handleProfileAnswer(currentPage.field.id, val)}
                       onNext={handleProfileNext}
+                    />
+                  )}
+
+                  {!SUPPORTED_PROFILE_TYPES.has(currentPage.field.answer_type) && (
+                    <UnsupportedQuestionFallback
+                      fieldId={currentPage.field.id}
+                      answerType={currentPage.field.answer_type}
+                      questionText={currentPage.field.text}
+                      onSkip={() => {
+                        if (currentIndex < totalPages - 1) {
+                          goNext();
+                        } else {
+                          setCurrentStage(2);
+                          setPhase("stage_intro");
+                        }
+                      }}
                     />
                   )}
                 </>
@@ -963,6 +997,22 @@ export function TestFlow({ token, clientName, professionalName }: TestFlowProps)
                       }}
                     />
                   )}
+
+                  {currentPage.question.answer_type !== undefined &&
+                    !SUPPORTED_DEEP_DIVE_TYPES.has(currentPage.question.answer_type) && (
+                      <UnsupportedQuestionFallback
+                        fieldId={currentPage.question.id}
+                        answerType={currentPage.question.answer_type}
+                        questionText={currentPage.question.text}
+                        onSkip={() => {
+                          if (currentIndex < totalPages - 1) {
+                            goNext();
+                          } else {
+                            handleFinalAnalysis();
+                          }
+                        }}
+                      />
+                    )}
                 </>
               )}
             </motion.div>

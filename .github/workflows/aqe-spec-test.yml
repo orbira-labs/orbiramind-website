@@ -1,0 +1,55 @@
+name: AQE Conditional-Logic Golden Test
+
+# orbira-engines'in conditional-logic spec'i ile orbiramind'ın
+# shouldShowProfileField implementasyonunun aynı davrandığını doğrular.
+# Drift olursa burada kırmızı yanar.
+
+on:
+  pull_request:
+    paths:
+      - 'src/lib/engine-api.ts'
+      - 'src/lib/__tests__/**'
+      - 'scripts/sync-aqe-spec.mjs'
+      - '.github/workflows/aqe-spec-test.yml'
+  push:
+    branches: [master, main]
+    paths:
+      - 'src/lib/engine-api.ts'
+      - 'src/lib/__tests__/**'
+  schedule:
+    # Haftalık drift kontrolü — orbira-engines'te spec değişmiş olabilir
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+jobs:
+  golden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout orbiramind-website
+        uses: actions/checkout@v4
+        with:
+          path: orbiramind-website
+
+      - name: Checkout orbira-engines (sibling for spec sync)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/orbira-engines
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: orbira-engines
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: orbiramind-website/package-lock.json
+
+      - name: Install deps
+        working-directory: orbiramind-website
+        run: npm ci
+
+      - name: Run golden tests
+        working-directory: orbiramind-website
+        env:
+          ORBIRA_ENGINES_PATH: ${{ github.workspace }}/orbira-engines
+        run: npm test
